@@ -61,6 +61,7 @@ Then open `http://localhost:4567`.
 ## Reporting Issues
 
 Open an issue with:
+
 - Expected behavior vs actual behavior
 - Steps to reproduce
 - Environment info (OS, Java/Node version)
