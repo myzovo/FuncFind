@@ -1,21 +1,49 @@
-MIT License
+Business Source License 1.1
 
-Copyright (c) 2026 FuncFind Contributors
+License text copyright (c) 2017 MariaDB Corporation Ab, All Rights Reserved.
+"Business Source License" is a trademark of MariaDB Corporation Ab.
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+Parameters
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
+Licensor: myzovo
+Licensed Work: FuncFind
+(The software and associated documentation files
+licensed under this BSL.)
+Change Date: 2030-05-06
+Change License: MIT License
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+Additional Use Grant: You may use, copy, modify, and distribute the
+Licensed Work for non-commercial purposes, including
+academic research and education, without a separate
+license.
+
+Notice
+
+The Licensor hereby grants you the right to copy, modify, create derivative
+works, redistribute, and make non-production use of the Licensed Work. The
+Licensor may make an Additional Use Grant, above and beyond the scope of this
+license, which is hereby incorporated by reference.
+
+Any use of the Licensed Work other than those permitted under this license
+or the Additional Use Grant is prohibited, and will make your license
+automatically terminate.
+
+The above permissions do not apply to any production use of the Licensed Work.
+"Production use" means use of the Licensed Work in a production environment,
+or making the Licensed Work available to third parties on a commercial basis,
+including as part of a product or service offered for a fee or other
+consideration.
+
+If your use is not permitted by this license, you must obtain a separate
+commercial license from the Licensor.
+
+On or after the Change Date, this license will automatically convert
+to the Change License. The Licensor hereby grants you, as of the Change Date,
+all the rights granted by the Change License.
+
+THE LICENSED WORK IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+LICENSOR BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN
+ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+WITH THE LICENSED WORK OR THE USE OR OTHER DEALINGS IN THE LICENSED WORK.
