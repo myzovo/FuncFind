@@ -6,16 +6,16 @@
 
 ## 项目概述
 
-| 维度     | 说明                                            |
-| -------- | ----------------------------------------------- |
-| 项目类型 | 智能网页功能导航 + RAG 知识检索                 |
+| 维度     | 说明                                                       |
+| -------- | ---------------------------------------------------------- |
+| 项目类型 | 智能网页功能导航 + RAG 知识检索                            |
 | 核心能力 | 网站爬取 → 元素提取 → 知识库构建 → 自然语言定位 → 跨页导航 |
-| 后端     | Java Spring Boot（Maven）                       |
-| 爬虫     | Node.js + Crawlee + Playwright                  |
-| 前端     | Vue 3（原生 JS，零构建工具依赖）                |
-| Widget   | 原生 JS（Shadow DOM，零依赖嵌入）               |
-| 向量库   | Cloudflare Vectorize（可替换）                  |
-| 许可证   | MIT                                              |
+| 后端     | Java Spring Boot（Maven）                                  |
+| 爬虫     | Node.js + Crawlee + Playwright                             |
+| 前端     | Vue 3（原生 JS，零构建工具依赖）                           |
+| Widget   | 原生 JS（Shadow DOM，零依赖嵌入）                          |
+| 向量库   | Cloudflare Vectorize（可替换）                             |
+| 许可证   | MIT                                                        |
 
 ---
 
@@ -98,10 +98,10 @@ FuncFind/
 
 ### 环境要求
 
-| 组件   | 要求                 |
-| ------ | -------------------- |
-| 后端   | Java 17+, Maven 3.6+ |
-| 爬虫   | Node.js 18+          |
+| 组件   | 要求                            |
+| ------ | ------------------------------- |
+| 后端   | Java 17+, Maven 3.6+            |
+| 爬虫   | Node.js 18+                     |
 | 浏览器 | Chromium（Playwright 自动安装） |
 
 ### 1. 启动 RAG 后端
@@ -112,7 +112,7 @@ cd backend
 # API 运行在 http://localhost:8080
 ```
 
-### 2. 启动爬虫控制台
+### 2. 启动爬虫控制台（入口）
 
 ```bash
 cd crawler
@@ -146,11 +146,11 @@ node server.js
 ```html
 <script>
   window.__SITE_NAV_CONFIG__ = {
-    apiBase: "http://localhost:8080",   // RAG 后端地址
-    kbName: "default-kb",               // 知识库名称
-    topK: 6,                            // 检索数量
-    title: "Site Navigator",            // Widget 标题
-    subtitle: "Ask where a feature lives"
+    apiBase: "http://localhost:8080", // RAG 后端地址
+    kbName: "default-kb", // 知识库名称
+    topK: 6, // 检索数量
+    title: "Site Navigator", // Widget 标题
+    subtitle: "Ask where a feature lives",
   };
 </script>
 <script src="widget/widget.js"></script>
@@ -164,26 +164,26 @@ Widget 使用 Shadow DOM 实现样式隔离，不会影响宿主页面样式。
 
 ### RAG 后端 (`localhost:8080`)
 
-| 端点                                    | 方法 | 说明                 |
-| --------------------------------------- | ---- | -------------------- |
-| `/api/documents/upload`                 | POST | 上传文档             |
-| `/api/knowledge-base/build`             | POST | 从文档构建知识库     |
-| `/api/knowledge-base/build-from-crawl`  | POST | 从爬取结果构建知识库 |
-| `/api/chat`                             | POST | 问答（返回定位提示） |
-| `/api/locate`                           | POST | 上报定位失败事件     |
-| `/api/runtime-config/apply`             | POST | 应用运行时配置       |
-| `/api/runtime-config/current`           | GET  | 查看当前配置         |
+| 端点                                   | 方法 | 说明                 |
+| -------------------------------------- | ---- | -------------------- |
+| `/api/documents/upload`                | POST | 上传文档             |
+| `/api/knowledge-base/build`            | POST | 从文档构建知识库     |
+| `/api/knowledge-base/build-from-crawl` | POST | 从爬取结果构建知识库 |
+| `/api/chat`                            | POST | 问答（返回定位提示） |
+| `/api/locate`                          | POST | 上报定位失败事件     |
+| `/api/runtime-config/apply`            | POST | 应用运行时配置       |
+| `/api/runtime-config/current`          | GET  | 查看当前配置         |
 
 ### 爬虫控制台 (`localhost:3456`)
 
-| 端点                          | 方法 | 说明             |
-| ----------------------------- | ---- | ---------------- |
-| `/api/crawl/start`            | POST | 启动爬取         |
-| `/api/crawl/stop`             | POST | 停止爬取         |
-| `/api/status`                 | GET  | 爬取状态         |
-| `/api/results`                | GET  | 获取结果         |
-| `/api/rag/build-from-crawl`   | POST | 推送到 RAG       |
-| `/api/datasets`               | GET  | 列出历史数据集   |
+| 端点                        | 方法 | 说明           |
+| --------------------------- | ---- | -------------- |
+| `/api/crawl/start`          | POST | 启动爬取       |
+| `/api/crawl/stop`           | POST | 停止爬取       |
+| `/api/status`               | GET  | 爬取状态       |
+| `/api/results`              | GET  | 获取结果       |
+| `/api/rag/build-from-crawl` | POST | 推送到 RAG     |
+| `/api/datasets`             | GET  | 列出历史数据集 |
 
 完整 API 文档见 [docs/API_CONTRACT.md](docs/API_CONTRACT.md)。
 
