@@ -1226,31 +1226,58 @@
     }
 
     /* Chat Form */
-    #view-chat .chat-form { display: grid; gap: 10px; }
+    #view-chat .chat-form { display: grid; gap: 10px; position: relative; }
 
-    /* Chat Config (expandable advanced settings) */
+    /* Chat Config — absolute popover (does NOT affect layout) */
     #view-chat .chat-config {
-      border: 1px solid rgba(36,91,255,0.12);
+      position: absolute;
+      right: 0;
+      bottom: calc(100% + 12px);
+      width: 520px;
+      max-width: calc(100vw - 48px);
+      max-height: 420px;
+      overflow-y: auto;
+      border: 1px solid rgba(36,91,255,0.15);
       border-radius: 16px;
-      background: rgba(255,255,255,0.72);
-      overflow: hidden;
-      animation: config-slide-in 0.25s cubic-bezier(0.16,1,0.3,1) both;
+      background: rgba(255,255,255,0.98);
+      backdrop-filter: blur(20px) saturate(1.2);
+      -webkit-backdrop-filter: blur(20px) saturate(1.2);
+      box-shadow: 0 18px 50px rgba(15,26,54,0.18), 0 2px 8px rgba(15,26,54,0.06);
+      z-index: 200;
+      animation: config-pop-in 0.22s cubic-bezier(0.16,1,0.3,1) both;
     }
-    @keyframes config-slide-in { from { opacity:0; transform:translateY(-6px) } to { opacity:1; transform:translateY(0) } }
+    @keyframes config-pop-in { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+
+    /* Arrow pointer pointing down to the gear button */
+    #view-chat .chat-config-arrow {
+      position: absolute;
+      bottom: -8px;
+      right: 52px;
+      width: 16px;
+      height: 8px;
+      background: rgba(255,255,255,0.98);
+      clip-path: polygon(0 0, 100% 0, 50% 100%);
+      border-left: 1px solid rgba(36,91,255,0.15);
+      border-right: 1px solid rgba(36,91,255,0.15);
+    }
 
     #view-chat .chat-config-head {
       display: flex; justify-content: space-between; align-items: center;
-      padding: 12px 16px;
-      border-bottom: 1px solid rgba(36,91,255,0.06);
-      font-size: 13px; font-weight: 700; color: #0f1a36;
+      padding: 14px 18px;
+      border-bottom: 1px solid rgba(36,91,255,0.08);
+      font-size: 13.5px; font-weight: 700; color: #0f1a36;
+      position: sticky; top: 0; background: rgba(255,255,255,0.98);
+      backdrop-filter: blur(20px);
+      z-index: 1;
+      border-radius: 16px 16px 0 0;
     }
     #view-chat .chat-config-close { font-size: 14px; padding: 4px 8px; border-radius: 6px; }
-    #view-chat .chat-config-body { padding: 14px 16px; }
+    #view-chat .chat-config-body { padding: 14px 18px; }
     #view-chat .chat-config-body .runtime-grid { margin: 0; padding: 0; border: none; }
     #view-chat .chat-config-body .actions-row { margin: 0; padding-top: 12px; }
 
-    /* Chat Input Bar */
-    #view-chat .chat-input-bar { display: grid; gap: 8px; }
+    /* Chat Input Bar — relative for popover positioning */
+    #view-chat .chat-input-bar { display: grid; gap: 8px; position: relative; }
     #view-chat .chat-input-bar textarea {
       border-radius: 16px; padding: 14px 16px;
       font-size: 14px; min-height: 72px; max-height: 140px;
@@ -1754,82 +1781,6 @@
             </div>
 
             <form class="chat-form" @submit.prevent="sendMessage">
-              <!-- Expandable Advanced Settings -->
-              <div class="chat-config" v-if="showChatSettings">
-                <div class="chat-config-head">
-                  <span>
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;vertical-align:-2px"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-                    高级 API 配置（会话级）
-                  </span>
-                  <button type="button" class="icon-btn chat-config-close" @click="showChatSettings = false" title="关闭">✕</button>
-                </div>
-                <div class="chat-config-body">
-                  <div class="runtime-grid">
-                    <label>
-                      生成模型
-                      <select v-model="settings.generationModel">
-                        <option>gpt-4o-mini</option>
-                        <option>llama-3-8b-instruct-q4</option>
-                        <option>qwen2.5-7b-instruct</option>
-                        <option>deepseek-chat</option>
-                        <option>claude-3-haiku</option>
-                      </select>
-                    </label>
-                    <label>
-                      Generation Provider
-                      <select v-model="runtimeConfig.generation.providerType">
-                        <option value="workers-ai">workers-ai</option>
-                        <option value="external">external</option>
-                      </select>
-                    </label>
-                    <label>
-                      Generation Base URL
-                      <input v-model="runtimeConfig.generation.baseUrl" type="text" placeholder="例如: http://localhost:9000" />
-                    </label>
-                    <label>
-                      Generation API Key
-                      <div class="secret-field">
-                        <input v-model="runtimeConfig.generation.apiKey" :type="showSecrets.generationApiKey ? 'text' : 'password'" placeholder="仅用于会话配置接口" autocomplete="off" />
-                        <button class="icon-btn" type="button" @click="showSecrets.generationApiKey = !showSecrets.generationApiKey">{{ showSecrets.generationApiKey ? '隐藏' : '显示' }}</button>
-                      </div>
-                      <small class="secret-hint" v-if="runtimeServerState.hasGenerationApiKey">服务端已保存: {{ runtimeServerState.generationApiKeyMasked || '已设置' }}</small>
-                    </label>
-                    <label>
-                      Cloudflare Account ID
-                      <input v-model="runtimeConfig.cloudflare.accountId" type="text" placeholder="例如: 2f4d..." />
-                    </label>
-                    <label>
-                      Cloudflare API Token
-                      <div class="secret-field">
-                        <input v-model="runtimeConfig.cloudflare.apiToken" :type="showSecrets.cloudflareToken ? 'text' : 'password'" placeholder="仅用于会话配置接口" autocomplete="off" />
-                        <button class="icon-btn" type="button" @click="showSecrets.cloudflareToken = !showSecrets.cloudflareToken">{{ showSecrets.cloudflareToken ? '隐藏' : '显示' }}</button>
-                      </div>
-                      <small class="secret-hint" v-if="runtimeServerState.hasCloudflareToken">服务端已保存: {{ runtimeServerState.cloudflareTokenMasked || '已设置' }}</small>
-                    </label>
-                    <label>
-                      Vectorize Index Name
-                      <input v-model="runtimeConfig.cloudflare.vectorizeIndexName" type="text" placeholder="例如: docvec-prod" />
-                    </label>
-                    <label>
-                      Vectorize Namespace
-                      <input v-model="runtimeConfig.cloudflare.vectorizeNamespace" type="text" placeholder="例如: kb-default" />
-                    </label>
-                    <label>
-                      R2 Bucket
-                      <input v-model="runtimeConfig.cloudflare.r2Bucket" type="text" placeholder="例如: docvec-raw" />
-                    </label>
-                  </div>
-
-                  <div class="actions-row" style="padding-top:12px;">
-                    <button type="button" class="btn ghost small" :disabled="loadingRuntimeConfig" @click="loadRuntimeConfigFromServer(false)">{{ loadingRuntimeConfig ? '读取中...' : '读取当前配置' }}</button>
-                    <button type="button" class="btn small" :disabled="applyingRuntimeConfig" @click="applyRuntimeConfig">{{ applyingRuntimeConfig ? '应用中...' : '应用会话配置' }}</button>
-                  </div>
-
-                  <p class="status-text" v-if="runtimeConfigMessage" style="margin-top:10px;">{{ runtimeConfigMessage }}</p>
-                  <p class="status-text" v-if="runtimeServerState.appliedAt" style="margin-top:4px;">最近应用时间: {{ runtimeServerState.appliedAt }}</p>
-                </div>
-              </div>
-
               <!-- Chat Input Bar -->
               <div class="chat-input-bar">
                 <textarea v-model="draft" rows="2" placeholder="请输入问题，例如：请总结这份技术文档的关键接口与约束"></textarea>
@@ -1850,6 +1801,83 @@
                     <svg v-if="!chatting" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
                     {{ chatting ? '思考中...' : '发送' }}
                   </button>
+                </div>
+
+                <!-- Popover Advanced Settings -->
+                <div class="chat-config" v-if="showChatSettings">
+                  <div class="chat-config-head">
+                    <span>
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;vertical-align:-2px"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                      高级 API 配置（会话级）
+                    </span>
+                    <button type="button" class="icon-btn chat-config-close" @click="showChatSettings = false" title="关闭">✕</button>
+                  </div>
+                  <div class="chat-config-body">
+                    <div class="runtime-grid">
+                      <label>
+                        生成模型
+                        <select v-model="settings.generationModel">
+                          <option>gpt-4o-mini</option>
+                          <option>llama-3-8b-instruct-q4</option>
+                          <option>qwen2.5-7b-instruct</option>
+                          <option>deepseek-chat</option>
+                          <option>claude-3-haiku</option>
+                        </select>
+                      </label>
+                      <label>
+                        生成服务商 Provider
+                        <select v-model="runtimeConfig.generation.providerType">
+                          <option value="workers-ai">workers-ai</option>
+                          <option value="external">external</option>
+                        </select>
+                      </label>
+                      <label>
+                        生成服务地址 Base URL
+                        <input v-model="runtimeConfig.generation.baseUrl" type="text" placeholder="例如: http://localhost:9000" />
+                      </label>
+                      <label>
+                        API 密钥 API Key
+                        <div class="secret-field">
+                          <input v-model="runtimeConfig.generation.apiKey" :type="showSecrets.generationApiKey ? 'text' : 'password'" placeholder="仅用于会话配置接口" autocomplete="off" />
+                          <button class="icon-btn" type="button" @click="showSecrets.generationApiKey = !showSecrets.generationApiKey">{{ showSecrets.generationApiKey ? '隐藏' : '显示' }}</button>
+                        </div>
+                        <small class="secret-hint" v-if="runtimeServerState.hasGenerationApiKey">服务端已保存: {{ runtimeServerState.generationApiKeyMasked || '已设置' }}</small>
+                      </label>
+                      <label>
+                        Cloudflare 账户 ID
+                        <input v-model="runtimeConfig.cloudflare.accountId" type="text" placeholder="例如: 2f4d..." />
+                      </label>
+                      <label>
+                        Cloudflare API 令牌 Token
+                        <div class="secret-field">
+                          <input v-model="runtimeConfig.cloudflare.apiToken" :type="showSecrets.cloudflareToken ? 'text' : 'password'" placeholder="仅用于会话配置接口" autocomplete="off" />
+                          <button class="icon-btn" type="button" @click="showSecrets.cloudflareToken = !showSecrets.cloudflareToken">{{ showSecrets.cloudflareToken ? '隐藏' : '显示' }}</button>
+                        </div>
+                        <small class="secret-hint" v-if="runtimeServerState.hasCloudflareToken">服务端已保存: {{ runtimeServerState.cloudflareTokenMasked || '已设置' }}</small>
+                      </label>
+                      <label>
+                        向量索引名称 Vectorize Index
+                        <input v-model="runtimeConfig.cloudflare.vectorizeIndexName" type="text" placeholder="例如: docvec-prod" />
+                      </label>
+                      <label>
+                        向量命名空间 Namespace
+                        <input v-model="runtimeConfig.cloudflare.vectorizeNamespace" type="text" placeholder="例如: kb-default" />
+                      </label>
+                      <label>
+                        R2 存储桶 Bucket
+                        <input v-model="runtimeConfig.cloudflare.r2Bucket" type="text" placeholder="例如: docvec-raw" />
+                      </label>
+                    </div>
+
+                    <div class="actions-row" style="padding-top:12px;">
+                      <button type="button" class="btn ghost small" :disabled="loadingRuntimeConfig" @click="loadRuntimeConfigFromServer(false)">{{ loadingRuntimeConfig ? '读取中...' : '读取当前配置' }}</button>
+                      <button type="button" class="btn small" :disabled="applyingRuntimeConfig" @click="applyRuntimeConfig">{{ applyingRuntimeConfig ? '应用中...' : '应用会话配置' }}</button>
+                    </div>
+
+                    <p class="status-text" v-if="runtimeConfigMessage" style="margin-top:10px;">{{ runtimeConfigMessage }}</p>
+                    <p class="status-text" v-if="runtimeServerState.appliedAt" style="margin-top:4px;">最近应用时间: {{ runtimeServerState.appliedAt }}</p>
+                  </div>
+                  <div class="chat-config-arrow"></div>
                 </div>
               </div>
             </form>

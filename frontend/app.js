@@ -358,7 +358,9 @@ createApp({
       }
 
       this.runtimeServerState.appliedAt = responseData.appliedAt || "";
-      this.settings.generationModel = this.runtimeConfig.generation.generationModelId || this.settings.generationModel;
+      if (responseData.generation && responseData.generation.generationModelId) {
+        this.settings.generationModel = responseData.generation.generationModelId;
+      }
       this.persistRuntimeSnapshot(this.currentKbName());
     },
     async loadRuntimeConfigFromServer(silent = false) {
@@ -397,6 +399,11 @@ createApp({
 
       const kbName = this.currentKbName();
       this.persistRuntimeSnapshot(kbName);
+
+      // Sync user-selected model into runtime config before applying
+      if (this.settings.generationModel) {
+        this.runtimeConfig.generation.generationModelId = this.settings.generationModel;
+      }
 
       const payload = {
         kbName,
