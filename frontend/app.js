@@ -114,6 +114,8 @@ createApp({
       // --- Crawled KB support ---
       crawledKbs: [],
       crawledKbActive: false,
+      // --- Chat settings ---
+      showChatSettings: false,
     };
   },
   computed: {

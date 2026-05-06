@@ -1097,34 +1097,168 @@ input[type="range"]::-moz-range-thumb {
   gap: 10px;
 }
 
-.chat-form textarea {
-  border-radius: var(--radius-md);
+/* ---- Chat Config (expandable advanced settings) ---- */
+
+.chat-config {
+  border: 1px solid rgba(36, 91, 255, 0.12);
+  border-radius: var(--radius-lg);
+  background: var(--surface-0);
+  overflow: hidden;
+  animation: config-slide-in 0.25s var(--ease-out) both;
+}
+
+@keyframes config-slide-in {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.chat-config-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  border-bottom: 1px solid rgba(36, 91, 255, 0.06);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ink-strong);
+}
+
+.chat-config-close {
+  font-size: 14px;
+  padding: 4px 8px;
+  border-radius: 6px;
+}
+
+.chat-config-body {
+  padding: 14px 16px;
+}
+
+.chat-config-body .runtime-grid {
+  margin: 0;
+  padding: 0;
+  border: none;
+}
+
+.chat-config-body .actions-row {
+  margin: 0;
+  padding-top: 12px;
+}
+
+/* ---- Chat Input Bar ---- */
+
+.chat-input-bar {
+  display: grid;
+  gap: 8px;
+}
+
+.chat-input-bar textarea {
+  border-radius: var(--radius-lg);
   padding: 14px 16px;
   font-size: 14px;
-  min-height: 80px;
+  min-height: 72px;
+  max-height: 140px;
   border: 1.5px solid rgba(36, 91, 255, 0.1);
   transition: all 0.25s var(--ease-out);
 }
 
-.chat-form textarea:focus {
+.chat-input-bar textarea:focus {
   border-color: var(--primary);
   box-shadow: var(--shadow-glow);
-  min-height: 100px;
+  min-height: 88px;
 }
 
-.chat-actions {
+.chat-input-actions {
   display: flex;
-  justify-content: flex-end;
+  align-items: center;
   gap: 8px;
 }
 
-.chat-actions .btn {
+/* ---- Model Picker ---- */
+
+.model-picker {
+  flex-shrink: 0;
+}
+
+.model-picker select {
+  width: auto;
+  min-width: 140px;
+  padding: 8px 28px 8px 10px;
+  font-size: 12px;
+  font-weight: 600;
+  border-radius: 999px;
+  border: 1.5px solid rgba(36, 91, 255, 0.12);
+  background: var(--surface-2);
+  color: var(--ink-strong);
+  cursor: pointer;
+  transition: all 0.25s var(--ease-out);
+  background-image: url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L5 5L9 1' stroke='%237b8bb2' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+}
+
+.model-picker select:hover {
+  border-color: rgba(36, 91, 255, 0.25);
+  background: #fff;
+}
+
+.model-picker select:focus {
+  border-color: var(--primary);
+  box-shadow: var(--shadow-glow);
+}
+
+/* ---- Settings Toggle ---- */
+
+.settings-toggle {
+  flex-shrink: 0;
+  width: 38px;
+  height: 38px;
+  border-radius: 999px;
+  border: 1.5px solid rgba(36, 91, 255, 0.1);
+  background: var(--surface-2);
+  color: var(--ink-muted);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.25s var(--ease-out);
+}
+
+.settings-toggle svg {
+  width: 18px;
+  height: 18px;
+  transition: transform 0.4s var(--ease-out);
+}
+
+.settings-toggle:hover {
+  border-color: rgba(36, 91, 255, 0.25);
+  background: #fff;
+  color: var(--primary);
+}
+
+.settings-toggle:hover svg {
+  transform: rotate(60deg);
+}
+
+.settings-toggle.active {
+  border-color: var(--primary);
+  background: var(--primary-soft);
+  color: var(--primary);
+  box-shadow: 0 0 0 3px var(--primary-glow);
+}
+
+/* ---- Send Button ---- */
+
+.send-btn {
+  flex-shrink: 0;
   display: inline-flex;
   align-items: center;
   gap: 6px;
+  padding: 10px 20px;
+  font-size: 14px;
+  border-radius: 999px;
 }
 
-.chat-actions .btn svg {
+.send-btn svg {
   width: 16px;
   height: 16px;
 }
