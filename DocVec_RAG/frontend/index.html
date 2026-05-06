@@ -1,0 +1,279 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DocVec Studio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700;800&family=Noto+Sans+SC:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div id="app" v-cloak>
+      <header class="hero reveal">
+        <div class="hero-badge">RAG Workspace</div>
+        <h1>DocVec Studio</h1>
+        <p>
+          上传文档、构建知识库、网页聊天问答，一屏完成。<br />
+          前端已支持拖拽上传与参数化构建，后端可直接对接 Spring Boot API。
+        </p>
+        <div class="hero-metrics">
+          <span>Session: {{ clientSessionIdShort }}</span>
+          <span>Chunk Size: {{ settings.chunkSize }}</span>
+          <span>Threshold: {{ settings.semanticThreshold.toFixed(2) }}</span>
+          <span>Top-K: {{ settings.topK }}</span>
+        </div>
+      </header>
+
+      <main class="workspace">
+        <section class="panel reveal upload-panel">
+          <div class="panel-head">
+            <h2>1) 文档上传与预处理</h2>
+            <span class="chip" :class="selectedFiles.length ? 'ok' : 'idle'">
+              {{ selectedFiles.length }} files
+            </span>
+          </div>
+
+          <div
+            class="dropzone"
+            :class="{ active: dragActive }"
+            @dragover.prevent="dragActive = true"
+            @dragleave.prevent="dragActive = false"
+            @drop.prevent="handleDrop"
+          >
+            <input ref="fileInput" type="file" multiple accept=".pdf,.docx,.txt" @change="handleFileChoose" hidden />
+            <p>将 PDF / DOCX / TXT 拖到这里，或点击按钮选择</p>
+            <button class="btn ghost" @click="openFilePicker">选择文件</button>
+          </div>
+
+          <ul class="file-list" v-if="selectedFiles.length">
+            <li v-for="file in selectedFiles" :key="file.id" class="file-item">
+              <div>
+                <strong>{{ file.name }}</strong>
+                <small>{{ formatBytes(file.size) }}</small>
+              </div>
+              <button class="icon-btn" @click="removeFile(file.id)">删除</button>
+            </li>
+          </ul>
+
+          <div class="settings-grid">
+            <label>
+              知识库名称
+              <input v-model.lazy="settings.kbName" type="text" placeholder="例如: product-docs" />
+            </label>
+            <label>
+              API Base URL
+              <input v-model="settings.apiBase" type="text" placeholder="http://localhost:8080/api" />
+            </label>
+            <label>
+              Embedding 模型
+              <select v-model="settings.embeddingModel">
+                <option>all-MiniLM-L6-v2</option>
+                <option>bge-small-zh-v1.5</option>
+                <option>text-embedding-3-small</option>
+              </select>
+            </label>
+            <label>
+              生成模型
+              <select v-model="settings.generationModel">
+                <option>gpt-4o-mini</option>
+                <option>llama-3-8b-instruct-q4</option>
+                <option>qwen2.5-7b-instruct</option>
+              </select>
+            </label>
+          </div>
+
+          <details class="advanced-config">
+            <summary>
+              <span>高级 API 配置（会话级）</span>
+              <small>按 kbName 独立快照，不把密钥放入业务请求体</small>
+            </summary>
+
+            <div class="runtime-grid">
+              <label>
+                Cloudflare Account ID
+                <input v-model="runtimeConfig.cloudflare.accountId" type="text" placeholder="例如: 2f4d..." />
+              </label>
+
+              <label>
+                Cloudflare API Token
+                <div class="secret-field">
+                  <input
+                    v-model="runtimeConfig.cloudflare.apiToken"
+                    :type="showSecrets.cloudflareToken ? 'text' : 'password'"
+                    placeholder="仅用于会话配置接口"
+                    autocomplete="off"
+                  />
+                  <button class="icon-btn" type="button" @click="showSecrets.cloudflareToken = !showSecrets.cloudflareToken">
+                    {{ showSecrets.cloudflareToken ? '隐藏' : '显示' }}
+                  </button>
+                </div>
+                <small class="secret-hint" v-if="runtimeServerState.hasCloudflareToken">
+                  服务端已保存 Token: {{ runtimeServerState.cloudflareTokenMasked || '已设置' }}
+                </small>
+              </label>
+
+              <label>
+                Vectorize Index Name
+                <input v-model="runtimeConfig.cloudflare.vectorizeIndexName" type="text" placeholder="例如: docvec-prod" />
+              </label>
+
+              <label>
+                Vectorize Namespace
+                <input v-model="runtimeConfig.cloudflare.vectorizeNamespace" type="text" placeholder="例如: kb-default" />
+              </label>
+
+              <label>
+                R2 Bucket
+                <input v-model="runtimeConfig.cloudflare.r2Bucket" type="text" placeholder="例如: docvec-raw" />
+              </label>
+
+              <label>
+                Generation Provider
+                <select v-model="runtimeConfig.generation.providerType">
+                  <option value="workers-ai">workers-ai</option>
+                  <option value="external">external</option>
+                </select>
+              </label>
+
+              <label>
+                Generation Base URL
+                <input v-model="runtimeConfig.generation.baseUrl" type="text" placeholder="例如: http://localhost:9000" />
+              </label>
+
+              <label>
+                Generation API Key
+                <div class="secret-field">
+                  <input
+                    v-model="runtimeConfig.generation.apiKey"
+                    :type="showSecrets.generationApiKey ? 'text' : 'password'"
+                    placeholder="仅用于会话配置接口"
+                    autocomplete="off"
+                  />
+                  <button class="icon-btn" type="button" @click="showSecrets.generationApiKey = !showSecrets.generationApiKey">
+                    {{ showSecrets.generationApiKey ? '隐藏' : '显示' }}
+                  </button>
+                </div>
+                <small class="secret-hint" v-if="runtimeServerState.hasGenerationApiKey">
+                  服务端已保存 API Key: {{ runtimeServerState.generationApiKeyMasked || '已设置' }}
+                </small>
+              </label>
+
+              <label>
+                Generation Model ID
+                <input
+                  v-model="runtimeConfig.generation.generationModelId"
+                  type="text"
+                  placeholder="例如: gpt-4o-mini"
+                />
+              </label>
+            </div>
+
+            <div class="actions-row">
+              <button class="btn ghost" :disabled="loadingRuntimeConfig" @click="loadRuntimeConfigFromServer(false)">
+                {{ loadingRuntimeConfig ? '读取中...' : '读取当前配置' }}
+              </button>
+              <button class="btn" :disabled="applyingRuntimeConfig" @click="applyRuntimeConfig">
+                {{ applyingRuntimeConfig ? '应用中...' : '应用会话配置' }}
+              </button>
+            </div>
+
+            <p class="status-text" v-if="runtimeConfigMessage">{{ runtimeConfigMessage }}</p>
+            <p class="status-text" v-if="runtimeServerState.appliedAt">
+              最近应用时间: {{ runtimeServerState.appliedAt }}
+            </p>
+          </details>
+
+          <div class="slider-group">
+            <label>
+              预分块长度: {{ settings.chunkSize }}
+              <input v-model.number="settings.chunkSize" type="range" min="300" max="1200" step="50" />
+            </label>
+            <label>
+              语义阈值: {{ settings.semanticThreshold.toFixed(2) }}
+              <input v-model.number="settings.semanticThreshold" type="range" min="0.5" max="0.95" step="0.01" />
+            </label>
+            <label>
+              检索 Top-K: {{ settings.topK }}
+              <input v-model.number="settings.topK" type="range" min="3" max="12" step="1" />
+            </label>
+          </div>
+
+          <div class="actions-row">
+            <button class="btn" :disabled="!selectedFiles.length || uploading" @click="uploadDocuments">
+              {{ uploading ? '上传中...' : '上传文档' }}
+            </button>
+            <button class="btn accent" :disabled="!selectedFiles.length || buildingKb" @click="buildKnowledgeBase">
+              {{ buildingKb ? '构建中...' : '构建知识库' }}
+            </button>
+          </div>
+
+          <ol class="pipeline">
+            <li :class="pipelineState.extract">提取纯文本</li>
+            <li :class="pipelineState.chunk">混合分块</li>
+            <li :class="pipelineState.embed">向量化</li>
+            <li :class="pipelineState.index">写入向量库</li>
+          </ol>
+
+          <p class="status-text" v-if="systemMessage">{{ systemMessage }}</p>
+        </section>
+
+        <!-- ====== 已爬取知识库 ====== -->
+        <section class="panel reveal crawl-kb-panel" v-if="crawledKbs.length">
+          <div class="panel-head">
+            <h2>📦 已爬取知识库</h2>
+            <span class="chip ok">{{ crawledKbs.length }} KB(s)</span>
+          </div>
+          <p class="hint" style="margin:0 0 12px 0;color:var(--muted);font-size:0.85rem;">
+            来自爬虫控制台的 RAG 构建结果，无需上传文档即可直接对话。
+          </p>
+          <div class="crawl-kb-list">
+            <div v-for="(kb, idx) in crawledKbs" :key="idx" class="crawl-kb-item">
+              <div>
+                <strong>{{ kb.kbName }}</strong>
+                <small>{{ kb.dataset }} · {{ kb.pushedAt ? new Date(kb.pushedAt).toLocaleString() : '' }}</small>
+              </div>
+              <button class="btn small" @click="useCrawledKb(kb)">使用此知识库</button>
+            </div>
+          </div>
+          <button class="btn ghost small" style="margin-top:8px;" @click="clearCrawledKbs">清除列表</button>
+        </section>
+
+        <section class="panel reveal chat-panel">
+          <div class="panel-head">
+            <h2>2) 网页 AI 聊天</h2>
+            <span class="chip" :class="kbReady ? 'ok' : 'warn'">
+              {{ kbReady ? 'Knowledge Base Ready' : 'Knowledge Base Not Ready' }}
+            </span>
+          </div>
+
+          <div class="chat-feed" ref="chatFeed">
+            <article v-for="msg in messages" :key="msg.id" class="bubble" :class="msg.role">
+              <h4>{{ msg.role === 'user' ? '你' : msg.role === 'assistant' ? 'AI' : '系统' }}</h4>
+              <p>{{ msg.content }}</p>
+            </article>
+          </div>
+
+          <form class="chat-form" @submit.prevent="sendMessage">
+            <textarea
+              v-model="draft"
+              rows="3"
+              placeholder="请输入问题，例如：请总结这份技术文档的关键接口与约束"
+            ></textarea>
+            <div class="chat-actions">
+              <button class="btn accent" :disabled="chatting || !draft.trim()">
+                {{ chatting ? '思考中...' : '发送问题' }}
+              </button>
+            </div>
+          </form>
+        </section>
+      </main>
+    </div>
+
+    <script type="module" src="./app.js"></script>
+  </body>
+</html>

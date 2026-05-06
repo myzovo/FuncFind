@@ -1,0 +1,28 @@
+# Java
+target/
+*.class
+*.jar
+*.war
+!mvnw
+!.mvn/
+
+# Node.js
+node_modules/
+npm-debug.log*
+
+# IDE
+.idea/
+*.iml
+.vscode/
+.trae/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Crawler storage (runtime data)
+Web_intelligent_function_navigation/storage/
+
+# Environment
+.env
+.env.local

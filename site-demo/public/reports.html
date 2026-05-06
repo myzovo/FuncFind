@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Reports</title>
+  <style>
+    body {
+      font-family: "Sora", sans-serif;
+      background: #fefce8;
+      margin: 0;
+      padding: 32px;
+      color: #0f172a;
+    }
+
+    .card {
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 16px;
+      box-shadow: 0 10px 22px rgba(15, 23, 42, 0.08);
+    }
+
+    .btn {
+      display: inline-block;
+      padding: 10px 14px;
+      border-radius: 10px;
+      background: #0f766e;
+      color: #fff;
+      font-weight: 600;
+      border: none;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>Reports</h1>
+    <p>Export and download reports from this page.</p>
+    <button class="btn" id="export-report-btn" data-testid="export-report">Export Report</button>
+    <button class="btn" id="download-summary">Download Summary</button>
+  </div>
+
+  <script>
+    window.__SITE_NAV_CONFIG__ = {
+      apiBase: "http://localhost:8080",
+      kbName: "demo-kb",
+      topK: 6,
+      title: "Feature Finder",
+      subtitle: "Ask and navigate"
+    };
+  </script>
+  <script src="/widget.js"></script>
+</body>
+</html>
