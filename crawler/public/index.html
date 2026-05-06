@@ -3,228 +3,199 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Web 智能功能导航控制台</title>
+  <title>FuncFind — 智能功能导航</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Manrope:wght@400;500;600;700;800&family=Noto+Sans+SC:wght@300;400;500;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <style>
-    @import url("https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Noto+Sans+SC:wght@300;400;500;700&family=Space+Grotesk:wght@400;500;600;700&family=Sora:wght@300;400;500;600;700&display=swap");
-
+    /* ============================================
+       Shell Layout — Sidebar + Content
+       ============================================ */
     :root {
-      --bg: #f6f1ea;
-      --bg-soft: #fff8f0;
-      --panel: #ffffff;
-      --panel-shadow: rgba(16, 24, 40, 0.08);
-      --ink: #1f2a37;
-      --muted: #5f6b7a;
-      --border: #e6dccf;
-      --accent: #1f8a70;
-      --accent-strong: #0f766e;
-      --accent-warm: #f08a5d;
-      --accent-sun: #f2b94a;
-      --danger: #d94f4f;
-      --success: #199473;
-      --info: #1f7dbd;
-      --mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-      --heading: "Space Grotesk", "Noto Sans SC", sans-serif;
-      --body: "Sora", "Noto Sans SC", sans-serif;
+      --sidebar-w: 240px;
+      --ink: #0f1a36;
+      --muted: #7b8bb2;
+      --accent: #245bff;
+      --accent-strong: #1a4de8;
+      --accent-warm: #00a0a8;
+      --danger: #d94432;
+      --success: #0e8a5e;
+      --info: #245bff;
+      --border: rgba(38, 63, 130, 0.12);
+      --surface: rgba(255, 255, 255, 0.88);
+      --primary-glow: rgba(36, 91, 255, 0.18);
+      --mono: "JetBrains Mono", ui-monospace, monospace;
+      --heading: "Space Grotesk", "Manrope", sans-serif;
+      --body: "Manrope", "Noto Sans SC", sans-serif;
     }
 
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { -webkit-font-smoothing: antialiased; }
 
     body {
       font-family: var(--body);
       color: var(--ink);
-      background: radial-gradient(circle at top left, rgba(242, 185, 74, 0.18), transparent 50%),
-        radial-gradient(circle at 20% 10%, rgba(240, 138, 93, 0.15), transparent 55%),
-        linear-gradient(180deg, #fdf8f3, #f4eee6 50%, #f6f1ea 100%);
+      min-height: 100vh;
+      background:
+        radial-gradient(900px 500px at 5% -8%, rgba(252, 232, 191, 0.4), transparent 50%),
+        radial-gradient(1000px 600px at 95% 0%, rgba(212, 247, 255, 0.4), transparent 50%),
+        linear-gradient(170deg, #f0f2f9 0%, #d8e8ff 100%);
+    }
+
+    /* ---- Sidebar ---- */
+    .sidebar {
+      position: fixed;
+      left: 0; top: 0; bottom: 0;
+      width: var(--sidebar-w);
+      background: rgba(255, 255, 255, 0.75);
+      backdrop-filter: blur(20px) saturate(1.2);
+      -webkit-backdrop-filter: blur(20px) saturate(1.2);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      z-index: 100;
+      padding: 20px 0;
+    }
+
+    .sidebar-logo {
+      padding: 0 20px 20px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 8px;
+    }
+
+    .sidebar-logo h1 {
+      font-family: var(--heading);
+      font-size: 18px;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      background: linear-gradient(135deg, var(--accent), var(--accent-warm));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .sidebar-logo small {
+      color: var(--muted);
+      font-size: 11px;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 20px;
+      cursor: pointer;
+      color: var(--muted);
+      font-size: 13.5px;
+      font-weight: 600;
+      border-left: 3px solid transparent;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      user-select: none;
+    }
+
+    .nav-item:hover {
+      color: var(--ink);
+      background: rgba(36, 91, 255, 0.04);
+    }
+
+    .nav-item.active {
+      color: var(--accent);
+      border-left-color: var(--accent);
+      background: rgba(36, 91, 255, 0.06);
+    }
+
+    .nav-item svg {
+      width: 18px;
+      height: 18px;
+      flex-shrink: 0;
+    }
+
+    .nav-spacer { flex: 1; }
+
+    .nav-status {
+      padding: 12px 20px;
+      border-top: 1px solid var(--border);
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    .nav-status .dot {
+      display: inline-block;
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      margin-right: 6px;
+    }
+
+    .dot-idle { background: var(--muted); }
+    .dot-running { background: var(--info); animation: pulse 1.5s ease infinite; }
+    .dot-done { background: var(--success); }
+    .dot-error { background: var(--danger); }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+
+    /* ---- Content ---- */
+    .content {
+      margin-left: var(--sidebar-w);
       min-height: 100vh;
     }
 
-    body::after {
-      content: "";
-      position: fixed;
-      inset: 0;
-      background: linear-gradient(120deg, rgba(31, 138, 112, 0.08), transparent 40%),
-        radial-gradient(circle at 80% 20%, rgba(31, 125, 189, 0.1), transparent 60%);
-      pointer-events: none;
-      z-index: -1;
+    .view-panel {
+      display: none;
+      height: 100vh;
+      overflow-y: auto;
     }
 
-    .container {
-      max-width: 1280px;
-      margin: 0 auto;
-      padding: 32px 24px 48px;
+    .view-panel.active {
+      display: block;
     }
 
-    header.hero {
-      background: var(--panel);
-      border: 1px solid var(--border);
-      border-radius: 24px;
-      padding: 28px 32px;
-      display: grid;
-      grid-template-columns: 1.1fr 0.9fr;
-      gap: 24px;
-      box-shadow: 0 20px 40px var(--panel-shadow);
-      position: relative;
-      overflow: hidden;
-      animation: rise 0.6s ease-out;
+    /* ============================================
+       RAG Chat View (#view-chat)
+       ============================================ */
+    #view-chat {
+      padding: 0;
+    }
+    #view-chat > #app {
+      max-width: none;
+      margin: 0;
+      padding: 24px;
     }
 
-    header.hero::before {
-      content: "";
-      position: absolute;
-      width: 240px;
-      height: 240px;
-      right: -60px;
-      top: -80px;
-      background: radial-gradient(circle, rgba(31, 138, 112, 0.2), transparent 70%);
-      border-radius: 50%;
-      z-index: 0;
+    /* ============================================
+       Crawl / Report / RAG / Download Views
+       ============================================ */
+    .view-shell {
+      padding: 24px;
+      max-width: 1200px;
     }
 
-    .hero h1 {
+    .view-shell h2 {
       font-family: var(--heading);
-      font-size: 2.4rem;
+      font-size: 20px;
+      font-weight: 700;
       letter-spacing: -0.02em;
-      margin-bottom: 8px;
-      position: relative;
-      z-index: 1;
-    }
-
-    .hero p {
-      color: var(--muted);
-      font-size: 1rem;
-      line-height: 1.6;
-      position: relative;
-      z-index: 1;
-    }
-
-    .hero-meta {
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-      align-items: flex-end;
-      justify-content: center;
-      position: relative;
-      z-index: 1;
-    }
-
-    .status-indicator {
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      padding: 10px 18px;
-      border-radius: 999px;
-      font-size: 0.9rem;
-      font-weight: 600;
-      background: rgba(95, 107, 122, 0.12);
-      color: var(--muted);
-    }
-
-    .status-indicator .dot {
-      width: 10px;
-      height: 10px;
-      border-radius: 50%;
-      background: currentColor;
-      animation: pulse 1.8s ease-in-out infinite;
-    }
-
-    .status-running {
-      background: rgba(31, 125, 189, 0.12);
-      color: var(--info);
-    }
-
-    .status-completed {
-      background: rgba(25, 148, 115, 0.12);
-      color: var(--success);
-    }
-
-    .status-error,
-    .status-stopped {
-      background: rgba(217, 79, 79, 0.12);
-      color: var(--danger);
-    }
-
-    .hero-actions {
-      display: flex;
-      gap: 12px;
-    }
-
-    .btn {
-      border: none;
-      border-radius: 12px;
-      padding: 12px 18px;
-      font-weight: 600;
-      font-size: 0.95rem;
-      cursor: pointer;
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-    }
-
-    .btn-primary {
-      background: linear-gradient(120deg, var(--accent), var(--accent-strong));
-      color: #fff;
-      box-shadow: 0 12px 25px rgba(31, 138, 112, 0.2);
-    }
-
-    .btn-primary:hover:not(:disabled) {
-      transform: translateY(-2px);
-      box-shadow: 0 18px 30px rgba(31, 138, 112, 0.25);
-    }
-
-    .btn-outline {
-      background: #fff;
-      border: 1px solid var(--border);
-      color: var(--ink);
-    }
-
-    .btn-outline:hover:not(:disabled) {
-      transform: translateY(-2px);
-      box-shadow: 0 12px 22px rgba(16, 24, 40, 0.08);
-    }
-
-    .btn-danger {
-      background: linear-gradient(120deg, #d94f4f, #c53939);
-      color: #fff;
-      box-shadow: 0 12px 25px rgba(217, 79, 79, 0.2);
-    }
-
-    .btn-danger:hover:not(:disabled) {
-      transform: translateY(-2px);
-      box-shadow: 0 18px 30px rgba(217, 79, 79, 0.25);
-    }
-
-    button:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-      transform: none;
-      box-shadow: none;
-    }
-
-    .main-grid {
-      display: grid;
-      grid-template-columns: 380px 1fr;
-      gap: 24px;
-      margin-top: 28px;
+      margin-bottom: 16px;
     }
 
     .panel {
-      background: var(--panel);
-      border-radius: 20px;
+      background: var(--surface);
+      backdrop-filter: blur(16px) saturate(1.1);
+      -webkit-backdrop-filter: blur(16px) saturate(1.1);
+      border-radius: 16px;
       border: 1px solid var(--border);
-      padding: 24px;
-      box-shadow: 0 14px 28px var(--panel-shadow);
+      padding: 20px;
+      box-shadow: 0 8px 24px rgba(15, 26, 54, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.5);
+      margin-bottom: 16px;
     }
 
     .panel-title {
       font-family: var(--heading);
-      font-size: 1.2rem;
-      margin-bottom: 18px;
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 14px;
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -232,573 +203,1637 @@
     }
 
     .field {
-      margin-bottom: 16px;
+      margin-bottom: 14px;
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      gap: 6px;
     }
 
-    label {
-      font-size: 0.85rem;
-      font-weight: 600;
+    .field label {
+      font-size: 12.5px;
+      font-weight: 700;
       color: var(--muted);
     }
 
-    input,
-    select,
-    textarea {
+    input, select, textarea {
       width: 100%;
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 12px 14px;
+      border: 1.5px solid rgba(36, 91, 255, 0.1);
+      border-radius: 10px;
+      padding: 10px 12px;
       font-family: var(--body);
-      font-size: 0.95rem;
-      background: #fff;
+      font-size: 13.5px;
+      background: rgba(255, 255, 255, 0.96);
       color: var(--ink);
-      transition: border 0.2s ease, box-shadow 0.2s ease;
-    }
-
-    textarea {
-      min-height: 80px;
-      resize: vertical;
-    }
-
-    input:focus,
-    select:focus,
-    textarea:focus {
       outline: none;
+      transition: border 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    input:hover, select:hover, textarea:hover { border-color: rgba(36, 91, 255, 0.2); }
+
+    textarea { min-height: 80px; resize: vertical; }
+
+    input:focus, select:focus, textarea:focus {
       border-color: var(--accent);
-      box-shadow: 0 0 0 3px rgba(31, 138, 112, 0.15);
+      box-shadow: 0 0 0 3px var(--primary-glow);
+      background: #fff;
     }
 
-    .input-error {
-      border-color: var(--danger);
-      box-shadow: 0 0 0 3px rgba(217, 79, 79, 0.15);
+    .hint { font-size: 12px; color: var(--muted); }
+
+    .btn {
+      border: none;
+      border-radius: 10px;
+      padding: 10px 16px;
+      font-weight: 700;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
     }
 
-    .hint {
-      font-size: 0.8rem;
-      color: var(--muted);
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent), var(--accent-strong));
+      color: #fff;
+      box-shadow: 0 4px 14px rgba(36, 91, 255, 0.25);
     }
+
+    .btn-primary:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(36, 91, 255, 0.3);
+    }
+
+    .btn-outline {
+      background: rgba(255, 255, 255, 0.88);
+      border: 1.5px solid rgba(36, 91, 255, 0.12);
+      color: var(--ink);
+    }
+
+    .btn-outline:hover:not(:disabled) {
+      border-color: rgba(36, 91, 255, 0.25);
+      transform: translateY(-1px);
+    }
+
+    .btn-danger {
+      background: linear-gradient(135deg, #d94432, #c53939);
+      color: #fff;
+    }
+
+    .btn-danger:hover:not(:disabled) { transform: translateY(-2px); }
+
+    .btn-small { padding: 7px 12px; font-size: 12px; border-radius: 8px; }
+
+    button:disabled { opacity: 0.45; cursor: not-allowed; transform: none; box-shadow: none; }
 
     .action-row {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 12px;
+      gap: 10px;
       margin-top: 12px;
     }
 
     details.advanced {
       margin-top: 12px;
-      border: 1px dashed var(--border);
-      border-radius: 16px;
+      border: 1px solid rgba(36, 91, 255, 0.1);
+      border-radius: 12px;
       padding: 12px 14px 6px;
-      background: var(--bg-soft);
+      background: rgba(228, 236, 255, 0.3);
     }
 
     details.advanced summary {
       list-style: none;
       cursor: pointer;
-      font-weight: 600;
-      color: var(--accent-strong);
-      display: flex;
-      align-items: center;
-      gap: 8px;
+      font-weight: 700;
+      color: var(--accent);
+      font-size: 13.5px;
     }
 
-    details.advanced summary::-webkit-details-marker {
-      display: none;
-    }
+    details.advanced summary::-webkit-details-marker { display: none; }
 
-    details.advanced[open] {
-      box-shadow: inset 0 0 0 1px rgba(31, 138, 112, 0.15);
-    }
+    details.advanced[open] { border-color: rgba(36, 91, 255, 0.2); }
 
+    /* ---- Log container ---- */
     .log-container {
-      background: #0f1b22;
-      color: #f8fafc;
-      border-radius: 16px;
-      padding: 16px;
-      height: 420px;
+      background: #0f1a2e;
+      color: #f0f4ff;
+      border-radius: 14px;
+      padding: 14px;
+      height: 400px;
       overflow-y: auto;
       font-family: var(--mono);
       font-size: 0.82rem;
-      border: 1px solid #0f2430;
+      border: 1px solid rgba(36, 91, 255, 0.15);
     }
+
+    .log-container::-webkit-scrollbar { width: 6px; }
+    .log-container::-webkit-scrollbar-track { background: transparent; }
+    .log-container::-webkit-scrollbar-thumb { background: rgba(36, 91, 255, 0.2); border-radius: 3px; }
 
     .log-entry {
       display: grid;
-      grid-template-columns: 76px 1fr;
-      gap: 12px;
-      padding: 6px 0;
-      border-bottom: 1px solid rgba(148, 163, 184, 0.12);
-      animation: slideIn 0.25s ease;
-    }
-
-    .log-time {
-      color: #94a3b8;
-      font-size: 0.75rem;
-    }
-
-    .log-message {
-      word-break: break-word;
-      color: #e2e8f0;
-    }
-
-    .log-info { color: #7dd3fc; }
-    .log-error { color: #fca5a5; }
-    .log-success { color: #86efac; }
-
-    .results-panel {
-      margin-top: 28px;
-    }
-
-    .dataset-panel {
-      margin-top: 28px;
-    }
-
-    .rag-panel {
-      margin-top: 28px;
-    }
-
-    .rag-status {
-      margin-top: 12px;
-      padding: 12px 14px;
-      border-radius: 12px;
-      border: 1px dashed var(--border);
-      background: var(--bg-soft);
-      color: var(--muted);
-      font-size: 0.85rem;
-      line-height: 1.4;
-    }
-
-    .rag-status.success {
-      border-color: rgba(25, 148, 115, 0.4);
-      background: rgba(25, 148, 115, 0.08);
-      color: var(--success);
-    }
-
-    .rag-status.error {
-      border-color: rgba(217, 79, 79, 0.4);
-      background: rgba(217, 79, 79, 0.08);
-      color: var(--danger);
-    }
-
-    .dataset-actions {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-    }
-
-    .btn-small {
-      padding: 8px 12px;
-      font-size: 0.85rem;
-      border-radius: 10px;
-    }
-
-    .dataset-table td:first-child {
-      font-family: var(--mono);
-      font-size: 0.82rem;
-      word-break: break-all;
-    }
-
-    .results-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      gap: 16px;
-      margin-bottom: 16px;
-      flex-wrap: wrap;
-    }
-
-    .results-header p {
-      color: var(--muted);
-      margin-top: 4px;
-    }
-
-    .filters {
-      display: flex;
-      gap: 12px;
-      flex-wrap: wrap;
-    }
-
-    .filters input {
-      min-width: 220px;
-    }
-
-    .tabs {
-      display: inline-flex;
+      grid-template-columns: 72px 1fr;
       gap: 10px;
-      border: 1px solid var(--border);
+      padding: 5px 0;
+      border-bottom: 1px solid rgba(36, 91, 255, 0.08);
+      animation: slideIn 0.2s ease;
+    }
+
+    .log-time { color: #7b8bb2; font-size: 0.72rem; }
+    .log-message { word-break: break-word; color: #d0d8f0; }
+    .log-info { color: #7da8ff; }
+    .log-error { color: #ff9b9b; }
+    .log-success { color: #6ee7b7; }
+
+    /* ---- Status indicator ---- */
+    .status-indicator {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 14px;
       border-radius: 999px;
-      padding: 6px;
-      background: #fff;
-    }
-
-    .tab-btn {
-      border: none;
-      background: transparent;
-      padding: 8px 16px;
-      border-radius: 999px;
-      font-weight: 600;
-      color: var(--muted);
-      cursor: pointer;
-    }
-
-    .tab-btn.active {
-      background: var(--accent);
-      color: #fff;
-    }
-
-    .stats-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-      gap: 16px;
-      margin: 20px 0;
-    }
-
-    .stat-card {
-      background: var(--bg-soft);
-      border-radius: 16px;
-      padding: 18px;
-      border: 1px solid var(--border);
-    }
-
-    .stat-value {
-      font-family: var(--heading);
-      font-size: 1.6rem;
-      color: var(--accent-strong);
-    }
-
-    .stat-label {
-      color: var(--muted);
-      margin-top: 4px;
       font-size: 0.85rem;
-    }
-
-    .table-container {
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      overflow: hidden;
-      background: #fff;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 0.88rem;
-    }
-
-    thead {
-      background: #f5efe6;
+      font-weight: 600;
+      background: rgba(123, 139, 178, 0.1);
       color: var(--muted);
     }
 
-    th,
-    td {
-      padding: 12px 14px;
-      text-align: left;
-      border-bottom: 1px solid var(--border);
-      vertical-align: top;
+    .status-indicator .dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: currentColor;
     }
 
-    tbody tr:hover {
-      background: rgba(31, 138, 112, 0.08);
+    .status-running { background: rgba(36, 91, 255, 0.1); color: var(--info); }
+    .status-completed { background: rgba(14, 138, 94, 0.1); color: var(--success); }
+    .status-error, .status-stopped { background: rgba(217, 68, 50, 0.1); color: var(--danger); }
+
+    /* ---- Report styles ---- */
+    .stat-grid {
+      display: grid;
+      gap: 12px;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
     }
+
+    .stat {
+      padding: 14px;
+      border-radius: 14px;
+      border: 1px solid rgba(36, 91, 255, 0.08);
+      background: rgba(228, 236, 255, 0.3);
+      display: grid;
+      gap: 4px;
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .stat:hover { border-color: rgba(36, 91, 255, 0.2); transform: translateY(-2px); }
+
+    .stat .value {
+      font-size: 22px;
+      font-weight: 700;
+      font-family: var(--mono);
+      color: var(--accent);
+    }
+
+    .stat .label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--muted);
+    }
+
+    .bar-chart { display: grid; gap: 10px; }
+
+    .bar-row {
+      display: grid;
+      grid-template-columns: minmax(80px, 120px) 1fr;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .bar-label { font-size: 12px; color: var(--muted); }
+
+    .bar-wrap {
+      position: relative;
+      height: 24px;
+      border-radius: 999px;
+      background: rgba(228, 236, 255, 0.5);
+      overflow: hidden;
+      border: 1px solid rgba(36, 91, 255, 0.08);
+    }
+
+    .bar {
+      position: absolute;
+      left: 0; top: 0;
+      height: 100%;
+      width: 0;
+      border-radius: 999px;
+      background: linear-gradient(90deg, var(--accent), var(--accent-warm));
+      box-shadow: 0 0 14px var(--primary-glow);
+      transition: width 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .bar-value {
+      position: absolute;
+      right: 10px; top: 50%;
+      transform: translateY(-50%);
+      font-size: 11px;
+      color: var(--ink);
+      font-family: var(--mono);
+    }
+
+    .table-wrap {
+      overflow: auto;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      background: rgba(255, 255, 255, 0.88);
+    }
+
+    table { width: 100%; border-collapse: collapse; min-width: 500px; }
+
+    thead th {
+      text-align: left;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--muted);
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--border);
+      background: rgba(228, 236, 255, 0.4);
+      position: sticky;
+      top: 0;
+      z-index: 2;
+    }
+
+    tbody tr {
+      border-bottom: 1px solid rgba(38, 63, 130, 0.06);
+      cursor: pointer;
+      transition: background 0.2s ease;
+    }
+
+    tbody tr:hover { background: rgba(36, 91, 255, 0.04); }
+    tbody tr.active { background: rgba(0, 160, 168, 0.08); }
+
+    td { padding: 10px 12px; vertical-align: top; font-size: 13px; }
+    td.mono { font-family: var(--mono); font-size: 11px; }
 
     .tag {
       display: inline-flex;
       align-items: center;
-      justify-content: center;
-      padding: 4px 10px;
+      padding: 3px 8px;
       border-radius: 999px;
-      font-size: 0.72rem;
-      font-weight: 600;
+      font-size: 10.5px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      background: rgba(36, 91, 255, 0.08);
+      color: var(--accent);
+      font-weight: 700;
     }
 
-    .tag-link { background: rgba(31, 125, 189, 0.16); color: #1f7dbd; }
-    .tag-button { background: rgba(240, 138, 93, 0.18); color: #cc5f33; }
-    .tag-form { background: rgba(25, 148, 115, 0.18); color: var(--accent-strong); }
+    .detail-card {
+      padding: 14px;
+      border-radius: 14px;
+      border: 1px solid rgba(36, 91, 255, 0.08);
+      background: rgba(255, 255, 255, 0.88);
+      display: grid;
+      gap: 8px;
+    }
 
-    .empty-state {
-      text-align: center;
-      padding: 40px 20px;
+    .detail-card h3 { margin: 0; font-size: 15px; }
+
+    .detail-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      color: var(--muted);
+      font-size: 11px;
+    }
+
+    .element-list { display: grid; gap: 8px; }
+
+    .element-card {
+      padding: 10px;
+      border-radius: 12px;
+      border: 1px solid rgba(36, 91, 255, 0.08);
+      background: rgba(228, 236, 255, 0.2);
+      display: grid;
+      gap: 6px;
+      transition: all 0.2s ease;
+    }
+
+    .element-card:hover { border-color: rgba(36, 91, 255, 0.18); transform: translateX(2px); }
+
+    .element-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 6px;
+    }
+
+    .element-actions button { padding: 6px 10px; font-size: 11px; border-radius: 8px; }
+
+    .element-title {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 12px;
+    }
+
+    .element-body {
+      display: grid;
+      gap: 4px;
+      font-size: 12px;
       color: var(--muted);
     }
 
-    footer {
-      margin-top: 32px;
-      text-align: center;
+    .element-body code {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--ink);
+      background: rgba(36, 91, 255, 0.06);
+      padding: 2px 6px;
+      border-radius: 6px;
+      word-break: break-all;
+    }
+
+    .verify-frame {
+      width: 100%;
+      height: 360px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: #fff;
+    }
+
+    .rag-status {
+      border-radius: 12px;
+      border: 1px dashed var(--border);
+      background: rgba(228, 236, 255, 0.3);
+      padding: 10px 12px;
+      font-size: 12px;
       color: var(--muted);
-      font-size: 0.85rem;
     }
 
-    @media (max-width: 1080px) {
-      header.hero {
-        grid-template-columns: 1fr;
-      }
+    .rag-status.success { border-color: rgba(14, 138, 94, 0.3); color: var(--success); background: rgba(14, 138, 94, 0.06); }
+    .rag-status.error { border-color: rgba(217, 68, 50, 0.3); color: var(--danger); background: rgba(217, 68, 50, 0.06); }
 
-      .hero-meta {
-        align-items: flex-start;
-      }
-
-      .main-grid {
-        grid-template-columns: 1fr;
-      }
+    .empty {
+      padding: 18px;
+      border-radius: 14px;
+      border: 1px dashed var(--border);
+      color: var(--muted);
+      text-align: center;
+      background: rgba(228, 236, 255, 0.2);
     }
 
-    @media (max-width: 720px) {
-      .action-row {
-        grid-template-columns: 1fr;
-      }
-
-      .log-container {
-        height: 320px;
-      }
+    .rag-grid {
+      display: grid;
+      gap: 12px;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     }
 
-    @keyframes pulse {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.6; }
+    .rag-field { display: grid; gap: 4px; }
+    .rag-field label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); font-weight: 700; }
+
+    .grid-2 {
+      display: grid;
+      gap: 16px;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
     }
 
-    @keyframes slideIn {
-      from { opacity: 0; transform: translateX(-10px); }
-      to { opacity: 1; transform: translateX(0); }
+    .subtle { font-size: 12px; color: var(--muted); }
+    .subtle.success { color: var(--success); font-weight: 700; }
+    .subtle.error { color: var(--danger); font-weight: 700; }
+
+    .control { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+
+    .panel-header {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid rgba(38, 63, 130, 0.06);
     }
 
-    @keyframes rise {
-      from { opacity: 0; transform: translateY(12px); }
+    .panel-header h3 { margin: 0; font-size: 16px; font-weight: 700; }
+    .panel-header .tools { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+
+    /* ---- Download view ---- */
+    .download-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 12px;
+    }
+
+    .download-card {
+      padding: 16px;
+      border-radius: 14px;
+      border: 1px solid rgba(36, 91, 255, 0.08);
+      background: rgba(228, 236, 255, 0.3);
+      display: grid;
+      gap: 8px;
+      text-align: center;
+    }
+
+    .download-card .icon {
+      font-size: 28px;
+      margin-bottom: 4px;
+    }
+
+    .download-card h4 { margin: 0; font-size: 14px; }
+    .download-card p { margin: 0; font-size: 12px; color: var(--muted); }
+
+    /* ---- Animations ---- */
+    @keyframes slideIn { from { opacity: 0; transform: translateX(-10px); } to { opacity: 1; transform: translateX(0); } }
+    @keyframes rise { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* ---- Responsive ---- */
+    @media (max-width: 900px) {
+      :root { --sidebar-w: 56px; }
+      .sidebar-logo h1, .sidebar-logo small, .nav-item span, .nav-status span { display: none; }
+      .nav-item { justify-content: center; padding: 12px 0; }
+      .nav-item svg { width: 22px; height: 22px; }
+      .sidebar-logo { padding: 0 0 16px; text-align: center; }
+    }
+
+    @media (max-width: 600px) {
+      :root { --sidebar-w: 0px; }
+      .sidebar { display: none; }
+      .view-shell { padding: 12px; }
+      .action-row { grid-template-columns: 1fr; }
+    }
+
+    /* ============================================
+       RAG Chat Styles (scoped to #view-chat)
+       ============================================ */
+    #view-chat #app {
+      position: relative;
+      z-index: 1;
+      max-width: 1340px;
+      margin: 0 auto;
+    }
+
+    #view-chat [v-cloak] { display: none; }
+
+    /* Hero */
+    #view-chat .hero {
+      position: relative;
+      overflow: hidden;
+      border: 1px solid rgba(38, 63, 130, 0.12);
+      background: linear-gradient(135deg, rgba(255,255,255,0.96), rgba(235, 243, 255, 0.85));
+      backdrop-filter: blur(20px) saturate(1.2);
+      border-radius: 24px;
+      box-shadow: 0 18px 48px rgba(15, 26, 54, 0.12), inset 0 1px 0 rgba(255,255,255,0.6);
+      padding: 36px 36px 32px;
+      margin-bottom: 24px;
+      transition: box-shadow 0.4s cubic-bezier(0.16,1,0.3,1);
+    }
+    #view-chat .hero:hover {
+      box-shadow: 0 24px 60px rgba(20, 42, 102, 0.14), inset 0 1px 0 rgba(255,255,255,0.6);
+    }
+    #view-chat .hero::before {
+      content: "";
+      position: absolute;
+      width: 280px; height: 280px;
+      right: -80px; top: -100px;
+      border-radius: 50%;
+      background: linear-gradient(140deg, rgba(36,91,255,0.2), rgba(0,160,168,0.12));
+      filter: blur(40px);
+      pointer-events: none;
+    }
+    #view-chat .hero::after {
+      content: "";
+      position: absolute;
+      width: 180px; height: 180px;
+      left: 60%; bottom: -60px;
+      border-radius: 50%;
+      background: linear-gradient(140deg, rgba(252,200,120,0.2), rgba(255,160,80,0.08));
+      filter: blur(30px);
+      pointer-events: none;
+    }
+    #view-chat .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: linear-gradient(135deg, #e4ecff, rgba(200,220,255,0.6));
+      color: #245bff;
+      border: 1px solid rgba(36,91,255,0.15);
+      border-radius: 999px;
+      padding: 6px 14px;
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      backdrop-filter: blur(8px);
+      transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.3s cubic-bezier(0.16,1,0.3,1);
+    }
+    #view-chat .hero-badge:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(36,91,255,0.15);
+    }
+    #view-chat .hero-badge svg { width: 14px; height: 14px; }
+
+    #view-chat h1 {
+      margin: 14px 0 12px;
+      font-family: "Space Grotesk", "Manrope", sans-serif;
+      font-size: clamp(28px, 4vw, 48px);
+      font-weight: 800;
+      line-height: 1.08;
+      letter-spacing: -0.035em;
+      background: linear-gradient(135deg, #0f1a36 0%, #2a4a8a 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    #view-chat .hero p {
+      margin: 0;
+      color: #3a4a72;
+      font-size: 15px;
+      line-height: 1.65;
+      max-width: 600px;
+    }
+    #view-chat .hero-metrics {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 18px;
+    }
+    #view-chat .hero-metrics span {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      border-radius: 999px;
+      border: 1px solid rgba(36,91,255,0.1);
+      background: rgba(255,255,255,0.88);
+      backdrop-filter: blur(8px);
+      padding: 6px 12px;
+      font-size: 11.5px;
+      font-weight: 700;
+      color: #3a4a72;
+      font-family: "JetBrains Mono", "Manrope", monospace;
+      letter-spacing: -0.01em;
+      transition: all 0.25s cubic-bezier(0.16,1,0.3,1);
+    }
+    #view-chat .hero-metrics span:hover {
+      border-color: rgba(36,91,255,0.25);
+      background: rgba(255,255,255,0.96);
+      transform: translateY(-1px);
+    }
+
+    /* Workspace Grid */
+    #view-chat .workspace {
+      display: grid;
+      grid-template-columns: minmax(320px, 0.95fr) minmax(360px, 1.05fr);
+      gap: 20px;
+    }
+
+    /* Panels */
+    #view-chat .panel {
+      position: relative;
+      border-radius: 24px;
+      border: 1px solid rgba(38,63,130,0.12);
+      background: rgba(255,255,255,0.88);
+      backdrop-filter: blur(16px) saturate(1.1);
+      box-shadow: 0 8px 24px rgba(15,26,54,0.08), inset 0 1px 0 rgba(255,255,255,0.5);
+      padding: 26px;
+      min-height: 600px;
+      transition: border-color 0.3s, box-shadow 0.3s;
+    }
+    #view-chat .panel:hover {
+      border-color: rgba(38,63,130,0.22);
+      box-shadow: 0 18px 48px rgba(15,26,54,0.12), inset 0 1px 0 rgba(255,255,255,0.5);
+    }
+    #view-chat .panel-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 18px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid rgba(38,63,130,0.06);
+    }
+    #view-chat h2 {
+      margin: 0;
+      font-family: "Space Grotesk", "Manrope", sans-serif;
+      font-size: 19px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: #0f1a36;
+    }
+    #view-chat h2 svg { width: 20px; height: 20px; vertical-align: -3px; margin-right: 4px; opacity: 0.7; }
+
+    /* Chips */
+    #view-chat .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      border-radius: 999px;
+      border: 1px solid rgba(36,91,255,0.1);
+      padding: 5px 12px;
+      font-size: 10.5px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      backdrop-filter: blur(6px);
+      transition: all 0.25s;
+    }
+    #view-chat .chip.idle, #view-chat .chip.warn {
+      color: #d94432;
+      background: #fff0ee;
+      border-color: rgba(217,68,50,0.15);
+    }
+    #view-chat .chip.ok {
+      color: #0e8a5e;
+      background: #e6f9f1;
+      border-color: rgba(14,138,94,0.15);
+    }
+    #view-chat .chip.ok::before {
+      content: "";
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: #0e8a5e;
+      animation: pulse-dot-chat 2s ease-in-out infinite;
+    }
+    @keyframes pulse-dot-chat {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(0.8); }
+    }
+
+    /* Dropzone */
+    #view-chat .dropzone {
+      position: relative;
+      border: 2px dashed rgba(36,91,255,0.2);
+      border-radius: 16px;
+      background: linear-gradient(135deg, rgba(228,236,255,0.5), rgba(224,247,248,0.4));
+      padding: 36px 24px;
+      text-align: center;
+      transition: all 0.3s;
+      overflow: hidden;
+    }
+    #view-chat .dropzone:hover {
+      border-color: rgba(36,91,255,0.35);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(36,91,255,0.08);
+    }
+    #view-chat .dropzone-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 52px; height: 52px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, #e4ecff, rgba(200,220,255,0.5));
+      margin-bottom: 12px;
+      transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    #view-chat .dropzone:hover .dropzone-icon { transform: translateY(-3px) scale(1.05); }
+    #view-chat .dropzone-icon svg { width: 24px; height: 24px; color: #245bff; }
+    #view-chat .dropzone p { margin: 0 0 14px; color: #3a4a72; font-weight: 600; font-size: 14px; }
+    #view-chat .dropzone.active {
+      border-color: #245bff;
+      border-style: solid;
+      background: linear-gradient(135deg, rgba(36,91,255,0.06), rgba(0,160,168,0.04));
+      transform: translateY(-3px) scale(1.01);
+      box-shadow: 0 12px 32px rgba(36,91,255,0.15);
+    }
+
+    /* File List */
+    #view-chat .file-list { list-style: none; padding: 0; margin: 16px 0; display: grid; gap: 8px; }
+    #view-chat .file-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-radius: 12px;
+      padding: 12px 14px;
+      border: 1px solid rgba(36,91,255,0.08);
+      background: rgba(255,255,255,0.88);
+      transition: all 0.25s;
+    }
+    #view-chat .file-item:hover {
+      border-color: rgba(36,91,255,0.18);
+      box-shadow: 0 2px 8px rgba(15,26,54,0.06);
+      transform: translateX(2px);
+    }
+    #view-chat .file-item strong { display: block; font-size: 13.5px; color: #0f1a36; }
+    #view-chat .file-item small { color: #7b8bb2; font-size: 12px; }
+
+    /* Settings */
+    #view-chat .settings-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 16px; }
+
+    /* Advanced Config */
+    #view-chat .advanced-config {
+      margin-top: 16px;
+      border: 1px solid rgba(36,91,255,0.1);
+      border-radius: 12px;
+      background: rgba(255,255,255,0.72);
+      padding: 0;
+      overflow: hidden;
+      transition: border-color 0.3s;
+    }
+    #view-chat .advanced-config[open] { border-color: rgba(36,91,255,0.18); }
+    #view-chat .advanced-config summary {
+      display: flex; flex-direction: column; gap: 3px;
+      cursor: pointer; list-style: none;
+      font-weight: 700; font-size: 14px; color: #0f1a36;
+      padding: 14px 16px;
+      transition: background 0.2s;
+      border-radius: 12px;
+    }
+    #view-chat .advanced-config summary:hover { background: rgba(36,91,255,0.03); }
+    #view-chat .advanced-config summary::-webkit-details-marker { display: none; }
+    #view-chat .advanced-config summary small { font-weight: 500; font-size: 12px; color: #7b8bb2; }
+    #view-chat .runtime-grid {
+      margin: 0; padding: 16px;
+      display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+      border-top: 1px solid rgba(36,91,255,0.06);
+    }
+    #view-chat .secret-field { display: grid; grid-template-columns: 1fr auto; gap: 8px; align-items: center; }
+    #view-chat .secret-hint { font-size: 11.5px; color: #0e8a5e; font-weight: 600; margin-top: 4px; }
+
+    /* Labels & Inputs inside chat */
+    #view-chat label {
+      display: grid; gap: 6px;
+      color: #3a4a72; font-size: 12.5px; font-weight: 700; letter-spacing: 0.01em;
+    }
+    #view-chat input, #view-chat select, #view-chat textarea {
+      width: 100%;
+      border-radius: 8px;
+      border: 1.5px solid rgba(36,91,255,0.1);
+      background: rgba(255,255,255,0.96);
+      color: #0f1a36;
+      font: inherit; font-size: 13.5px;
+      padding: 10px 12px;
+      transition: all 0.25s;
+      outline: none;
+    }
+    #view-chat input::placeholder, #view-chat textarea::placeholder { color: #a8b5d0; }
+    #view-chat textarea { min-height: 86px; resize: vertical; }
+    #view-chat input:hover, #view-chat select:hover, #view-chat textarea:hover { border-color: rgba(36,91,255,0.2); }
+    #view-chat input:focus, #view-chat select:focus, #view-chat textarea:focus {
+      border-color: #245bff;
+      box-shadow: 0 0 0 3px rgba(36,91,255,0.18);
+      background: #fff;
+    }
+    #view-chat select {
+      cursor: pointer; appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L5 5L9 1' stroke='%237b8bb2' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      padding-right: 32px;
+    }
+
+    /* Range Sliders */
+    #view-chat .slider-group { margin-top: 14px; display: grid; gap: 12px; }
+    #view-chat .slider-group label { font-size: 12.5px; }
+    #view-chat input[type="range"] {
+      -webkit-appearance: none; appearance: none;
+      width: 100%; height: 6px; border-radius: 3px; border: none;
+      background: linear-gradient(90deg, #e4ecff, rgba(200,220,255,0.5));
+      outline: none; padding: 0; cursor: pointer;
+    }
+    #view-chat input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 18px; height: 18px; border-radius: 50%;
+      background: #245bff; border: 3px solid #fff;
+      box-shadow: 0 2px 8px rgba(36,91,255,0.3);
+      cursor: pointer;
+    }
+    #view-chat input[type="range"]::-moz-range-thumb {
+      width: 18px; height: 18px; border-radius: 50%;
+      background: #245bff; border: 3px solid #fff;
+      box-shadow: 0 2px 8px rgba(36,91,255,0.3); cursor: pointer;
+    }
+
+    /* Buttons */
+    #view-chat .btn, #view-chat .icon-btn {
+      border: 0; border-radius: 8px; cursor: pointer;
+      font-family: inherit; font-weight: 700;
+      transition: all 0.2s; position: relative; overflow: hidden;
+    }
+    #view-chat .btn {
+      padding: 11px 18px; font-size: 13.5px;
+      background: linear-gradient(135deg, #245bff, #1a4de8);
+      color: #fff;
+      box-shadow: 0 4px 14px rgba(36,91,255,0.25);
+    }
+    #view-chat .btn:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(36,91,255,0.3);
+    }
+    #view-chat .btn:active:not(:disabled) { transform: translateY(0); }
+    #view-chat .btn:disabled, #view-chat .icon-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+    #view-chat .btn.ghost {
+      background: rgba(255,255,255,0.88); color: #245bff;
+      box-shadow: none; border: 1.5px solid rgba(36,91,255,0.12);
+    }
+    #view-chat .btn.ghost:hover:not(:disabled) { background: #e4ecff; border-color: rgba(36,91,255,0.25); }
+    #view-chat .btn.accent {
+      background: linear-gradient(135deg, #0e91d5, #00a192);
+      box-shadow: 0 4px 14px rgba(0,129,136,0.25);
+    }
+    #view-chat .btn.accent:hover:not(:disabled) { box-shadow: 0 8px 24px rgba(0,129,136,0.3); }
+    #view-chat .icon-btn {
+      background: rgba(255,255,255,0.88); color: #3a4a72;
+      padding: 7px 10px; white-space: nowrap; font-size: 12px;
+      border: 1.5px solid rgba(36,91,255,0.08);
+    }
+    #view-chat .icon-btn:hover:not(:disabled) { background: #e4ecff; color: #245bff; }
+    #view-chat .btn.small { padding: 7px 14px; font-size: 12.5px; white-space: nowrap; }
+    #view-chat .btn.ghost.small { font-size: 12px; padding: 5px 12px; }
+
+    /* Actions Row */
+    #view-chat .actions-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 16px; }
+
+    /* Pipeline */
+    #view-chat .pipeline {
+      margin: 18px 0 0; padding: 0; list-style: none;
+      display: grid; gap: 0; position: relative;
+    }
+    #view-chat .pipeline li {
+      position: relative; border-radius: 8px;
+      padding: 12px 14px 12px 36px;
+      border: 1px solid rgba(36,91,255,0.06);
+      color: #7b8bb2; background: rgba(255,255,255,0.72);
+      font-size: 13.5px; font-weight: 600;
+      transition: all 0.3s;
+    }
+    #view-chat .pipeline li::before {
+      content: ""; position: absolute;
+      left: 12px; top: 50%; transform: translateY(-50%);
+      width: 16px; height: 16px; border-radius: 50%;
+      border: 2px solid rgba(36,91,255,0.15);
+      background: rgba(255,255,255,0.96);
+      transition: all 0.3s;
+    }
+    #view-chat .pipeline li:not(:last-child)::after {
+      content: ""; position: absolute;
+      left: 19px; top: calc(50% + 10px);
+      width: 2px; height: calc(100% - 20px);
+      background: rgba(36,91,255,0.08);
+    }
+    #view-chat .pipeline li.active {
+      border-color: rgba(36,91,255,0.2);
+      background: linear-gradient(135deg, rgba(36,91,255,0.04), rgba(0,160,168,0.02));
+      color: #245bff;
+    }
+    #view-chat .pipeline li.active::before {
+      border-color: #245bff; background: #245bff;
+      box-shadow: 0 0 0 4px rgba(36,91,255,0.12);
+      animation: pulse-ring-chat 1.5s ease-in-out infinite;
+    }
+    #view-chat .pipeline li.done {
+      border-color: rgba(14,138,94,0.12);
+      background: rgba(14,138,94,0.03);
+      color: #0e8a5e;
+    }
+    #view-chat .pipeline li.done::before {
+      border-color: #0e8a5e; background: #0e8a5e;
+      box-shadow: inset 0 0 0 2px #fff, 0 0 0 2px #0e8a5e;
+    }
+    @keyframes pulse-ring-chat {
+      0%, 100% { box-shadow: 0 0 0 4px rgba(36,91,255,0.12); }
+      50% { box-shadow: 0 0 0 8px rgba(36,91,255,0.06); }
+    }
+
+    /* Status Text */
+    #view-chat .status-text {
+      margin-top: 12px; font-size: 12.5px; color: #7b8bb2; font-weight: 500;
+      padding: 8px 12px; background: rgba(255,255,255,0.72);
+      border-radius: 8px; border: 1px solid rgba(36,91,255,0.04);
+    }
+
+    /* Crawled KB */
+    #view-chat .crawl-kb-panel { border-left: 3px solid #00a0a8; }
+    #view-chat .crawl-kb-list { display: flex; flex-direction: column; gap: 8px; }
+    #view-chat .crawl-kb-item {
+      display: flex; justify-content: space-between; align-items: center; gap: 14px;
+      padding: 12px 16px; border-radius: 12px;
+      background: linear-gradient(135deg, #e0f7f8, rgba(224,247,248,0.5));
+      border: 1px solid rgba(0,160,168,0.12);
+      transition: all 0.25s;
+    }
+    #view-chat .crawl-kb-item:hover { border-color: rgba(0,160,168,0.25); box-shadow: 0 2px 8px rgba(15,26,54,0.06); }
+    #view-chat .crawl-kb-item strong { display: block; font-size: 14px; color: #0f1a36; }
+    #view-chat .crawl-kb-item small { color: #3a4a72; font-size: 12px; }
+    #view-chat .hint { color: #7b8bb2; font-size: 13px; }
+
+    /* Chat Panel */
+    #view-chat .chat-panel {
+      display: grid; grid-template-rows: auto 1fr auto; gap: 14px;
+    }
+    #view-chat .chat-feed {
+      border-radius: 16px;
+      border: 1px solid rgba(36,91,255,0.06);
+      background: rgba(255,255,255,0.72);
+      min-height: 400px; max-height: 400px;
+      padding: 16px; overflow: auto;
+      display: grid; gap: 10px; align-content: start;
+    }
+    #view-chat .chat-feed::-webkit-scrollbar { width: 6px; }
+    #view-chat .chat-feed::-webkit-scrollbar-track { background: transparent; }
+    #view-chat .chat-feed::-webkit-scrollbar-thumb { background: rgba(36,91,255,0.12); border-radius: 3px; }
+
+    /* Bubbles */
+    #view-chat .bubble {
+      border-radius: 12px; padding: 12px 14px;
+      max-width: 85%; white-space: pre-wrap; line-height: 1.6;
+      font-size: 13.5px;
+      animation: bubble-in-chat 0.3s cubic-bezier(0.16,1,0.3,1) both;
+    }
+    @keyframes bubble-in-chat {
+      from { opacity: 0; transform: translateY(8px) scale(0.97); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    #view-chat .bubble h4 { margin: 0 0 5px; font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.08em; font-weight: 800; }
+    #view-chat .bubble p { margin: 0; font-size: 13.5px; }
+    #view-chat .bubble.user {
+      justify-self: end;
+      background: linear-gradient(135deg, #245bff, #1a4de8);
+      color: #f0f4ff;
+      box-shadow: 0 4px 16px rgba(36,91,255,0.2);
+      border-bottom-right-radius: 4px;
+    }
+    #view-chat .bubble.user h4 { color: rgba(255,255,255,0.7); }
+    #view-chat .bubble.assistant {
+      justify-self: start;
+      background: rgba(255,255,255,0.96);
+      color: #0f1a36;
+      border: 1px solid rgba(36,91,255,0.08);
+      box-shadow: 0 2px 8px rgba(15,26,54,0.06);
+      border-bottom-left-radius: 4px;
+    }
+    #view-chat .bubble.system {
+      justify-self: center; width: 100%; max-width: 100%;
+      background: linear-gradient(135deg, rgba(255,247,226,0.8), rgba(255,240,210,0.5));
+      border: 1px solid rgba(182,130,40,0.12);
+      color: #6b5020; font-size: 12.5px; text-align: center;
+    }
+
+    /* Typing Indicator */
+    #view-chat .typing-indicator { display: inline-flex; align-items: center; gap: 4px; padding: 8px 4px; }
+    #view-chat .typing-indicator span {
+      width: 7px; height: 7px; border-radius: 50%;
+      background: #7b8bb2;
+      animation: typing-bounce-chat 1.4s ease-in-out infinite;
+    }
+    #view-chat .typing-indicator span:nth-child(2) { animation-delay: 0.15s; }
+    #view-chat .typing-indicator span:nth-child(3) { animation-delay: 0.3s; }
+    @keyframes typing-bounce-chat {
+      0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
+      30% { transform: translateY(-6px); opacity: 1; }
+    }
+
+    /* Chat Form */
+    #view-chat .chat-form { display: grid; gap: 10px; }
+    #view-chat .chat-form textarea {
+      border-radius: 12px; padding: 14px 16px;
+      font-size: 14px; min-height: 80px;
+      border: 1.5px solid rgba(36,91,255,0.1);
+      transition: all 0.25s;
+    }
+    #view-chat .chat-form textarea:focus {
+      border-color: #245bff;
+      box-shadow: 0 0 0 3px rgba(36,91,255,0.18);
+      min-height: 100px;
+    }
+    #view-chat .chat-actions { display: flex; justify-content: flex-end; gap: 8px; }
+    #view-chat .chat-actions .btn { display: inline-flex; align-items: center; gap: 6px; }
+    #view-chat .chat-actions .btn svg { width: 16px; height: 16px; }
+
+    /* Reveal Animation */
+    #view-chat .reveal { animation: rise-in-chat 0.6s cubic-bezier(0.16,1,0.3,1) both; }
+    #view-chat .workspace .reveal:nth-child(1) { animation-delay: 80ms; }
+    #view-chat .workspace .reveal:nth-child(2) { animation-delay: 160ms; }
+    #view-chat .workspace .reveal:nth-child(3) { animation-delay: 240ms; }
+    @keyframes rise-in-chat {
+      from { opacity: 0; transform: translateY(16px); }
       to { opacity: 1; transform: translateY(0); }
     }
+
+    /* Responsive for chat */
+    @media (max-width: 1100px) {
+      #view-chat .workspace { grid-template-columns: 1fr; }
+      #view-chat .panel { min-height: auto; }
+      #view-chat .chat-feed { min-height: 300px; max-height: 340px; }
+    }
+    @media (max-width: 760px) {
+      #view-chat .hero { padding: 24px 20px; border-radius: 18px; }
+      #view-chat .panel { padding: 18px; border-radius: 18px; }
+      #view-chat .settings-grid { grid-template-columns: 1fr; }
+      #view-chat .runtime-grid { grid-template-columns: 1fr; padding: 12px; }
+      #view-chat h1 { font-size: 28px; }
+      #view-chat .dropzone { padding: 28px 16px; }
+      #view-chat .bubble { max-width: 92%; }
+    }
+    @media (max-width: 480px) {
+      #view-chat .hero, #view-chat .panel { padding: 14px; border-radius: 14px; }
+      #view-chat .actions-row { flex-direction: column; }
+      #view-chat .actions-row .btn { width: 100%; justify-content: center; }
+    }
+
+    /* ============================================
+       Sub-view visibility inside #app
+       ============================================ */
+
+    /* Default (chat mode): hide upload & KB sections, show hero + chat */
+    #view-chat #app .upload-panel { display: none; }
+    #view-chat #app .crawl-kb-panel { display: none; }
+    #view-chat #app .workspace { grid-template-columns: 1fr; }
+    #view-chat #app .workspace .chat-panel { min-height: calc(100vh - 200px); }
+    #view-chat #app .workspace .chat-feed { min-height: 50vh; max-height: 55vh; }
+
+    /* Upload mode: show upload panel, hide hero + chat + KB */
+    #view-chat #app.mode-upload .hero { display: none; }
+    #view-chat #app.mode-upload .upload-panel { display: block; }
+    #view-chat #app.mode-upload .chat-panel { display: none; }
+    #view-chat #app.mode-upload .crawl-kb-panel { display: none; }
+    #view-chat #app.mode-upload .workspace { grid-template-columns: 1fr; }
+
+    /* KB mode: show crawled KB, hide hero + chat + upload */
+    #view-chat #app.mode-kb .hero { display: none; }
+    #view-chat #app.mode-kb .upload-panel { display: none; }
+    #view-chat #app.mode-kb .chat-panel { display: none; }
+    #view-chat #app.mode-kb .crawl-kb-panel { display: block !important; }
+    #view-chat #app.mode-kb .workspace { grid-template-columns: 1fr; }
   </style>
 </head>
 <body>
-  <div class="container">
-    <header class="hero">
-      <div>
-        <h1>Web 智能功能导航控制台</h1>
-        <p>统一配置、实时日志与结果洞察，帮助你快速发现站点功能入口。</p>
+  <!-- ====== Sidebar ====== -->
+  <nav class="sidebar">
+    <div class="sidebar-logo">
+      <h1>FuncFind</h1>
+      <small>智能功能导航</small>
+    </div>
+
+    <div class="nav-item active" data-view="chat" onclick="switchView('chat')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      <span>RAG 对话</span>
+    </div>
+
+    <div class="nav-item" data-view="upload" onclick="switchView('upload')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><polyline points="9 15 12 12 15 15"/></svg>
+      <span>文档上传</span>
+    </div>
+
+    <div class="nav-item" data-view="crawled-kb" onclick="switchView('crawled-kb')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+      <span>已爬取知识库</span>
+    </div>
+
+    <div class="nav-item" data-view="crawl" onclick="switchView('crawl')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      <span>爬取控制台</span>
+    </div>
+
+    <div class="nav-item" data-view="report" onclick="switchView('report')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+      <span>爬取报告</span>
+    </div>
+
+    <div class="nav-item" data-view="rag" onclick="switchView('rag')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+      <span>知识库推送</span>
+    </div>
+
+    <div class="nav-item" data-view="download" onclick="switchView('download')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      <span>下载导出</span>
+    </div>
+
+    <div class="nav-spacer"></div>
+
+    <div class="nav-status">
+      <span><span class="dot dot-idle" id="navStatusDot"></span> <span id="navStatusText">就绪</span></span>
+    </div>
+  </nav>
+
+  <!-- ====== Content ====== -->
+  <div class="content">
+
+    <!-- View 1: RAG Chat (default) -->
+    <div id="view-chat" class="view-panel active">
+      <div id="app" v-cloak>
+        <header class="hero reveal">
+          <div class="hero-badge">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+            RAG Workspace
+          </div>
+          <h1>DocVec Studio</h1>
+          <p>
+            上传文档、构建知识库、网页聊天问答，一屏完成。<br />
+            前端已支持拖拽上传与参数化构建，后端可直接对接 Spring Boot API。
+          </p>
+          <div class="hero-metrics">
+            <span>Session: {{ clientSessionIdShort }}</span>
+            <span>Chunk Size: {{ settings.chunkSize }}</span>
+            <span>Threshold: {{ settings.semanticThreshold.toFixed(2) }}</span>
+            <span>Top-K: {{ settings.topK }}</span>
+          </div>
+        </header>
+
+        <main class="workspace">
+          <section class="panel reveal upload-panel">
+            <div class="panel-head">
+              <h2>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><polyline points="9 15 12 12 15 15"/></svg>
+                文档上传与预处理
+              </h2>
+              <span class="chip" :class="selectedFiles.length ? 'ok' : 'idle'">
+                {{ selectedFiles.length }} files
+              </span>
+            </div>
+
+            <div
+              class="dropzone"
+              :class="{ active: dragActive }"
+              @dragover.prevent="dragActive = true"
+              @dragleave.prevent="dragActive = false"
+              @drop.prevent="handleDrop"
+            >
+              <input ref="fileInput" type="file" multiple accept=".pdf,.docx,.txt" @change="handleFileChoose" hidden />
+              <div class="dropzone-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+              </div>
+              <p>将 PDF / DOCX / TXT 拖到这里，或点击按钮选择</p>
+              <button class="btn ghost" @click="openFilePicker">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;vertical-align:-3px;margin-right:4px"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                选择文件
+              </button>
+            </div>
+
+            <ul class="file-list" v-if="selectedFiles.length">
+              <li v-for="file in selectedFiles" :key="file.id" class="file-item">
+                <div>
+                  <strong>{{ file.name }}</strong>
+                  <small>{{ formatBytes(file.size) }}</small>
+                </div>
+                <button class="icon-btn" @click="removeFile(file.id)">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;vertical-align:-2px"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                  删除
+                </button>
+              </li>
+            </ul>
+
+            <div class="settings-grid">
+              <label>
+                知识库名称
+                <input v-model.lazy="settings.kbName" type="text" placeholder="例如: product-docs" />
+              </label>
+              <label>
+                API Base URL
+                <input v-model="settings.apiBase" type="text" placeholder="http://localhost:8080/api" />
+              </label>
+              <label>
+                Embedding 模型
+                <select v-model="settings.embeddingModel">
+                  <option>all-MiniLM-L6-v2</option>
+                  <option>bge-small-zh-v1.5</option>
+                  <option>text-embedding-3-small</option>
+                </select>
+              </label>
+              <label>
+                生成模型
+                <select v-model="settings.generationModel">
+                  <option>gpt-4o-mini</option>
+                  <option>llama-3-8b-instruct-q4</option>
+                  <option>qwen2.5-7b-instruct</option>
+                </select>
+              </label>
+            </div>
+
+            <details class="advanced-config">
+              <summary>
+                <span>高级 API 配置（会话级）</span>
+                <small>按 kbName 独立快照，不把密钥放入业务请求体</small>
+              </summary>
+
+              <div class="runtime-grid">
+                <label>
+                  Cloudflare Account ID
+                  <input v-model="runtimeConfig.cloudflare.accountId" type="text" placeholder="例如: 2f4d..." />
+                </label>
+
+                <label>
+                  Cloudflare API Token
+                  <div class="secret-field">
+                    <input
+                      v-model="runtimeConfig.cloudflare.apiToken"
+                      :type="showSecrets.cloudflareToken ? 'text' : 'password'"
+                      placeholder="仅用于会话配置接口"
+                      autocomplete="off"
+                    />
+                    <button class="icon-btn" type="button" @click="showSecrets.cloudflareToken = !showSecrets.cloudflareToken">
+                      {{ showSecrets.cloudflareToken ? '隐藏' : '显示' }}
+                    </button>
+                  </div>
+                  <small class="secret-hint" v-if="runtimeServerState.hasCloudflareToken">
+                    服务端已保存 Token: {{ runtimeServerState.cloudflareTokenMasked || '已设置' }}
+                  </small>
+                </label>
+
+                <label>
+                  Vectorize Index Name
+                  <input v-model="runtimeConfig.cloudflare.vectorizeIndexName" type="text" placeholder="例如: docvec-prod" />
+                </label>
+
+                <label>
+                  Vectorize Namespace
+                  <input v-model="runtimeConfig.cloudflare.vectorizeNamespace" type="text" placeholder="例如: kb-default" />
+                </label>
+
+                <label>
+                  R2 Bucket
+                  <input v-model="runtimeConfig.cloudflare.r2Bucket" type="text" placeholder="例如: docvec-raw" />
+                </label>
+
+                <label>
+                  Generation Provider
+                  <select v-model="runtimeConfig.generation.providerType">
+                    <option value="workers-ai">workers-ai</option>
+                    <option value="external">external</option>
+                  </select>
+                </label>
+
+                <label>
+                  Generation Base URL
+                  <input v-model="runtimeConfig.generation.baseUrl" type="text" placeholder="例如: http://localhost:9000" />
+                </label>
+
+                <label>
+                  Generation API Key
+                  <div class="secret-field">
+                    <input
+                      v-model="runtimeConfig.generation.apiKey"
+                      :type="showSecrets.generationApiKey ? 'text' : 'password'"
+                      placeholder="仅用于会话配置接口"
+                      autocomplete="off"
+                    />
+                    <button class="icon-btn" type="button" @click="showSecrets.generationApiKey = !showSecrets.generationApiKey">
+                      {{ showSecrets.generationApiKey ? '隐藏' : '显示' }}
+                    </button>
+                  </div>
+                  <small class="secret-hint" v-if="runtimeServerState.hasGenerationApiKey">
+                    服务端已保存 API Key: {{ runtimeServerState.generationApiKeyMasked || '已设置' }}
+                  </small>
+                </label>
+
+                <label>
+                  Generation Model ID
+                  <input
+                    v-model="runtimeConfig.generation.generationModelId"
+                    type="text"
+                    placeholder="例如: gpt-4o-mini"
+                  />
+                </label>
+              </div>
+
+              <div class="actions-row" style="padding: 0 16px 16px;">
+                <button class="btn ghost" :disabled="loadingRuntimeConfig" @click="loadRuntimeConfigFromServer(false)">
+                  {{ loadingRuntimeConfig ? '读取中...' : '读取当前配置' }}
+                </button>
+                <button class="btn" :disabled="applyingRuntimeConfig" @click="applyRuntimeConfig">
+                  {{ applyingRuntimeConfig ? '应用中...' : '应用会话配置' }}
+                </button>
+              </div>
+
+              <p class="status-text" v-if="runtimeConfigMessage" style="margin: 0 16px 12px;">{{ runtimeConfigMessage }}</p>
+              <p class="status-text" v-if="runtimeServerState.appliedAt" style="margin: 0 16px 12px;">
+                最近应用时间: {{ runtimeServerState.appliedAt }}
+              </p>
+            </details>
+
+            <div class="slider-group">
+              <label>
+                预分块长度: {{ settings.chunkSize }}
+                <input v-model.number="settings.chunkSize" type="range" min="300" max="1200" step="50" />
+              </label>
+              <label>
+                语义阈值: {{ settings.semanticThreshold.toFixed(2) }}
+                <input v-model.number="settings.semanticThreshold" type="range" min="0.5" max="0.95" step="0.01" />
+              </label>
+              <label>
+                检索 Top-K: {{ settings.topK }}
+                <input v-model.number="settings.topK" type="range" min="3" max="12" step="1" />
+              </label>
+            </div>
+
+            <div class="actions-row">
+              <button class="btn" :disabled="!selectedFiles.length || uploading" @click="uploadDocuments">
+                <svg v-if="!uploading" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                {{ uploading ? '上传中...' : '上传文档' }}
+              </button>
+              <button class="btn accent" :disabled="!selectedFiles.length || buildingKb" @click="buildKnowledgeBase">
+                <svg v-if="!buildingKb" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                {{ buildingKb ? '构建中...' : '构建知识库' }}
+              </button>
+            </div>
+
+            <ol class="pipeline">
+              <li :class="pipelineState.extract">提取纯文本</li>
+              <li :class="pipelineState.chunk">混合分块</li>
+              <li :class="pipelineState.embed">向量化</li>
+              <li :class="pipelineState.index">写入向量库</li>
+            </ol>
+
+            <p class="status-text" v-if="systemMessage">{{ systemMessage }}</p>
+          </section>
+
+          <!-- ====== 已爬取知识库 ====== -->
+          <section class="panel reveal crawl-kb-panel" v-if="crawledKbs.length">
+            <div class="panel-head">
+              <h2>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+                已爬取知识库
+              </h2>
+              <span class="chip ok">{{ crawledKbs.length }} KB(s)</span>
+            </div>
+            <p class="hint" style="margin:0 0 14px 0;">
+              来自爬虫控制台的 RAG 构建结果，无需上传文档即可直接对话。
+            </p>
+            <div class="crawl-kb-list">
+              <div v-for="(kb, idx) in crawledKbs" :key="idx" class="crawl-kb-item">
+                <div>
+                  <strong>{{ kb.kbName }}</strong>
+                  <small>{{ kb.dataset }} · {{ kb.pushedAt ? new Date(kb.pushedAt).toLocaleString() : '' }}</small>
+                </div>
+                <button class="btn small" @click="useCrawledKb(kb)">使用此知识库</button>
+              </div>
+            </div>
+            <button class="btn ghost small" style="margin-top:10px;" @click="clearCrawledKbs">清除列表</button>
+          </section>
+
+          <section class="panel reveal chat-panel">
+            <div class="panel-head">
+              <h2>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                网页 AI 聊天
+              </h2>
+              <span class="chip" :class="kbReady ? 'ok' : 'warn'">
+                {{ kbReady ? 'Knowledge Base Ready' : 'Knowledge Base Not Ready' }}
+              </span>
+            </div>
+
+            <div class="chat-feed" ref="chatFeed">
+              <article v-for="msg in messages" :key="msg.id" class="bubble" :class="msg.role">
+                <h4>{{ msg.role === 'user' ? '你' : msg.role === 'assistant' ? 'AI' : '系统' }}</h4>
+                <p>{{ msg.content }}</p>
+              </article>
+              <!-- Typing indicator -->
+              <article v-if="chatting" class="bubble assistant">
+                <h4>AI</h4>
+                <div class="typing-indicator">
+                  <span></span>
+                  <span></span>
+                  <span></span>
+                </div>
+              </article>
+            </div>
+
+            <form class="chat-form" @submit.prevent="sendMessage">
+              <textarea
+                v-model="draft"
+                rows="3"
+                placeholder="请输入问题，例如：请总结这份技术文档的关键接口与约束"
+              ></textarea>
+              <div class="chat-actions">
+                <button class="btn accent" :disabled="chatting || !draft.trim()">
+                  <svg v-if="!chatting" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                  {{ chatting ? '思考中...' : '发送问题' }}
+                </button>
+              </div>
+            </form>
+          </section>
+        </main>
       </div>
-      <div class="hero-meta">
-        <div class="status-indicator status-idle" id="statusIndicator">
-          <span class="dot"></span>
-          <span id="statusText">就绪</span>
+    </div>
+
+    <!-- View 2: Crawl Console -->
+    <div id="view-crawl" class="view-panel">
+      <div class="view-shell">
+        <h2>爬取控制台</h2>
+
+        <div class="grid-2">
+          <div class="panel">
+            <div class="panel-title">
+              <span>基础配置</span>
+              <div class="status-indicator status-idle" id="statusIndicator">
+                <span class="dot"></span>
+                <span id="statusText">就绪</span>
+              </div>
+            </div>
+            <div class="field">
+              <label for="url">目标网址</label>
+              <input type="url" id="url" placeholder="https://example.com" value="https://crawlee.dev" />
+              <span class="hint">只需填写 URL，其他参数可在高级配置中调整。</span>
+            </div>
+
+            <div class="action-row">
+              <button class="btn btn-primary" id="startBtn" onclick="startCrawl()">开始爬取</button>
+              <button class="btn btn-danger" id="stopBtn" onclick="stopCrawl()" disabled>停止</button>
+            </div>
+
+            <details class="advanced">
+              <summary>高级配置</summary>
+              <div class="field"><label for="maxRequests">最大请求数</label><input type="number" id="maxRequests" value="100" min="1" max="10000" /></div>
+              <div class="field"><label for="maxConcurrency">并发数</label><input type="number" id="maxConcurrency" value="1" min="1" max="10" /></div>
+              <div class="field"><label for="navigationTimeout">导航超时 (秒)</label><input type="number" id="navigationTimeout" value="60" min="10" max="300" /></div>
+              <div class="field"><label for="requestHandlerTimeout">请求超时 (秒)</label><input type="number" id="requestHandlerTimeout" value="240" min="30" max="600" /></div>
+              <div class="field"><label for="maxRetries">最大重试次数</label><input type="number" id="maxRetries" value="1" min="0" max="5" /></div>
+              <div class="field"><label for="browserChannel">浏览器通道</label><select id="browserChannel"><option value="">默认 (Chromium)</option><option value="chrome">Chrome</option><option value="msedge">Microsoft Edge</option></select></div>
+              <div class="field"><label for="blockedResources">阻断资源类型</label><input type="text" id="blockedResources" value="image,font,media" /><span class="hint">用逗号分隔</span></div>
+              <div class="field"><label for="sensitiveWords">敏感词</label><textarea id="sensitiveWords">delete,remove,pay,submit,confirm,logout,reset,clear,删除,注销,支付,清空,重置</textarea></div>
+              <div class="field"><label for="outputName">输出文件名</label><input type="text" id="outputName" placeholder="sitemap-2026-05-05.json" /><span class="hint">留空则自动生成</span></div>
+            </details>
+          </div>
+
+          <div class="panel">
+            <div class="panel-title">实时日志</div>
+            <div class="log-container" id="logContainer">
+              <div class="log-entry log-info"><span class="log-time">--:--:--</span><span class="log-message">系统就绪，等待开始爬取...</span></div>
+            </div>
+          </div>
         </div>
-        <div class="hero-actions">
-          <button class="btn btn-outline" onclick="scrollToResults()">查看结果</button>
-          <button class="btn btn-outline" onclick="openReportLatest()">打开报告</button>
-          <button class="btn btn-outline" onclick="downloadResults()">下载 JSON</button>
-          <button class="btn btn-primary" onclick="location.href='/rag/'" title="打开 RAG 知识库对话页面">🤖 RAG 对话</button>
+
+        <!-- Dataset index -->
+        <div class="panel">
+          <div class="panel-title">
+            <span>数据库爬取索引</span>
+            <div>
+              <button class="btn btn-outline btn-small" onclick="openReportLatest()">打开最新报告</button>
+              <button class="btn btn-outline btn-small" onclick="loadDatasetIndex()">刷新列表</button>
+            </div>
+          </div>
+          <p class="hint" style="margin-bottom:12px;">扫描 database 目录下的 JSON 结果文件。</p>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>文件名</th><th>更新时间</th><th>大小</th><th>操作</th><th>RAG</th></tr></thead>
+              <tbody id="datasetTableBody"><tr><td colspan="5" class="empty">正在加载...</td></tr></tbody>
+            </table>
+          </div>
         </div>
       </div>
-    </header>
+    </div>
 
-    <main class="main-grid">
-      <section class="panel">
-        <h2 class="panel-title">基础配置</h2>
-        <div class="field">
-          <label for="url">目标网址</label>
-          <input type="url" id="url" placeholder="https://example.com" value="https://crawlee.dev" />
-          <span class="hint">只需填写 URL，其他参数可在高级配置中调整。</span>
+    <!-- View 3: Crawl Report -->
+    <div id="view-report" class="view-panel">
+      <div class="view-shell">
+        <h2>爬取报告</h2>
+
+        <div class="panel">
+          <div class="panel-header">
+            <h3>数据源</h3>
+            <div class="control">
+              <select id="datasetSelect"></select>
+              <button id="loadFileBtn" class="btn btn-outline btn-small">加载 JSON</button>
+              <input id="fileInput" type="file" accept="application/json" style="display:none" />
+            </div>
+          </div>
+          <div class="detail-meta" id="datasetMetaContent">暂无数据</div>
+          <div class="subtle" id="datasetHint">从控制台打开或上传 JSON 文件。</div>
         </div>
 
-        <div class="action-row">
-          <button class="btn btn-primary" id="startBtn" onclick="startCrawl()">开始爬取</button>
-          <button class="btn btn-danger" id="stopBtn" onclick="stopCrawl()" disabled>停止</button>
+        <div class="panel" id="statsPanel">
+          <div class="panel-header">
+            <h3>快照统计</h3>
+            <span class="subtle" id="snapshotNote"></span>
+          </div>
+          <div class="stat-grid" id="statGrid"></div>
         </div>
 
-        <details class="advanced" id="advancedSettings">
-          <summary>高级配置</summary>
+        <div class="grid-2" id="chartsPanel">
+          <div class="panel">
+            <div class="panel-header"><h3>元素类型分布</h3><span class="subtle" id="elementMixNote"></span></div>
+            <div class="bar-chart" id="typeChart"></div>
+          </div>
+          <div class="panel">
+            <div class="panel-header"><h3>Top 页面</h3><span class="subtle" id="topPagesNote"></span></div>
+            <div class="bar-chart" id="topPagesChart"></div>
+          </div>
+        </div>
+
+        <div class="panel" id="pagesPanel">
+          <div class="panel-header">
+            <h3>页面列表</h3>
+            <div class="tools">
+              <input id="pageSearch" type="search" placeholder="筛选页面" style="min-width:180px" />
+            </div>
+          </div>
+          <div class="table-wrap" id="pagesTableWrap"></div>
+        </div>
+
+        <div class="panel" id="detailPanel">
+          <div class="panel-header">
+            <h3>页面详情</h3>
+            <div class="tools">
+              <input id="elementSearch" type="search" placeholder="筛选元素" style="min-width:160px" />
+              <select id="elementTypeFilter" style="min-width:120px"></select>
+            </div>
+          </div>
+          <div id="pageDetail"></div>
+          <div id="verifyPanel" style="margin-top:16px;">
+            <div class="detail-card">
+              <h3>验证定位</h3>
+              <div class="subtle" id="verifyStatus">未选择元素。</div>
+              <iframe class="verify-frame" id="verifyFrame" title="验证定位"></iframe>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- View 4: RAG Push -->
+    <div id="view-rag" class="view-panel">
+      <div class="view-shell">
+        <h2>知识库推送</h2>
+        <div class="panel">
+          <div class="panel-title">RAG 构建</div>
+          <p class="hint" style="margin-bottom:14px;">将爬取结果发送到 DocVec_RAG 的 build-from-crawl 接口。</p>
+          <div class="rag-grid">
+            <div class="rag-field"><label>RAG Base URL</label><input id="ragBaseUrl" type="text" value="http://localhost:8080" /></div>
+            <div class="rag-field"><label>知识库名称</label><input id="ragKbName" type="text" value="default-kb" /></div>
+            <div class="rag-field"><label>数据集</label><input id="ragDataset" type="text" value="latest" /><span class="hint">填写 latest 或文件名</span></div>
+            <div class="rag-field"><label>Session ID (可选)</label><input id="ragSessionId" type="text" placeholder="X-Client-Session-Id" /></div>
+            <div class="rag-field"><label>Embedding 模型 (可选)</label><input id="ragEmbeddingModel" type="text" placeholder="all-MiniLM-L6-v2" /></div>
+          </div>
+          <div class="action-row" style="margin-top:14px;">
+            <button class="btn btn-primary" id="ragPushBtn" onclick="pushToRagView()">推送并构建</button>
+            <button class="btn btn-outline" onclick="setRagDatasetView('latest')">使用最新结果</button>
+          </div>
+          <div class="rag-status" id="ragStatus" style="margin-top:12px;">等待推送。</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- View 5: Download -->
+    <div id="view-download" class="view-panel">
+      <div class="view-shell">
+        <h2>下载导出</h2>
+        <div class="panel">
+          <div class="panel-title">导出数据</div>
+          <p class="hint" style="margin-bottom:16px;">选择数据源后可下载 JSON 或 CSV 格式的爬取结果。</p>
           <div class="field">
-            <label for="maxRequests">最大请求数</label>
-            <input type="number" id="maxRequests" value="100" min="1" max="10000" />
+            <label>数据源</label>
+            <select id="downloadDatasetSelect"></select>
           </div>
-          <div class="field">
-            <label for="maxConcurrency">并发数</label>
-            <input type="number" id="maxConcurrency" value="1" min="1" max="10" />
-          </div>
-          <div class="field">
-            <label for="navigationTimeout">导航超时 (秒)</label>
-            <input type="number" id="navigationTimeout" value="60" min="10" max="300" />
-          </div>
-          <div class="field">
-            <label for="requestHandlerTimeout">请求超时 (秒)</label>
-            <input type="number" id="requestHandlerTimeout" value="240" min="30" max="600" />
-          </div>
-          <div class="field">
-            <label for="maxRetries">最大重试次数</label>
-            <input type="number" id="maxRetries" value="1" min="0" max="5" />
-          </div>
-          <div class="field">
-            <label for="browserChannel">浏览器通道</label>
-            <select id="browserChannel">
-              <option value="">默认 (Chromium)</option>
-              <option value="chrome">Chrome</option>
-              <option value="msedge">Microsoft Edge</option>
-            </select>
-          </div>
-          <div class="field">
-            <label for="blockedResources">阻断资源类型</label>
-            <input type="text" id="blockedResources" value="image,font,media" />
-            <span class="hint">用逗号分隔，例如 image,font,media</span>
-          </div>
-          <div class="field">
-            <label for="sensitiveWords">敏感词（跳过危险点击）</label>
-            <textarea id="sensitiveWords">delete,remove,pay,submit,confirm,logout,reset,clear,删除,注销,支付,清空,重置</textarea>
-          </div>
-          <div class="field">
-            <label for="outputName">输出文件名</label>
-            <input type="text" id="outputName" placeholder="sitemap-2026-05-05.json" />
-            <span class="hint">留空则自动生成文件名。</span>
-          </div>
-        </details>
-      </section>
-
-      <section class="panel">
-        <h2 class="panel-title">实时日志</h2>
-        <div class="log-container" id="logContainer">
-          <div class="log-entry log-info">
-            <span class="log-time">--:--:--</span>
-            <span class="log-message">系统就绪，等待开始爬取...</span>
+          <div class="download-grid" style="margin-top:14px;">
+            <div class="download-card">
+              <div class="icon">{ }</div>
+              <h4>JSON 格式</h4>
+              <p>完整的结构化数据，适合程序处理</p>
+              <button class="btn btn-primary btn-small" id="downloadJsonBtn" onclick="downloadJsonView()" disabled>下载 JSON</button>
+            </div>
+            <div class="download-card">
+              <div class="icon">.csv</div>
+              <h4>CSV 格式</h4>
+              <p>表格数据，适合 Excel 打开</p>
+              <button class="btn btn-outline btn-small" id="downloadCsvBtn" onclick="downloadCsvView()" disabled>下载 CSV</button>
+            </div>
           </div>
         </div>
-      </section>
-    </main>
+      </div>
+    </div>
 
-    <section class="panel dataset-panel" id="datasetSection">
-      <div class="panel-title">
-        <span>数据库爬取索引</span>
-        <div class="dataset-actions">
-          <button class="btn btn-outline btn-small" onclick="openReportLatest()">打开最新报告</button>
-          <button class="btn btn-outline btn-small" onclick="loadDatasetIndex()">刷新列表</button>
-        </div>
-      </div>
-      <p class="hint">扫描 database 目录下的 JSON 结果文件。</p>
-      <div class="table-container">
-        <table class="dataset-table">
-          <thead>
-            <tr>
-              <th>文件名</th>
-              <th>更新时间</th>
-              <th>大小</th>
-              <th>操作</th>
-              <th>RAG</th>
-            </tr>
-          </thead>
-          <tbody id="datasetTableBody">
-            <tr><td colspan="5" class="empty-state">正在加载...</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </section>
+  </div><!-- /content -->
 
-    <section class="panel rag-panel" id="ragSection">
-      <div class="panel-title">
-        <span>RAG 构建</span>
-        <div class="dataset-actions">
-          <button class="btn btn-outline btn-small" onclick="setRagDataset('latest')">使用最新结果</button>
-          <button class="btn btn-outline btn-small" onclick="pushToRag()">推送到 RAG</button>
-        </div>
-      </div>
-      <p class="hint">将爬取结果发送到 DocVec_RAG 的 build-from-crawl 接口。</p>
-      <div class="field">
-        <label for="ragBaseUrl">RAG Base URL</label>
-        <input type="text" id="ragBaseUrl" value="http://localhost:8080" />
-      </div>
-      <div class="field">
-        <label for="ragKbName">知识库名称</label>
-        <input type="text" id="ragKbName" value="default-kb" />
-      </div>
-      <div class="field">
-        <label for="ragDataset">数据集</label>
-        <input type="text" id="ragDataset" value="latest" />
-        <span class="hint">填写 latest 或 database 目录中的 .json 文件名。</span>
-      </div>
-      <div class="field">
-        <label for="ragSiteId">站点标识（可选）</label>
-        <input type="text" id="ragSiteId" placeholder="site-001" />
-      </div>
-      <div class="field">
-        <label for="ragSessionId">Session ID（可选）</label>
-        <input type="text" id="ragSessionId" placeholder="X-Client-Session-Id" />
-      </div>
-      <div class="field">
-        <label for="ragEmbeddingModel">Embedding 模型（可选）</label>
-        <input type="text" id="ragEmbeddingModel" placeholder="all-MiniLM-L6-v2" />
-      </div>
-      <div class="action-row">
-        <button class="btn btn-primary" onclick="pushToRag()">推送并构建</button>
-        <button class="btn btn-outline" onclick="setRagDataset('latest')">使用最新结果</button>
-      </div>
-      <div class="rag-status" id="ragStatus">等待推送。</div>
-    </section>
+  <!-- RAG Chat Vue app -->
+  <script type="module" src="/rag/app.js"></script>
 
-    <section class="panel results-panel" id="resultsSection" style="display: none;">
-      <div class="results-header">
-        <div>
-          <h2 class="panel-title">爬取结果</h2>
-          <p>查看概览、页面列表与元素详情，支持过滤与导出。</p>
-        </div>
-        <div class="filters">
-          <input type="text" id="pageFilter" placeholder="筛选页面标题或 URL" />
-          <input type="text" id="elementFilter" placeholder="筛选元素文本或链接" />
-          <button class="btn btn-outline" onclick="downloadResults()">下载 JSON</button>
-        </div>
-        <div class="tabs">
-          <button class="tab-btn active" onclick="switchTab(event, 'overview')">概览</button>
-          <button class="tab-btn" onclick="switchTab(event, 'pages')">页面列表</button>
-          <button class="tab-btn" onclick="switchTab(event, 'elements')">元素详情</button>
-        </div>
-      </div>
-
-      <div id="overviewTab">
-        <div class="stats-grid" id="statsGrid"></div>
-      </div>
-
-      <div id="pagesTab" style="display: none;">
-        <div class="table-container">
-          <table>
-            <thead>
-              <tr>
-                <th>标题</th>
-                <th>URL</th>
-                <th>元素数量</th>
-                <th>唯一链接数</th>
-              </tr>
-            </thead>
-            <tbody id="pagesTableBody"></tbody>
-          </table>
-        </div>
-      </div>
-
-      <div id="elementsTab" style="display: none;">
-        <div class="table-container">
-          <table>
-            <thead>
-              <tr>
-                <th>类型</th>
-                <th>文本</th>
-                <th>链接/Href</th>
-                <th>选择器</th>
-                <th>上下文</th>
-              </tr>
-            </thead>
-            <tbody id="elementsTableBody"></tbody>
-          </table>
-        </div>
-      </div>
-    </section>
-
-    <footer>Web Intelligent Function Navigation System · Crawlee + Playwright</footer>
-  </div>
-
-  <script src="/socket.io/socket.io.js"></script>
   <script>
+    // ============================================
+    // View Switching
+    // ============================================
+    function switchView(name) {
+      document.querySelectorAll('.view-panel').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+      document.querySelector('[data-view="' + name + '"]').classList.add('active');
+
+      // Sub-views inside the Vue app (#view-chat)
+      const app = document.getElementById('app');
+      if (app) {
+        app.classList.remove('mode-upload', 'mode-kb');
+      }
+
+      if (name === 'upload' || name === 'crawled-kb') {
+        // These use the same view-chat panel with different mode
+        document.getElementById('view-chat').classList.add('active');
+        if (app) {
+          app.classList.add(name === 'upload' ? 'mode-upload' : 'mode-kb');
+        }
+      } else {
+        document.getElementById('view-' + name).classList.add('active');
+      }
+    }
+
+    // ============================================
+    // Crawl Console (from index.html)
+    // ============================================
     let socket = null;
     let crawlResults = null;
 
     function connectSocket() {
+      if (typeof io === 'undefined') return;
       socket = io();
 
       socket.on("connect", () => {
@@ -812,9 +1847,7 @@
 
       socket.on("crawl:status", (data) => {
         updateStatus(data.status);
-        if (data.message) {
-          addLog("info", data.message);
-        }
+        if (data.message) addLog("info", data.message);
       });
 
       socket.on("crawl:log", (data) => {
@@ -823,8 +1856,8 @@
 
       socket.on("crawl:complete", (data) => {
         crawlResults = data.results;
-        showResults(crawlResults);
-        addLog("success", `爬取完成! 共发现 ${crawlResults.pages.length} 个页面`);
+        addLog("success", "爬取完成! 共发现 " + crawlResults.pages.length + " 个页面");
+        refreshReportData();
       });
 
       socket.on("crawl:error", (data) => {
@@ -836,27 +1869,18 @@
     function addLog(type, message, timestamp) {
       const container = document.getElementById("logContainer");
       const entry = document.createElement("div");
-      entry.className = `log-entry log-${type}`;
-
+      entry.className = "log-entry log-" + type;
       const time = document.createElement("span");
       time.className = "log-time";
-      time.textContent = timestamp
-        ? new Date(timestamp).toLocaleTimeString()
-        : new Date().toLocaleTimeString();
-
+      time.textContent = timestamp ? new Date(timestamp).toLocaleTimeString() : new Date().toLocaleTimeString();
       const msg = document.createElement("span");
       msg.className = "log-message";
       msg.textContent = message;
-
       entry.appendChild(time);
       entry.appendChild(msg);
-
       container.appendChild(entry);
       container.scrollTop = container.scrollHeight;
-
-      if (container.children.length > 500) {
-        container.removeChild(container.firstChild);
-      }
+      if (container.children.length > 500) container.removeChild(container.firstChild);
     }
 
     function updateStatus(status) {
@@ -864,41 +1888,36 @@
       const text = document.getElementById("statusText");
       const startBtn = document.getElementById("startBtn");
       const stopBtn = document.getElementById("stopBtn");
+      const navDot = document.getElementById("navStatusDot");
+      const navText = document.getElementById("navStatusText");
 
       indicator.className = "status-indicator";
 
       switch (status) {
-        case "running":
-        case "started":
-          indicator.classList.add("status-running");
-          text.textContent = "正在爬取";
-          startBtn.disabled = true;
-          stopBtn.disabled = false;
+        case "running": case "started":
+          indicator.classList.add("status-running"); text.textContent = "正在爬取";
+          startBtn.disabled = true; stopBtn.disabled = false;
+          navDot.className = "dot dot-running"; navText.textContent = "爬取中";
           break;
         case "completed":
-          indicator.classList.add("status-completed");
-          text.textContent = "已完成";
-          startBtn.disabled = false;
-          stopBtn.disabled = true;
+          indicator.classList.add("status-completed"); text.textContent = "已完成";
+          startBtn.disabled = false; stopBtn.disabled = true;
+          navDot.className = "dot dot-done"; navText.textContent = "已完成";
           break;
         case "stopped":
-          indicator.classList.add("status-stopped");
-          text.textContent = "已停止";
-          startBtn.disabled = false;
-          stopBtn.disabled = true;
+          indicator.classList.add("status-stopped"); text.textContent = "已停止";
+          startBtn.disabled = false; stopBtn.disabled = true;
+          navDot.className = "dot dot-idle"; navText.textContent = "已停止";
           break;
-        case "error":
-        case "failed":
-          indicator.classList.add("status-error");
-          text.textContent = "发生错误";
-          startBtn.disabled = false;
-          stopBtn.disabled = true;
+        case "error": case "failed":
+          indicator.classList.add("status-error"); text.textContent = "发生错误";
+          startBtn.disabled = false; stopBtn.disabled = true;
+          navDot.className = "dot dot-error"; navText.textContent = "错误";
           break;
         default:
-          indicator.classList.add("status-idle");
-          text.textContent = "就绪";
-          startBtn.disabled = false;
-          stopBtn.disabled = true;
+          indicator.classList.add("status-idle"); text.textContent = "就绪";
+          startBtn.disabled = false; stopBtn.disabled = true;
+          navDot.className = "dot dot-idle"; navText.textContent = "就绪";
       }
     }
 
@@ -912,7 +1931,7 @@
           if (!crawlResults) {
             const resultsResponse = await fetch("/api/results");
             crawlResults = await resultsResponse.json();
-            showResults(crawlResults);
+            refreshReportData();
           }
           updateStatus("completed");
         }
@@ -924,16 +1943,8 @@
     async function startCrawl() {
       const urlInput = document.getElementById("url");
       const urlValue = urlInput.value.trim();
-
-      if (!urlValue) {
-        urlInput.classList.add("input-error");
-        addLog("error", "请输入目标网址");
-        return;
-      }
-
-      urlInput.classList.remove("input-error");
-
-      const outputName = document.getElementById("outputName").value.trim();
+      if (!urlValue) { urlInput.style.borderColor = "var(--danger)"; addLog("error", "请输入目标网址"); return; }
+      urlInput.style.borderColor = "";
 
       const config = {
         url: urlValue,
@@ -947,24 +1958,18 @@
         sensitiveWords: document.getElementById("sensitiveWords").value.trim()
       };
 
-      if (outputName) {
-        config.outputPath = outputName;
-      }
+      const outputName = document.getElementById("outputName").value.trim();
+      if (outputName) config.outputPath = outputName;
 
       try {
-        addLog("info", `开始爬取: ${config.url}`);
+        addLog("info", "开始爬取: " + config.url);
         const response = await fetch("/api/crawl/start", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(config)
         });
-
         const result = await response.json();
-
-        if (!result.success) {
-          throw new Error(result.error || "启动失败");
-        }
-
+        if (!result.success) throw new Error(result.error || "启动失败");
         updateStatus("started");
         addLog("info", result.message);
       } catch (error) {
@@ -977,341 +1982,623 @@
       try {
         const response = await fetch("/api/crawl/stop", { method: "POST" });
         const result = await response.json();
-
-        if (result.success) {
-          addLog("info", result.message);
-        }
+        if (result.success) addLog("info", result.message);
       } catch (error) {
         addLog("error", error.message);
       }
     }
 
-    function showResults(results) {
-      const section = document.getElementById("resultsSection");
-      section.style.display = "block";
-
-      renderStats(results);
-      renderPagesTable(results.pages);
-      renderElementsTable(results.pages);
-    }
-
-    function renderStats(results) {
-      const grid = document.getElementById("statsGrid");
-
-      let totalElements = 0;
-      const hrefSet = new Set();
-      const domains = new Set();
-
-      results.pages.forEach((page) => {
-        const elements = page.elements || [];
-        totalElements += elements.length;
-        elements.forEach((el) => {
-          if (el.href) hrefSet.add(el.href);
-        });
-        try {
-          const url = new URL(page.url);
-          domains.add(url.hostname);
-        } catch (e) {}
-      });
-
-      const stats = [
-        { label: "爬取页面数", value: results.pages.length },
-        { label: "总页面数", value: results.totalPages },
-        { label: "发现的元素", value: totalElements },
-        { label: "唯一链接", value: hrefSet.size },
-        { label: "域名数量", value: domains.size },
-        { label: "平均元素/页", value: (totalElements / results.pages.length || 0).toFixed(1) }
-      ];
-
-      grid.innerHTML = stats
-        .map(
-          (stat) => `
-        <div class="stat-card">
-          <div class="stat-value">${stat.value}</div>
-          <div class="stat-label">${stat.label}</div>
-        </div>
-      `
-        )
-        .join("");
-    }
-
-    function renderPagesTable(pages) {
-      const tbody = document.getElementById("pagesTableBody");
-      const filter = document.getElementById("pageFilter").value.trim().toLowerCase();
-
-      const filteredPages = pages.filter((page) => {
-        if (!filter) return true;
-        const title = (page.title || "").toLowerCase();
-        const url = (page.url || "").toLowerCase();
-        return title.includes(filter) || url.includes(filter);
-      });
-
-      if (filteredPages.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="4" class="empty-state">暂无匹配页面</td></tr>`;
-        return;
-      }
-
-      tbody.innerHTML = filteredPages
-        .map((page) => {
-          const links = new Set((page.elements || []).filter((el) => el.href).map((el) => el.href));
-          return `
-        <tr>
-          <td>${page.title || "(无标题)"}</td>
-          <td style="font-family: var(--mono); font-size: 0.82rem;">${page.url}</td>
-          <td><strong>${(page.elements || []).length}</strong></td>
-          <td>${links.size}</td>
-        </tr>
-      `;
-        })
-        .join("");
-    }
-
-    function renderElementsTable(pages) {
-      const tbody = document.getElementById("elementsTableBody");
-      const filter = document.getElementById("elementFilter").value.trim().toLowerCase();
-
-      let allElements = [];
-
-      pages.forEach((page) => {
-        (page.elements || []).forEach((el) => {
-          allElements.push({
-            ...el,
-            _pageTitle: page.title,
-            _pageUrl: page.url
-          });
-        });
-      });
-
-      if (filter) {
-        allElements = allElements.filter((el) => {
-          const hay = `${el.text || ""} ${el.href || ""} ${el.selector || ""}`.toLowerCase();
-          return hay.includes(filter);
-        });
-      }
-
-      if (allElements.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="5" class="empty-state">暂无数据</td></tr>`;
-        return;
-      }
-
-      tbody.innerHTML = allElements.slice(0, 200).map((el) => `
-        <tr>
-          <td><span class="tag tag-${el.type}">${el.type}</span></td>
-          <td>${el.text || "-"}</td>
-          <td style="font-family: var(--mono); font-size: 0.78rem; word-break: break-all;">
-            ${el.href ? `<a href="${el.href}" target="_blank" rel="noopener" style="color: var(--accent-strong);">${el.href}</a>` : "-"}
-          </td>
-          <td style="font-family: var(--mono); font-size: 0.78rem;">${el.selector || "-"}</td>
-          <td style="color: var(--muted); font-size: 0.82rem;">${el.context || "-"}</td>
-        </tr>
-      `).join("");
-
-      if (allElements.length > 200) {
-        tbody.innerHTML += `<tr><td colspan="5" class="empty-state">显示前 200 条记录，共 ${allElements.length} 条</td></tr>`;
-      }
-    }
-
-    function switchTab(event, tabName) {
-      document.querySelectorAll(".tab-btn").forEach((btn) => btn.classList.remove("active"));
-      event.target.classList.add("active");
-
-      document.getElementById("overviewTab").style.display = tabName === "overview" ? "block" : "none";
-      document.getElementById("pagesTab").style.display = tabName === "pages" ? "block" : "none";
-      document.getElementById("elementsTab").style.display = tabName === "elements" ? "block" : "none";
-    }
-
-    function setupFilters() {
-      document.getElementById("pageFilter").addEventListener("input", () => {
-        if (crawlResults) {
-          renderPagesTable(crawlResults.pages);
-        }
-      });
-
-      document.getElementById("elementFilter").addEventListener("input", () => {
-        if (crawlResults) {
-          renderElementsTable(crawlResults.pages);
-        }
-      });
-    }
-
-    function downloadResults() {
-      if (!crawlResults) {
-        addLog("error", "暂无可下载的结果");
-        return;
-      }
-      window.open("/api/results/download", "_blank");
-    }
-
-    function openReportLatest() {
-      window.open("/crawl-report.html?source=latest", "_blank");
-    }
-
-    function openRagChat() {
-      window.open("/rag/", "_blank");
-    }
-
-    function openReportForFile(fileName) {
-      const target = `/crawl-report.html?file=${encodeURIComponent(fileName)}`;
-      window.open(target, "_blank");
-    }
-
-    function setRagDataset(name) {
-      const input = document.getElementById("ragDataset");
-      if (!input) return;
-      input.value = name || "latest";
-      setRagStatus("", `已选择数据集: ${input.value}`);
-    }
-
-    function setRagStatus(state, message) {
-      const node = document.getElementById("ragStatus");
-      if (!node) return;
-      node.className = "rag-status";
-      if (state) {
-        node.classList.add(state);
-      }
-      node.textContent = message || "";
-    }
-
-    function safeJson(value) {
+    // Dataset index on crawl page
+    async function loadDatasetIndex() {
+      const tbody = document.getElementById("datasetTableBody");
+      tbody.innerHTML = '<tr><td colspan="5" class="empty">正在加载...</td></tr>';
       try {
-        return JSON.parse(value);
-      } catch {
-        return null;
-      }
-    }
-
-    async function pushToRag() {
-      const ragBaseUrl = document.getElementById("ragBaseUrl").value.trim();
-      const kbName = document.getElementById("ragKbName").value.trim() || "default-kb";
-      const dataset = document.getElementById("ragDataset").value.trim() || "latest";
-      const siteId = document.getElementById("ragSiteId").value.trim();
-      const sessionId = document.getElementById("ragSessionId").value.trim();
-      const embeddingModel = document.getElementById("ragEmbeddingModel").value.trim();
-
-      if (!ragBaseUrl) {
-        setRagStatus("error", "请填写 RAG Base URL。");
-        return;
-      }
-
-      const payload = {
-        ragBaseUrl,
-        kbName,
-        dataset
-      };
-
-      if (siteId) payload.siteId = siteId;
-      if (sessionId) payload.sessionId = sessionId;
-      if (embeddingModel) payload.embeddingModel = embeddingModel;
-
-      setRagStatus("", "正在推送到 RAG...");
-      addLog("info", `推送到 RAG: ${kbName} / ${dataset}`);
-
-      try {
-        const response = await fetch("/api/rag/build-from-crawl", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload)
-        });
-
-        const raw = await response.text();
-        const parsed = safeJson(raw) || raw;
-
-        if (!response.ok) {
-          setRagStatus("error", `构建失败: ${typeof parsed === "string" ? parsed : "RAG 返回错误"}`);
+        const response = await fetch("/api/datasets", { cache: "no-store" });
+        if (!response.ok) throw new Error("无法读取数据库索引");
+        const data = await response.json();
+        const items = Array.isArray(data.files) ? data.files : [];
+        if (items.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="5" class="empty">database 目录暂无结果文件</td></tr>';
           return;
         }
-
-        const msg = typeof parsed === "string" ? parsed : JSON.stringify(parsed, null, 2);
-        setRagStatus("success", `构建完成。${msg.slice(0, 240)}`);
-
-        // Store crawled KB info so RAG frontend can discover it
-        const crawledKbs = safeJson(localStorage.getItem("crawledKbList")) || [];
-        const existingIdx = crawledKbs.findIndex(k => k.kbName === kbName);
-        const entry = { kbName, dataset, pushedAt: new Date().toISOString() };
-        if (existingIdx >= 0) {
-          crawledKbs[existingIdx] = entry;
-        } else {
-          crawledKbs.push(entry);
-        }
-        localStorage.setItem("crawledKbList", JSON.stringify(crawledKbs));
-
-        addLog("success", `知识库 ${kbName} 已注册到浏览器，RAG 对话页面可直接使用。`);
+        tbody.innerHTML = items.map(item => '<tr>' +
+          '<td>' + item.name + '</td>' +
+          '<td>' + formatTimestamp(item.updatedAt) + '</td>' +
+          '<td>' + formatBytes(item.size) + '</td>' +
+          '<td><button class="btn btn-outline btn-small" onclick="openReportForFile(\'' + item.name + '\')">查看</button></td>' +
+          '<td><button class="btn btn-outline btn-small" onclick="setRagDatasetFromIndex(\'' + item.name + '\')">使用</button></td>' +
+          '</tr>').join("");
       } catch (error) {
-        setRagStatus("error", error.message || "推送失败");
+        tbody.innerHTML = '<tr><td colspan="5" class="empty">' + error.message + '</td></tr>';
       }
+    }
+
+    function formatTimestamp(value) {
+      if (!value) return "-";
+      try { return new Date(value).toLocaleString(); } catch { return "-"; }
     }
 
     function formatBytes(bytes) {
       if (!Number.isFinite(bytes)) return "-";
       const units = ["B", "KB", "MB", "GB"];
-      let size = bytes;
-      let idx = 0;
-      while (size >= 1024 && idx < units.length - 1) {
-        size /= 1024;
-        idx += 1;
-      }
-      return `${size.toFixed(size < 10 && idx > 0 ? 1 : 0)} ${units[idx]}`;
+      let size = bytes, idx = 0;
+      while (size >= 1024 && idx < units.length - 1) { size /= 1024; idx++; }
+      return size.toFixed(size < 10 && idx > 0 ? 1 : 0) + " " + units[idx];
     }
 
-    function formatTimestamp(value) {
-      if (!value) return "-";
+    function setRagDatasetFromIndex(name) {
+      document.getElementById("ragDataset").value = name;
+      switchView("rag");
+    }
+
+    function openReportLatest() {
+      switchView("report");
+      reportLoadLatest();
+    }
+
+    function openReportForFile(fileName) {
+      switchView("report");
+      reportLoadDataset(fileName);
+    }
+
+    // ============================================
+    // Report Viewer (from crawl-report.html)
+    // ============================================
+    const reportState = {
+      datasets: [],
+      selectedId: "",
+      selectedPageIndex: null,
+      pageFilter: "",
+      elementFilter: "",
+      elementType: "",
+      showAllElements: false
+    };
+
+    let reportInited = false;
+
+    function refreshReportData() {
+      if (!crawlResults) return;
+      if (reportState.datasets.find(d => d.source === "latest")) return;
+      addReportDataset({ file: "latest", label: "Latest (server)" }, crawlResults, "server");
+      refreshReportSelect();
+      reportRender();
+    }
+
+    function addReportDataset(source, data, origin) {
+      const pages = Array.isArray(data.pages) ? data.pages : [];
+      if (!pages.length) return;
+      const entry = {
+        id: source.file + "-" + Math.random().toString(36).slice(2, 8),
+        name: source.label,
+        source: source.file,
+        origin,
+        data
+      };
+      reportState.datasets.push(entry);
+      if (!reportState.selectedId) reportState.selectedId = entry.id;
+    }
+
+    function refreshReportSelect() {
+      const sel = document.getElementById("datasetSelect");
+      const dlSel = document.getElementById("downloadDatasetSelect");
+      [sel, dlSel].forEach(s => {
+        if (!s) return;
+        s.innerHTML = "";
+        reportState.datasets.forEach(d => {
+          const opt = document.createElement("option");
+          opt.value = d.id;
+          opt.textContent = d.name;
+          s.appendChild(opt);
+        });
+        s.value = reportState.selectedId;
+      });
+      // Enable/disable download buttons
+      const hasData = reportState.datasets.length > 0;
+      const dlJsonBtn = document.getElementById("downloadJsonBtn");
+      const dlCsvBtn = document.getElementById("downloadCsvBtn");
+      if (dlJsonBtn) dlJsonBtn.disabled = !hasData;
+      if (dlCsvBtn) dlCsvBtn.disabled = !hasData;
+    }
+
+    async function reportLoadLatest() {
       try {
-        return new Date(value).toLocaleString();
-      } catch {
-        return "-";
+        const r = await fetch("/api/results", { cache: "no-store" });
+        if (!r.ok) throw new Error("No results");
+        const data = await r.json();
+        addReportDataset({ file: "latest", label: "Latest (server)" }, data, "server");
+        refreshReportSelect();
+        reportRender();
+      } catch (e) {
+        document.getElementById("datasetHint").textContent = "无法加载最新结果。";
       }
     }
 
-    async function loadDatasetIndex() {
-      const tbody = document.getElementById("datasetTableBody");
-      tbody.innerHTML = `<tr><td colspan="5" class="empty-state">正在加载...</td></tr>`;
+    async function reportLoadDataset(fileName) {
+      try {
+        const r = await fetch("/api/datasets/" + encodeURIComponent(fileName), { cache: "no-store" });
+        if (!r.ok) throw new Error("Not available");
+        const data = await r.json();
+        addReportDataset({ file: fileName, label: fileName }, data, "database");
+        refreshReportSelect();
+        reportRender();
+      } catch (e) {
+        document.getElementById("datasetHint").textContent = "无法加载 " + fileName;
+      }
+    }
+
+    function reportNormalize(raw) {
+      const pages = Array.isArray(raw.pages) ? raw.pages : [];
+      return {
+        startUrl: raw.startUrl || "",
+        totalPages: Number.isFinite(raw.totalPages) ? raw.totalPages : pages.length,
+        pages
+      };
+    }
+
+    function reportBuildStats(data) {
+      let elementCount = 0;
+      const hrefSet = new Set(), domains = new Set();
+      data.pages.forEach(p => {
+        const items = p.elements || [];
+        elementCount += items.length;
+        try { domains.add(new URL(p.url).hostname); } catch {}
+        items.forEach(el => { if (el.href) hrefSet.add(el.href); });
+      });
+      return {
+        elementCount,
+        hrefCount: hrefSet.size,
+        domainCount: domains.size,
+        average: data.pages.length ? elementCount / data.pages.length : 0
+      };
+    }
+
+    function reportBuildTypeCounts(pages) {
+      const counts = {};
+      pages.forEach(p => (p.elements || []).forEach(el => {
+        const t = el.type || "unknown";
+        counts[t] = (counts[t] || 0) + 1;
+      }));
+      return counts;
+    }
+
+    function reportBuildPageEntries(pages) {
+      return pages.map((page, index) => {
+        const items = page.elements || [];
+        const hrefSet = new Set();
+        items.forEach(el => { if (el.href) hrefSet.add(el.href); });
+        return { index, url: page.url || "", title: page.title || "", elements: items, elementCount: items.length, hrefCount: hrefSet.size };
+      });
+    }
+
+    function clearNode(node) { while (node.firstChild) node.removeChild(node.firstChild); }
+    function formatNum(v) { return Number.isFinite(v) ? v.toLocaleString() : "0"; }
+
+    function reportRender() {
+      const dataset = reportState.datasets.find(d => d.id === reportState.selectedId);
+      if (!dataset) return;
+
+      const data = reportNormalize(dataset.data);
+      const stats = reportBuildStats(data);
+      const typeCounts = reportBuildTypeCounts(data.pages);
+      const pageEntries = reportBuildPageEntries(data.pages);
+
+      // Meta
+      const meta = document.getElementById("datasetMetaContent");
+      meta.textContent = (data.startUrl || "(no url)") + " · " + dataset.source + " · " + data.pages.length + " pages";
+
+      // Stats
+      const statGrid = document.getElementById("statGrid");
+      clearNode(statGrid);
+      [
+        { label: "Pages crawled", value: formatNum(data.pages.length) },
+        { label: "Total pages", value: formatNum(data.totalPages) },
+        { label: "Elements found", value: formatNum(stats.elementCount) },
+        { label: "Unique hrefs", value: formatNum(stats.hrefCount) },
+        { label: "Domains", value: formatNum(stats.domainCount) },
+        { label: "Avg elements", value: stats.average.toFixed(1) }
+      ].forEach(c => {
+        const node = document.createElement("div");
+        node.className = "stat";
+        node.innerHTML = '<div class="value">' + c.value + '</div><div class="label">' + c.label + '</div>';
+        statGrid.appendChild(node);
+      });
+
+      // Type chart
+      const typeItems = Object.keys(typeCounts).map(k => ({ label: k, value: typeCounts[k] })).sort((a, b) => b.value - a.value).slice(0, 8);
+      renderBarChart(document.getElementById("typeChart"), typeItems);
+
+      // Top pages chart
+      const topPages = [...pageEntries].sort((a, b) => b.elementCount - a.elementCount).slice(0, 6).map(p => ({ label: p.title || p.url, value: p.elementCount }));
+      renderBarChart(document.getElementById("topPagesChart"), topPages);
+
+      // Pages table
+      const filter = reportState.pageFilter;
+      const filtered = filter ? pageEntries.filter(p => (p.title + " " + p.url).toLowerCase().includes(filter)) : pageEntries;
+      renderPagesTable(filtered);
+
+      // Element type filter
+      const typeFilter = document.getElementById("elementTypeFilter");
+      clearNode(typeFilter);
+      const allOpt = document.createElement("option");
+      allOpt.value = ""; allOpt.textContent = "全部类型";
+      typeFilter.appendChild(allOpt);
+      Object.keys(typeCounts).sort((a, b) => typeCounts[b] - typeCounts[a]).forEach(t => {
+        const opt = document.createElement("option");
+        opt.value = t; opt.textContent = t + " (" + formatNum(typeCounts[t]) + ")";
+        typeFilter.appendChild(opt);
+      });
+      typeFilter.value = reportState.elementType;
+
+      // Detail
+      renderDetail(filtered);
+    }
+
+    function renderBarChart(container, items) {
+      clearNode(container);
+      if (!items.length) { container.innerHTML = '<div class="empty">暂无数据</div>'; return; }
+      const max = Math.max(...items.map(i => i.value));
+      items.forEach(item => {
+        const row = document.createElement("div");
+        row.className = "bar-row";
+        row.innerHTML = '<div class="bar-label">' + item.label + '</div><div class="bar-wrap"><div class="bar" style="width:0%"></div><div class="bar-value">' + formatNum(item.value) + '</div></div>';
+        container.appendChild(row);
+        const target = max ? (item.value / max) * 100 : 0;
+        requestAnimationFrame(() => { row.querySelector(".bar").style.width = target + "%"; });
+      });
+    }
+
+    function renderPagesTable(pageEntries) {
+      const wrap = document.getElementById("pagesTableWrap");
+      clearNode(wrap);
+      if (!pageEntries.length) { wrap.innerHTML = '<div class="empty">暂无匹配页面</div>'; return; }
+      const table = document.createElement("table");
+      table.innerHTML = '<thead><tr><th>标题</th><th>URL</th><th>元素</th><th>链接</th></tr></thead>';
+      const tbody = document.createElement("tbody");
+      pageEntries.forEach(page => {
+        const row = document.createElement("tr");
+        if (page.index === reportState.selectedPageIndex) row.classList.add("active");
+        row.innerHTML = '<td>' + (page.title || "(无标题)") + '</td><td class="mono">' + page.url + '</td><td>' + formatNum(page.elementCount) + '</td><td>' + formatNum(page.hrefCount) + '</td>';
+        row.addEventListener("click", () => {
+          reportState.selectedPageIndex = page.index;
+          reportState.showAllElements = false;
+          renderDetail(pageEntries);
+          renderPagesTable(pageEntries);
+        });
+        tbody.appendChild(row);
+      });
+      table.appendChild(tbody);
+      wrap.appendChild(table);
+    }
+
+    function renderDetail(pageEntries) {
+      const detail = document.getElementById("pageDetail");
+      clearNode(detail);
+      if (!pageEntries.length) { detail.innerHTML = '<div class="empty">选择页面查看详情</div>'; return; }
+
+      const selected = pageEntries.find(p => p.index === reportState.selectedPageIndex) || pageEntries[0];
+      reportState.selectedPageIndex = selected.index;
+
+      const card = document.createElement("div");
+      card.className = "detail-card";
+      card.innerHTML = '<h3>' + (selected.title || "(无标题)") + '</h3><div class="detail-meta">' + selected.url + ' · ' + formatNum(selected.elementCount) + ' elements</div>';
+
+      const elList = document.createElement("div");
+      elList.className = "element-list";
+
+      const filtered = selected.elements.filter(item => {
+        const text = ((item.text || "") + " " + (item.href || "") + " " + (item.selector || "")).toLowerCase();
+        const searchOk = !reportState.elementFilter || text.includes(reportState.elementFilter);
+        const typeOk = !reportState.elementType || (item.type || "unknown") === reportState.elementType;
+        return searchOk && typeOk;
+      });
+
+      const maxVis = reportState.showAllElements ? filtered.length : Math.min(filtered.length, 80);
+      filtered.slice(0, maxVis).forEach(item => {
+        const entry = document.createElement("div");
+        entry.className = "element-card";
+        entry.innerHTML =
+          '<div class="element-title"><span class="tag">' + (item.type || "unknown") + '</span><span>' + (item.text || "(no text)") + '</span></div>' +
+          '<div class="element-body">' +
+          (item.href ? '<div><a href="' + item.href + '" target="_blank" rel="noreferrer">' + item.href + '</a></div>' : '<div>(no href)</div>') +
+          '<div><code>' + (item.selector || "(no selector)") + '</code></div>' +
+          (item.xpath ? '<div><code>' + item.xpath + '</code></div>' : '') +
+          (item.context ? '<div>' + item.context + '</div>' : '') +
+          '</div>';
+
+        const actions = document.createElement("div");
+        actions.className = "element-actions";
+
+        const pushBtn = document.createElement("button");
+        pushBtn.className = "btn btn-outline btn-small";
+        pushBtn.textContent = "推送元素";
+        pushBtn.addEventListener("click", e => { e.stopPropagation(); pushElementToRag(selected, item); });
+
+        const verifyBtn = document.createElement("button");
+        verifyBtn.className = "btn btn-primary btn-small";
+        verifyBtn.textContent = "验证定位";
+        verifyBtn.addEventListener("click", e => { e.stopPropagation(); verifyLocate(selected, item); });
+
+        actions.appendChild(pushBtn);
+        actions.appendChild(verifyBtn);
+        entry.appendChild(actions);
+        elList.appendChild(entry);
+      });
+
+      card.appendChild(elList);
+      detail.appendChild(card);
+
+      if (filtered.length > maxVis) {
+        const more = document.createElement("button");
+        more.className = "btn btn-outline btn-small";
+        more.textContent = "显示更多 (" + formatNum(filtered.length - maxVis) + ")";
+        more.addEventListener("click", () => { reportState.showAllElements = true; renderDetail(pageEntries); });
+        detail.appendChild(more);
+      }
+    }
+
+    // RAG push from report
+    async function pushToRag() {
+      const ragBaseUrl = document.getElementById("ragBaseUrl").value.trim();
+      const kbName = document.getElementById("ragKbName").value.trim() || "default-kb";
+      const dataset = document.getElementById("ragDataset").value.trim();
+      const sessionId = document.getElementById("ragSessionId").value.trim();
+      const embeddingModel = document.getElementById("ragEmbeddingModel").value.trim();
+
+      if (!ragBaseUrl) { setRagStatusView("error", "请填写 RAG Base URL。"); return; }
+      if (!dataset) { setRagStatusView("error", "数据集必填。"); return; }
+
+      setRagStatusView("", "正在推送...");
+      const payload = { ragBaseUrl, kbName, dataset };
+      if (sessionId) payload.sessionId = sessionId;
+      if (embeddingModel) payload.embeddingModel = embeddingModel;
 
       try {
-        const response = await fetch("/api/datasets", { cache: "no-store" });
-        if (!response.ok) {
-          throw new Error("无法读取数据库索引");
-        }
-        const data = await response.json();
-        const items = Array.isArray(data.files) ? data.files : [];
-
-        if (items.length === 0) {
-          tbody.innerHTML = `<tr><td colspan="5" class="empty-state">database 目录暂无结果文件</td></tr>`;
-          return;
-        }
-
-        tbody.innerHTML = items
-          .map((item) => `
-            <tr>
-              <td>${item.name}</td>
-              <td>${formatTimestamp(item.updatedAt)}</td>
-              <td>${formatBytes(item.size)}</td>
-              <td>
-                <button class="btn btn-outline btn-small" onclick='openReportForFile(${JSON.stringify(item.name)})'>查看报告</button>
-              </td>
-              <td>
-                <button class="btn btn-outline btn-small" onclick='setRagDataset(${JSON.stringify(item.name)})'>使用</button>
-              </td>
-            </tr>
-          `)
-          .join("");
-      } catch (error) {
-        tbody.innerHTML = `<tr><td colspan="5" class="empty-state">${error.message}</td></tr>`;
+        const r = await fetch("/api/rag/build-from-crawl", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+        const raw = await r.text();
+        const parsed = safeJsonParse(raw) || raw;
+        if (!r.ok) { setRagStatusView("error", "构建失败: " + (typeof parsed === "string" ? parsed : "")); return; }
+        setRagStatusView("success", "构建完成。" + (typeof parsed === "string" ? parsed : JSON.stringify(parsed)).slice(0, 200));
+      } catch (e) {
+        setRagStatusView("error", e.message || "推送失败");
       }
     }
 
-    function scrollToResults() {
-      const section = document.getElementById("resultsSection");
-      if (!section || section.style.display === "none") {
-        addLog("info", "暂无结果可查看，请先开始一次爬取。");
-        return;
+    // Alias for the view button
+    function pushToRagView() { pushToRag(); }
+
+    async function pushElementToRag(page, element) {
+      const ragBaseUrl = document.getElementById("ragBaseUrl").value.trim();
+      const kbName = document.getElementById("ragKbName").value.trim() || "default-kb";
+      const sessionId = document.getElementById("ragSessionId").value.trim();
+      const embeddingModel = document.getElementById("ragEmbeddingModel").value.trim();
+
+      if (!ragBaseUrl) { setRagStatusView("error", "请填写 RAG Base URL。"); return; }
+      setRagStatusView("", "正在推送元素...");
+
+      const payload = { ragBaseUrl, kbName, page: { url: page.url || "", title: page.title || "" }, element };
+      if (sessionId) payload.sessionId = sessionId;
+      if (embeddingModel) payload.embeddingModel = embeddingModel;
+
+      try {
+        const r = await fetch("/api/rag/build-from-element", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+        const raw = await r.text();
+        const parsed = safeJsonParse(raw) || raw;
+        if (!r.ok) { setRagStatusView("error", "推送失败: " + (typeof parsed === "string" ? parsed : "")); return; }
+        setRagStatusView("success", "元素已推送。");
+      } catch (e) {
+        setRagStatusView("error", e.message || "推送失败");
       }
-      section.scrollIntoView({ behavior: "smooth", block: "start" });
     }
 
+    function setRagStatusView(state, message) {
+      const node = document.getElementById("ragStatus");
+      node.className = "rag-status";
+      if (state) node.classList.add(state);
+      node.textContent = message || "";
+    }
+
+    function setRagDatasetView(name) {
+      document.getElementById("ragDataset").value = name || "latest";
+      setRagStatusView("", "已选择数据集: " + name);
+    }
+
+    function safeJsonParse(v) { try { return JSON.parse(v); } catch { return null; } }
+
+    let verifyToken = 0;
+
+    async function verifyLocate(page, element) {
+      const ragBaseUrl = document.getElementById("ragBaseUrl").value.trim();
+      const kbName = document.getElementById("ragKbName").value.trim() || "default-kb";
+      const sessionId = document.getElementById("ragSessionId").value.trim();
+      if (!ragBaseUrl) { setVerifyStatusView("error", "请填写 RAG Base URL。"); return; }
+
+      const question = element.text || element.context || page.title || page.url || "";
+      if (!question) { setVerifyStatusView("error", "无法生成问题。"); return; }
+
+      setVerifyStatusView("", "调用 RAG /chat...");
+      const headers = { "Content-Type": "application/json" };
+      if (sessionId) headers["X-Client-Session-Id"] = sessionId;
+
+      try {
+        const r = await fetch(ragBaseUrl + "/api/chat", {
+          method: "POST", headers,
+          body: JSON.stringify({ question, kbName, topK: 5 })
+        });
+        const payload = await r.json();
+        if (!r.ok) { setVerifyStatusView("error", payload?.error || "Chat 失败"); return; }
+
+        const locations = Array.isArray(payload.locations) ? payload.locations : [];
+        const contexts = Array.isArray(payload.contextChunks) ? payload.contextChunks : [];
+        let location = locations.find(l => l.pageUrl === page.url) ||
+                       locations.find(l => l.selector === element.selector) ||
+                       locations[0] ||
+                       (contexts.find(c => c.pageUrl === page.url) ? { pageUrl: contexts.find(c => c.pageUrl === page.url).pageUrl, selector: contexts.find(c => c.pageUrl === page.url).selector, xpath: contexts.find(c => c.pageUrl === page.url).xpath, elementText: contexts.find(c => c.pageUrl === page.url).elementText } : null);
+
+        if (!location) { setVerifyStatusView("error", "未返回定位信息。"); return; }
+
+        const targetUrl = location.pageUrl || page.url;
+        if (!targetUrl) { setVerifyStatusView("error", "无目标 URL。"); return; }
+
+        const currentToken = ++verifyToken;
+        document.getElementById("verifyFrame").src = targetUrl;
+        setVerifyStatusView("", "加载 " + targetUrl + "...");
+
+        document.getElementById("verifyFrame").onload = () => {
+          if (currentToken !== verifyToken) return;
+          try {
+            const frameDoc = document.getElementById("verifyFrame").contentDocument;
+            const frameWin = document.getElementById("verifyFrame").contentWindow;
+            if (!frameDoc) { setVerifyStatusView("error", "无法访问 iframe。"); return; }
+
+            let found = null, method = "";
+            if (location.xpath) {
+              try {
+                const xr = frameDoc.evaluate(location.xpath, frameDoc, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null);
+                if (xr.singleNodeValue) { found = xr.singleNodeValue; method = "xpath"; }
+              } catch {}
+            }
+            if (!found && location.selector) {
+              found = frameDoc.querySelector(location.selector);
+              if (found) method = "selector";
+            }
+            if (!found && location.elementText) {
+              const target = location.elementText.trim().toLowerCase();
+              const nodes = frameDoc.querySelectorAll("a[href], button, [role=button], [role=link], input[type=submit]");
+              for (const n of nodes) {
+                const t = (n.innerText || n.textContent || "").trim().toLowerCase();
+                if (t && t.includes(target)) { found = n; method = "text"; break; }
+              }
+            }
+
+            if (!found) { setVerifyStatusView("error", "未找到元素。"); return; }
+
+            found.scrollIntoView({ behavior: "smooth", block: "center" });
+            const rect = found.getBoundingClientRect();
+            const overlay = frameDoc.createElement("div");
+            overlay.style.cssText = "position:absolute;left:" + Math.max(rect.left + frameWin.scrollX - 6, 0) + "px;top:" + Math.max(rect.top + frameWin.scrollY - 6, 0) + "px;width:" + Math.max(rect.width + 12, 12) + "px;height:" + Math.max(rect.height + 12, 12) + "px;border:2px solid #245bff;border-radius:10px;box-shadow:0 0 0 6px rgba(36,91,255,0.2);pointer-events:none;z-index:2147483647;transition:opacity 0.3s ease";
+            frameDoc.body.appendChild(overlay);
+            setTimeout(() => { overlay.style.opacity = "0"; setTimeout(() => overlay.remove(), 300); }, 2200);
+            setVerifyStatusView("success", "通过 " + method + " 定位成功。");
+          } catch (e) {
+            setVerifyStatusView("error", "跨域页面，无法验证。");
+          }
+        };
+      } catch (e) {
+        setVerifyStatusView("error", e.message || "请求失败");
+      }
+    }
+
+    function setVerifyStatusView(state, message) {
+      const node = document.getElementById("verifyStatus");
+      node.className = "subtle";
+      if (state) node.classList.add(state);
+      node.textContent = message || "";
+    }
+
+    // Download
+    function downloadJsonView() {
+      const sel = document.getElementById("downloadDatasetSelect");
+      const dataset = reportState.datasets.find(d => d.id === sel.value);
+      if (!dataset) return;
+      const data = reportNormalize(dataset.data);
+      const payload = {
+        source: dataset.source,
+        startUrl: data.startUrl,
+        totalPages: data.totalPages,
+        exportedAt: new Date().toISOString(),
+        pageCount: data.pages.length,
+        pages: data.pages
+      };
+      triggerDownload(new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" }), dataset.source.replace(/\.json$/i, "") + "-pages.json");
+    }
+
+    function downloadCsvView() {
+      const sel = document.getElementById("downloadDatasetSelect");
+      const dataset = reportState.datasets.find(d => d.id === sel.value);
+      if (!dataset) return;
+      const data = reportNormalize(dataset.data);
+      const entries = reportBuildPageEntries(data.pages);
+      const lines = ["title,url,elementCount,uniqueHrefs"];
+      entries.forEach(p => {
+        lines.push('"' + (p.title || "").replace(/"/g, '""') + '","' + (p.url || "").replace(/"/g, '""') + '",' + p.elementCount + ',' + p.hrefCount);
+      });
+      triggerDownload(new Blob([lines.join("\r\n")], { type: "text/csv" }), dataset.source.replace(/\.json$/i, "") + "-pages.csv");
+    }
+
+    function triggerDownload(blob, filename) {
+      const link = document.createElement("a");
+      const url = URL.createObjectURL(blob);
+      link.href = url; link.download = filename; link.rel = "noopener";
+      link.click();
+      setTimeout(() => URL.revokeObjectURL(url), 0);
+    }
+
+    // ============================================
+    // Init
+    // ============================================
     document.addEventListener("DOMContentLoaded", () => {
-      connectSocket();
-      setupFilters();
+      // Socket.IO
+      const script = document.createElement("script");
+      script.src = "/socket.io/socket.io.js";
+      script.onload = () => { connectSocket(); };
+      document.head.appendChild(script);
+
+      // Load dataset index
       loadDatasetIndex();
+
+      // Report events
+      document.getElementById("datasetSelect").addEventListener("change", e => {
+        reportState.selectedId = e.target.value;
+        reportState.selectedPageIndex = null;
+        reportState.showAllElements = false;
+        reportRender();
+      });
+
+      document.getElementById("loadFileBtn").addEventListener("click", () => {
+        document.getElementById("fileInput").click();
+      });
+
+      document.getElementById("fileInput").addEventListener("change", async e => {
+        const file = e.target.files[0];
+        if (!file) return;
+        try {
+          const data = JSON.parse(await file.text());
+          addReportDataset({ file: file.name, label: file.name }, data, "upload");
+          refreshReportSelect();
+          reportRender();
+        } catch {
+          document.getElementById("datasetHint").textContent = "JSON 解析失败。";
+        }
+      });
+
+      document.getElementById("pageSearch").addEventListener("input", e => {
+        reportState.pageFilter = e.target.value.toLowerCase();
+        reportState.selectedPageIndex = null;
+        reportRender();
+      });
+
+      document.getElementById("elementSearch").addEventListener("input", e => {
+        reportState.elementFilter = e.target.value.toLowerCase();
+        reportRender();
+      });
+
+      document.getElementById("elementTypeFilter").addEventListener("change", e => {
+        reportState.elementType = e.target.value;
+        reportRender();
+      });
+
+      document.getElementById("downloadDatasetSelect").addEventListener("change", () => {});
+
+      // Try loading latest results
+      reportLoadLatest().catch(() => {});
     });
   </script>
 </body>
