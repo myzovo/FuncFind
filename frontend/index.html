@@ -7,15 +7,25 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700;800&family=Noto+Sans+SC:wght@400;500;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Manrope:wght@400;500;600;700;800&family=Noto+Sans+SC:wght@400;500;700&family=Space+Grotesk:wght@500;600;700&display=swap"
       rel="stylesheet"
     />
     <link rel="stylesheet" href="./styles.css" />
   </head>
   <body>
+    <!-- Floating background orbs -->
+    <div class="bg-orbs" aria-hidden="true">
+      <div class="bg-orb bg-orb--1"></div>
+      <div class="bg-orb bg-orb--2"></div>
+      <div class="bg-orb bg-orb--3"></div>
+    </div>
+
     <div id="app" v-cloak>
       <header class="hero reveal">
-        <div class="hero-badge">RAG Workspace</div>
+        <div class="hero-badge">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+          RAG Workspace
+        </div>
         <h1>DocVec Studio</h1>
         <p>
           上传文档、构建知识库、网页聊天问答，一屏完成。<br />
@@ -32,7 +42,10 @@
       <main class="workspace">
         <section class="panel reveal upload-panel">
           <div class="panel-head">
-            <h2>1) 文档上传与预处理</h2>
+            <h2>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><polyline points="9 15 12 12 15 15"/></svg>
+              文档上传与预处理
+            </h2>
             <span class="chip" :class="selectedFiles.length ? 'ok' : 'idle'">
               {{ selectedFiles.length }} files
             </span>
@@ -46,8 +59,14 @@
             @drop.prevent="handleDrop"
           >
             <input ref="fileInput" type="file" multiple accept=".pdf,.docx,.txt" @change="handleFileChoose" hidden />
+            <div class="dropzone-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            </div>
             <p>将 PDF / DOCX / TXT 拖到这里，或点击按钮选择</p>
-            <button class="btn ghost" @click="openFilePicker">选择文件</button>
+            <button class="btn ghost" @click="openFilePicker">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;vertical-align:-3px;margin-right:4px"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+              选择文件
+            </button>
           </div>
 
           <ul class="file-list" v-if="selectedFiles.length">
@@ -56,7 +75,10 @@
                 <strong>{{ file.name }}</strong>
                 <small>{{ formatBytes(file.size) }}</small>
               </div>
-              <button class="icon-btn" @click="removeFile(file.id)">删除</button>
+              <button class="icon-btn" @click="removeFile(file.id)">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;vertical-align:-2px"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                删除
+              </button>
             </li>
           </ul>
 
@@ -173,7 +195,7 @@
               </label>
             </div>
 
-            <div class="actions-row">
+            <div class="actions-row" style="padding: 0 16px 16px;">
               <button class="btn ghost" :disabled="loadingRuntimeConfig" @click="loadRuntimeConfigFromServer(false)">
                 {{ loadingRuntimeConfig ? '读取中...' : '读取当前配置' }}
               </button>
@@ -182,8 +204,8 @@
               </button>
             </div>
 
-            <p class="status-text" v-if="runtimeConfigMessage">{{ runtimeConfigMessage }}</p>
-            <p class="status-text" v-if="runtimeServerState.appliedAt">
+            <p class="status-text" v-if="runtimeConfigMessage" style="margin: 0 16px 12px;">{{ runtimeConfigMessage }}</p>
+            <p class="status-text" v-if="runtimeServerState.appliedAt" style="margin: 0 16px 12px;">
               最近应用时间: {{ runtimeServerState.appliedAt }}
             </p>
           </details>
@@ -205,9 +227,11 @@
 
           <div class="actions-row">
             <button class="btn" :disabled="!selectedFiles.length || uploading" @click="uploadDocuments">
+              <svg v-if="!uploading" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
               {{ uploading ? '上传中...' : '上传文档' }}
             </button>
             <button class="btn accent" :disabled="!selectedFiles.length || buildingKb" @click="buildKnowledgeBase">
+              <svg v-if="!buildingKb" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
               {{ buildingKb ? '构建中...' : '构建知识库' }}
             </button>
           </div>
@@ -225,10 +249,13 @@
         <!-- ====== 已爬取知识库 ====== -->
         <section class="panel reveal crawl-kb-panel" v-if="crawledKbs.length">
           <div class="panel-head">
-            <h2>📦 已爬取知识库</h2>
+            <h2>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+              已爬取知识库
+            </h2>
             <span class="chip ok">{{ crawledKbs.length }} KB(s)</span>
           </div>
-          <p class="hint" style="margin:0 0 12px 0;color:var(--muted);font-size:0.85rem;">
+          <p class="hint" style="margin:0 0 14px 0;">
             来自爬虫控制台的 RAG 构建结果，无需上传文档即可直接对话。
           </p>
           <div class="crawl-kb-list">
@@ -240,12 +267,15 @@
               <button class="btn small" @click="useCrawledKb(kb)">使用此知识库</button>
             </div>
           </div>
-          <button class="btn ghost small" style="margin-top:8px;" @click="clearCrawledKbs">清除列表</button>
+          <button class="btn ghost small" style="margin-top:10px;" @click="clearCrawledKbs">清除列表</button>
         </section>
 
         <section class="panel reveal chat-panel">
           <div class="panel-head">
-            <h2>2) 网页 AI 聊天</h2>
+            <h2>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+              网页 AI 聊天
+            </h2>
             <span class="chip" :class="kbReady ? 'ok' : 'warn'">
               {{ kbReady ? 'Knowledge Base Ready' : 'Knowledge Base Not Ready' }}
             </span>
@@ -255,6 +285,15 @@
             <article v-for="msg in messages" :key="msg.id" class="bubble" :class="msg.role">
               <h4>{{ msg.role === 'user' ? '你' : msg.role === 'assistant' ? 'AI' : '系统' }}</h4>
               <p>{{ msg.content }}</p>
+            </article>
+            <!-- Typing indicator -->
+            <article v-if="chatting" class="bubble assistant">
+              <h4>AI</h4>
+              <div class="typing-indicator">
+                <span></span>
+                <span></span>
+                <span></span>
+              </div>
             </article>
           </div>
 
@@ -266,6 +305,7 @@
             ></textarea>
             <div class="chat-actions">
               <button class="btn accent" :disabled="chatting || !draft.trim()">
+                <svg v-if="!chatting" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
                 {{ chatting ? '思考中...' : '发送问题' }}
               </button>
             </div>

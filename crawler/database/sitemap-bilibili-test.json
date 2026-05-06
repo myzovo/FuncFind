@@ -1,0 +1,19 @@
+{
+  "startUrl": "https://search.bilibili.com/all",
+  "totalPages": 1,
+  "pages": [
+    {
+      "url": "https://search.bilibili.com/all",
+      "title": "搜索 - 哔哩哔哩_bilibili",
+      "elements": [
+        {
+          "type": "submit",
+          "text": "搜索",
+          "href": "",
+          "selector": "button.vui_button.vui_button--blue",
+          "context": ""
+        }
+      ]
+    }
+  ]
+}
