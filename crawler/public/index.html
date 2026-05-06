@@ -1,0 +1,1318 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Web 智能功能导航控制台</title>
+  <style>
+    @import url("https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Noto+Sans+SC:wght@300;400;500;700&family=Space+Grotesk:wght@400;500;600;700&family=Sora:wght@300;400;500;600;700&display=swap");
+
+    :root {
+      --bg: #f6f1ea;
+      --bg-soft: #fff8f0;
+      --panel: #ffffff;
+      --panel-shadow: rgba(16, 24, 40, 0.08);
+      --ink: #1f2a37;
+      --muted: #5f6b7a;
+      --border: #e6dccf;
+      --accent: #1f8a70;
+      --accent-strong: #0f766e;
+      --accent-warm: #f08a5d;
+      --accent-sun: #f2b94a;
+      --danger: #d94f4f;
+      --success: #199473;
+      --info: #1f7dbd;
+      --mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      --heading: "Space Grotesk", "Noto Sans SC", sans-serif;
+      --body: "Sora", "Noto Sans SC", sans-serif;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: var(--body);
+      color: var(--ink);
+      background: radial-gradient(circle at top left, rgba(242, 185, 74, 0.18), transparent 50%),
+        radial-gradient(circle at 20% 10%, rgba(240, 138, 93, 0.15), transparent 55%),
+        linear-gradient(180deg, #fdf8f3, #f4eee6 50%, #f6f1ea 100%);
+      min-height: 100vh;
+    }
+
+    body::after {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background: linear-gradient(120deg, rgba(31, 138, 112, 0.08), transparent 40%),
+        radial-gradient(circle at 80% 20%, rgba(31, 125, 189, 0.1), transparent 60%);
+      pointer-events: none;
+      z-index: -1;
+    }
+
+    .container {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 32px 24px 48px;
+    }
+
+    header.hero {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 28px 32px;
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 24px;
+      box-shadow: 0 20px 40px var(--panel-shadow);
+      position: relative;
+      overflow: hidden;
+      animation: rise 0.6s ease-out;
+    }
+
+    header.hero::before {
+      content: "";
+      position: absolute;
+      width: 240px;
+      height: 240px;
+      right: -60px;
+      top: -80px;
+      background: radial-gradient(circle, rgba(31, 138, 112, 0.2), transparent 70%);
+      border-radius: 50%;
+      z-index: 0;
+    }
+
+    .hero h1 {
+      font-family: var(--heading);
+      font-size: 2.4rem;
+      letter-spacing: -0.02em;
+      margin-bottom: 8px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero p {
+      color: var(--muted);
+      font-size: 1rem;
+      line-height: 1.6;
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero-meta {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      align-items: flex-end;
+      justify-content: center;
+      position: relative;
+      z-index: 1;
+    }
+
+    .status-indicator {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 18px;
+      border-radius: 999px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      background: rgba(95, 107, 122, 0.12);
+      color: var(--muted);
+    }
+
+    .status-indicator .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: currentColor;
+      animation: pulse 1.8s ease-in-out infinite;
+    }
+
+    .status-running {
+      background: rgba(31, 125, 189, 0.12);
+      color: var(--info);
+    }
+
+    .status-completed {
+      background: rgba(25, 148, 115, 0.12);
+      color: var(--success);
+    }
+
+    .status-error,
+    .status-stopped {
+      background: rgba(217, 79, 79, 0.12);
+      color: var(--danger);
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 12px;
+    }
+
+    .btn {
+      border: none;
+      border-radius: 12px;
+      padding: 12px 18px;
+      font-weight: 600;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .btn-primary {
+      background: linear-gradient(120deg, var(--accent), var(--accent-strong));
+      color: #fff;
+      box-shadow: 0 12px 25px rgba(31, 138, 112, 0.2);
+    }
+
+    .btn-primary:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 18px 30px rgba(31, 138, 112, 0.25);
+    }
+
+    .btn-outline {
+      background: #fff;
+      border: 1px solid var(--border);
+      color: var(--ink);
+    }
+
+    .btn-outline:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 22px rgba(16, 24, 40, 0.08);
+    }
+
+    .btn-danger {
+      background: linear-gradient(120deg, #d94f4f, #c53939);
+      color: #fff;
+      box-shadow: 0 12px 25px rgba(217, 79, 79, 0.2);
+    }
+
+    .btn-danger:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 18px 30px rgba(217, 79, 79, 0.25);
+    }
+
+    button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+
+    .main-grid {
+      display: grid;
+      grid-template-columns: 380px 1fr;
+      gap: 24px;
+      margin-top: 28px;
+    }
+
+    .panel {
+      background: var(--panel);
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      padding: 24px;
+      box-shadow: 0 14px 28px var(--panel-shadow);
+    }
+
+    .panel-title {
+      font-family: var(--heading);
+      font-size: 1.2rem;
+      margin-bottom: 18px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .field {
+      margin-bottom: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    label {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--muted);
+    }
+
+    input,
+    select,
+    textarea {
+      width: 100%;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px 14px;
+      font-family: var(--body);
+      font-size: 0.95rem;
+      background: #fff;
+      color: var(--ink);
+      transition: border 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    textarea {
+      min-height: 80px;
+      resize: vertical;
+    }
+
+    input:focus,
+    select:focus,
+    textarea:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(31, 138, 112, 0.15);
+    }
+
+    .input-error {
+      border-color: var(--danger);
+      box-shadow: 0 0 0 3px rgba(217, 79, 79, 0.15);
+    }
+
+    .hint {
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+
+    .action-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 12px;
+    }
+
+    details.advanced {
+      margin-top: 12px;
+      border: 1px dashed var(--border);
+      border-radius: 16px;
+      padding: 12px 14px 6px;
+      background: var(--bg-soft);
+    }
+
+    details.advanced summary {
+      list-style: none;
+      cursor: pointer;
+      font-weight: 600;
+      color: var(--accent-strong);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    details.advanced summary::-webkit-details-marker {
+      display: none;
+    }
+
+    details.advanced[open] {
+      box-shadow: inset 0 0 0 1px rgba(31, 138, 112, 0.15);
+    }
+
+    .log-container {
+      background: #0f1b22;
+      color: #f8fafc;
+      border-radius: 16px;
+      padding: 16px;
+      height: 420px;
+      overflow-y: auto;
+      font-family: var(--mono);
+      font-size: 0.82rem;
+      border: 1px solid #0f2430;
+    }
+
+    .log-entry {
+      display: grid;
+      grid-template-columns: 76px 1fr;
+      gap: 12px;
+      padding: 6px 0;
+      border-bottom: 1px solid rgba(148, 163, 184, 0.12);
+      animation: slideIn 0.25s ease;
+    }
+
+    .log-time {
+      color: #94a3b8;
+      font-size: 0.75rem;
+    }
+
+    .log-message {
+      word-break: break-word;
+      color: #e2e8f0;
+    }
+
+    .log-info { color: #7dd3fc; }
+    .log-error { color: #fca5a5; }
+    .log-success { color: #86efac; }
+
+    .results-panel {
+      margin-top: 28px;
+    }
+
+    .dataset-panel {
+      margin-top: 28px;
+    }
+
+    .rag-panel {
+      margin-top: 28px;
+    }
+
+    .rag-status {
+      margin-top: 12px;
+      padding: 12px 14px;
+      border-radius: 12px;
+      border: 1px dashed var(--border);
+      background: var(--bg-soft);
+      color: var(--muted);
+      font-size: 0.85rem;
+      line-height: 1.4;
+    }
+
+    .rag-status.success {
+      border-color: rgba(25, 148, 115, 0.4);
+      background: rgba(25, 148, 115, 0.08);
+      color: var(--success);
+    }
+
+    .rag-status.error {
+      border-color: rgba(217, 79, 79, 0.4);
+      background: rgba(217, 79, 79, 0.08);
+      color: var(--danger);
+    }
+
+    .dataset-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .btn-small {
+      padding: 8px 12px;
+      font-size: 0.85rem;
+      border-radius: 10px;
+    }
+
+    .dataset-table td:first-child {
+      font-family: var(--mono);
+      font-size: 0.82rem;
+      word-break: break-all;
+    }
+
+    .results-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 16px;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+    }
+
+    .results-header p {
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    .filters {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .filters input {
+      min-width: 220px;
+    }
+
+    .tabs {
+      display: inline-flex;
+      gap: 10px;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 6px;
+      background: #fff;
+    }
+
+    .tab-btn {
+      border: none;
+      background: transparent;
+      padding: 8px 16px;
+      border-radius: 999px;
+      font-weight: 600;
+      color: var(--muted);
+      cursor: pointer;
+    }
+
+    .tab-btn.active {
+      background: var(--accent);
+      color: #fff;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 16px;
+      margin: 20px 0;
+    }
+
+    .stat-card {
+      background: var(--bg-soft);
+      border-radius: 16px;
+      padding: 18px;
+      border: 1px solid var(--border);
+    }
+
+    .stat-value {
+      font-family: var(--heading);
+      font-size: 1.6rem;
+      color: var(--accent-strong);
+    }
+
+    .stat-label {
+      color: var(--muted);
+      margin-top: 4px;
+      font-size: 0.85rem;
+    }
+
+    .table-container {
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+      background: #fff;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.88rem;
+    }
+
+    thead {
+      background: #f5efe6;
+      color: var(--muted);
+    }
+
+    th,
+    td {
+      padding: 12px 14px;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+      vertical-align: top;
+    }
+
+    tbody tr:hover {
+      background: rgba(31, 138, 112, 0.08);
+    }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 0.72rem;
+      font-weight: 600;
+    }
+
+    .tag-link { background: rgba(31, 125, 189, 0.16); color: #1f7dbd; }
+    .tag-button { background: rgba(240, 138, 93, 0.18); color: #cc5f33; }
+    .tag-form { background: rgba(25, 148, 115, 0.18); color: var(--accent-strong); }
+
+    .empty-state {
+      text-align: center;
+      padding: 40px 20px;
+      color: var(--muted);
+    }
+
+    footer {
+      margin-top: 32px;
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+
+    @media (max-width: 1080px) {
+      header.hero {
+        grid-template-columns: 1fr;
+      }
+
+      .hero-meta {
+        align-items: flex-start;
+      }
+
+      .main-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 720px) {
+      .action-row {
+        grid-template-columns: 1fr;
+      }
+
+      .log-container {
+        height: 320px;
+      }
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.6; }
+    }
+
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateX(-10px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+
+    @keyframes rise {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header class="hero">
+      <div>
+        <h1>Web 智能功能导航控制台</h1>
+        <p>统一配置、实时日志与结果洞察，帮助你快速发现站点功能入口。</p>
+      </div>
+      <div class="hero-meta">
+        <div class="status-indicator status-idle" id="statusIndicator">
+          <span class="dot"></span>
+          <span id="statusText">就绪</span>
+        </div>
+        <div class="hero-actions">
+          <button class="btn btn-outline" onclick="scrollToResults()">查看结果</button>
+          <button class="btn btn-outline" onclick="openReportLatest()">打开报告</button>
+          <button class="btn btn-outline" onclick="downloadResults()">下载 JSON</button>
+          <button class="btn btn-primary" onclick="location.href='/rag/'" title="打开 RAG 知识库对话页面">🤖 RAG 对话</button>
+        </div>
+      </div>
+    </header>
+
+    <main class="main-grid">
+      <section class="panel">
+        <h2 class="panel-title">基础配置</h2>
+        <div class="field">
+          <label for="url">目标网址</label>
+          <input type="url" id="url" placeholder="https://example.com" value="https://crawlee.dev" />
+          <span class="hint">只需填写 URL，其他参数可在高级配置中调整。</span>
+        </div>
+
+        <div class="action-row">
+          <button class="btn btn-primary" id="startBtn" onclick="startCrawl()">开始爬取</button>
+          <button class="btn btn-danger" id="stopBtn" onclick="stopCrawl()" disabled>停止</button>
+        </div>
+
+        <details class="advanced" id="advancedSettings">
+          <summary>高级配置</summary>
+          <div class="field">
+            <label for="maxRequests">最大请求数</label>
+            <input type="number" id="maxRequests" value="100" min="1" max="10000" />
+          </div>
+          <div class="field">
+            <label for="maxConcurrency">并发数</label>
+            <input type="number" id="maxConcurrency" value="1" min="1" max="10" />
+          </div>
+          <div class="field">
+            <label for="navigationTimeout">导航超时 (秒)</label>
+            <input type="number" id="navigationTimeout" value="60" min="10" max="300" />
+          </div>
+          <div class="field">
+            <label for="requestHandlerTimeout">请求超时 (秒)</label>
+            <input type="number" id="requestHandlerTimeout" value="240" min="30" max="600" />
+          </div>
+          <div class="field">
+            <label for="maxRetries">最大重试次数</label>
+            <input type="number" id="maxRetries" value="1" min="0" max="5" />
+          </div>
+          <div class="field">
+            <label for="browserChannel">浏览器通道</label>
+            <select id="browserChannel">
+              <option value="">默认 (Chromium)</option>
+              <option value="chrome">Chrome</option>
+              <option value="msedge">Microsoft Edge</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="blockedResources">阻断资源类型</label>
+            <input type="text" id="blockedResources" value="image,font,media" />
+            <span class="hint">用逗号分隔，例如 image,font,media</span>
+          </div>
+          <div class="field">
+            <label for="sensitiveWords">敏感词（跳过危险点击）</label>
+            <textarea id="sensitiveWords">delete,remove,pay,submit,confirm,logout,reset,clear,删除,注销,支付,清空,重置</textarea>
+          </div>
+          <div class="field">
+            <label for="outputName">输出文件名</label>
+            <input type="text" id="outputName" placeholder="sitemap-2026-05-05.json" />
+            <span class="hint">留空则自动生成文件名。</span>
+          </div>
+        </details>
+      </section>
+
+      <section class="panel">
+        <h2 class="panel-title">实时日志</h2>
+        <div class="log-container" id="logContainer">
+          <div class="log-entry log-info">
+            <span class="log-time">--:--:--</span>
+            <span class="log-message">系统就绪，等待开始爬取...</span>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <section class="panel dataset-panel" id="datasetSection">
+      <div class="panel-title">
+        <span>数据库爬取索引</span>
+        <div class="dataset-actions">
+          <button class="btn btn-outline btn-small" onclick="openReportLatest()">打开最新报告</button>
+          <button class="btn btn-outline btn-small" onclick="loadDatasetIndex()">刷新列表</button>
+        </div>
+      </div>
+      <p class="hint">扫描 database 目录下的 JSON 结果文件。</p>
+      <div class="table-container">
+        <table class="dataset-table">
+          <thead>
+            <tr>
+              <th>文件名</th>
+              <th>更新时间</th>
+              <th>大小</th>
+              <th>操作</th>
+              <th>RAG</th>
+            </tr>
+          </thead>
+          <tbody id="datasetTableBody">
+            <tr><td colspan="5" class="empty-state">正在加载...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="panel rag-panel" id="ragSection">
+      <div class="panel-title">
+        <span>RAG 构建</span>
+        <div class="dataset-actions">
+          <button class="btn btn-outline btn-small" onclick="setRagDataset('latest')">使用最新结果</button>
+          <button class="btn btn-outline btn-small" onclick="pushToRag()">推送到 RAG</button>
+        </div>
+      </div>
+      <p class="hint">将爬取结果发送到 DocVec_RAG 的 build-from-crawl 接口。</p>
+      <div class="field">
+        <label for="ragBaseUrl">RAG Base URL</label>
+        <input type="text" id="ragBaseUrl" value="http://localhost:8080" />
+      </div>
+      <div class="field">
+        <label for="ragKbName">知识库名称</label>
+        <input type="text" id="ragKbName" value="default-kb" />
+      </div>
+      <div class="field">
+        <label for="ragDataset">数据集</label>
+        <input type="text" id="ragDataset" value="latest" />
+        <span class="hint">填写 latest 或 database 目录中的 .json 文件名。</span>
+      </div>
+      <div class="field">
+        <label for="ragSiteId">站点标识（可选）</label>
+        <input type="text" id="ragSiteId" placeholder="site-001" />
+      </div>
+      <div class="field">
+        <label for="ragSessionId">Session ID（可选）</label>
+        <input type="text" id="ragSessionId" placeholder="X-Client-Session-Id" />
+      </div>
+      <div class="field">
+        <label for="ragEmbeddingModel">Embedding 模型（可选）</label>
+        <input type="text" id="ragEmbeddingModel" placeholder="all-MiniLM-L6-v2" />
+      </div>
+      <div class="action-row">
+        <button class="btn btn-primary" onclick="pushToRag()">推送并构建</button>
+        <button class="btn btn-outline" onclick="setRagDataset('latest')">使用最新结果</button>
+      </div>
+      <div class="rag-status" id="ragStatus">等待推送。</div>
+    </section>
+
+    <section class="panel results-panel" id="resultsSection" style="display: none;">
+      <div class="results-header">
+        <div>
+          <h2 class="panel-title">爬取结果</h2>
+          <p>查看概览、页面列表与元素详情，支持过滤与导出。</p>
+        </div>
+        <div class="filters">
+          <input type="text" id="pageFilter" placeholder="筛选页面标题或 URL" />
+          <input type="text" id="elementFilter" placeholder="筛选元素文本或链接" />
+          <button class="btn btn-outline" onclick="downloadResults()">下载 JSON</button>
+        </div>
+        <div class="tabs">
+          <button class="tab-btn active" onclick="switchTab(event, 'overview')">概览</button>
+          <button class="tab-btn" onclick="switchTab(event, 'pages')">页面列表</button>
+          <button class="tab-btn" onclick="switchTab(event, 'elements')">元素详情</button>
+        </div>
+      </div>
+
+      <div id="overviewTab">
+        <div class="stats-grid" id="statsGrid"></div>
+      </div>
+
+      <div id="pagesTab" style="display: none;">
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>标题</th>
+                <th>URL</th>
+                <th>元素数量</th>
+                <th>唯一链接数</th>
+              </tr>
+            </thead>
+            <tbody id="pagesTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div id="elementsTab" style="display: none;">
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>类型</th>
+                <th>文本</th>
+                <th>链接/Href</th>
+                <th>选择器</th>
+                <th>上下文</th>
+              </tr>
+            </thead>
+            <tbody id="elementsTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <footer>Web Intelligent Function Navigation System · Crawlee + Playwright</footer>
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    let socket = null;
+    let crawlResults = null;
+
+    function connectSocket() {
+      socket = io();
+
+      socket.on("connect", () => {
+        addLog("success", "已连接到服务器");
+        checkStatus();
+      });
+
+      socket.on("disconnect", () => {
+        addLog("error", "与服务器断开连接");
+      });
+
+      socket.on("crawl:status", (data) => {
+        updateStatus(data.status);
+        if (data.message) {
+          addLog("info", data.message);
+        }
+      });
+
+      socket.on("crawl:log", (data) => {
+        addLog(data.type, data.message, data.timestamp);
+      });
+
+      socket.on("crawl:complete", (data) => {
+        crawlResults = data.results;
+        showResults(crawlResults);
+        addLog("success", `爬取完成! 共发现 ${crawlResults.pages.length} 个页面`);
+      });
+
+      socket.on("crawl:error", (data) => {
+        addLog("error", data.error || "发生错误");
+        updateStatus("error");
+      });
+    }
+
+    function addLog(type, message, timestamp) {
+      const container = document.getElementById("logContainer");
+      const entry = document.createElement("div");
+      entry.className = `log-entry log-${type}`;
+
+      const time = document.createElement("span");
+      time.className = "log-time";
+      time.textContent = timestamp
+        ? new Date(timestamp).toLocaleTimeString()
+        : new Date().toLocaleTimeString();
+
+      const msg = document.createElement("span");
+      msg.className = "log-message";
+      msg.textContent = message;
+
+      entry.appendChild(time);
+      entry.appendChild(msg);
+
+      container.appendChild(entry);
+      container.scrollTop = container.scrollHeight;
+
+      if (container.children.length > 500) {
+        container.removeChild(container.firstChild);
+      }
+    }
+
+    function updateStatus(status) {
+      const indicator = document.getElementById("statusIndicator");
+      const text = document.getElementById("statusText");
+      const startBtn = document.getElementById("startBtn");
+      const stopBtn = document.getElementById("stopBtn");
+
+      indicator.className = "status-indicator";
+
+      switch (status) {
+        case "running":
+        case "started":
+          indicator.classList.add("status-running");
+          text.textContent = "正在爬取";
+          startBtn.disabled = true;
+          stopBtn.disabled = false;
+          break;
+        case "completed":
+          indicator.classList.add("status-completed");
+          text.textContent = "已完成";
+          startBtn.disabled = false;
+          stopBtn.disabled = true;
+          break;
+        case "stopped":
+          indicator.classList.add("status-stopped");
+          text.textContent = "已停止";
+          startBtn.disabled = false;
+          stopBtn.disabled = true;
+          break;
+        case "error":
+        case "failed":
+          indicator.classList.add("status-error");
+          text.textContent = "发生错误";
+          startBtn.disabled = false;
+          stopBtn.disabled = true;
+          break;
+        default:
+          indicator.classList.add("status-idle");
+          text.textContent = "就绪";
+          startBtn.disabled = false;
+          stopBtn.disabled = true;
+      }
+    }
+
+    async function checkStatus() {
+      try {
+        const response = await fetch("/api/status");
+        const data = await response.json();
+        if (data.isCrawling) {
+          updateStatus("running");
+        } else if (data.hasResults && data.results) {
+          if (!crawlResults) {
+            const resultsResponse = await fetch("/api/results");
+            crawlResults = await resultsResponse.json();
+            showResults(crawlResults);
+          }
+          updateStatus("completed");
+        }
+      } catch (error) {
+        console.error("Failed to check status:", error);
+      }
+    }
+
+    async function startCrawl() {
+      const urlInput = document.getElementById("url");
+      const urlValue = urlInput.value.trim();
+
+      if (!urlValue) {
+        urlInput.classList.add("input-error");
+        addLog("error", "请输入目标网址");
+        return;
+      }
+
+      urlInput.classList.remove("input-error");
+
+      const outputName = document.getElementById("outputName").value.trim();
+
+      const config = {
+        url: urlValue,
+        maxRequests: parseInt(document.getElementById("maxRequests").value, 10),
+        maxConcurrency: parseInt(document.getElementById("maxConcurrency").value, 10),
+        navigationTimeout: parseInt(document.getElementById("navigationTimeout").value, 10),
+        requestHandlerTimeout: parseInt(document.getElementById("requestHandlerTimeout").value, 10),
+        maxRetries: parseInt(document.getElementById("maxRetries").value, 10),
+        browserChannel: document.getElementById("browserChannel").value,
+        blockedResources: document.getElementById("blockedResources").value.trim(),
+        sensitiveWords: document.getElementById("sensitiveWords").value.trim()
+      };
+
+      if (outputName) {
+        config.outputPath = outputName;
+      }
+
+      try {
+        addLog("info", `开始爬取: ${config.url}`);
+        const response = await fetch("/api/crawl/start", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(config)
+        });
+
+        const result = await response.json();
+
+        if (!result.success) {
+          throw new Error(result.error || "启动失败");
+        }
+
+        updateStatus("started");
+        addLog("info", result.message);
+      } catch (error) {
+        addLog("error", error.message);
+        updateStatus("error");
+      }
+    }
+
+    async function stopCrawl() {
+      try {
+        const response = await fetch("/api/crawl/stop", { method: "POST" });
+        const result = await response.json();
+
+        if (result.success) {
+          addLog("info", result.message);
+        }
+      } catch (error) {
+        addLog("error", error.message);
+      }
+    }
+
+    function showResults(results) {
+      const section = document.getElementById("resultsSection");
+      section.style.display = "block";
+
+      renderStats(results);
+      renderPagesTable(results.pages);
+      renderElementsTable(results.pages);
+    }
+
+    function renderStats(results) {
+      const grid = document.getElementById("statsGrid");
+
+      let totalElements = 0;
+      const hrefSet = new Set();
+      const domains = new Set();
+
+      results.pages.forEach((page) => {
+        const elements = page.elements || [];
+        totalElements += elements.length;
+        elements.forEach((el) => {
+          if (el.href) hrefSet.add(el.href);
+        });
+        try {
+          const url = new URL(page.url);
+          domains.add(url.hostname);
+        } catch (e) {}
+      });
+
+      const stats = [
+        { label: "爬取页面数", value: results.pages.length },
+        { label: "总页面数", value: results.totalPages },
+        { label: "发现的元素", value: totalElements },
+        { label: "唯一链接", value: hrefSet.size },
+        { label: "域名数量", value: domains.size },
+        { label: "平均元素/页", value: (totalElements / results.pages.length || 0).toFixed(1) }
+      ];
+
+      grid.innerHTML = stats
+        .map(
+          (stat) => `
+        <div class="stat-card">
+          <div class="stat-value">${stat.value}</div>
+          <div class="stat-label">${stat.label}</div>
+        </div>
+      `
+        )
+        .join("");
+    }
+
+    function renderPagesTable(pages) {
+      const tbody = document.getElementById("pagesTableBody");
+      const filter = document.getElementById("pageFilter").value.trim().toLowerCase();
+
+      const filteredPages = pages.filter((page) => {
+        if (!filter) return true;
+        const title = (page.title || "").toLowerCase();
+        const url = (page.url || "").toLowerCase();
+        return title.includes(filter) || url.includes(filter);
+      });
+
+      if (filteredPages.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="4" class="empty-state">暂无匹配页面</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = filteredPages
+        .map((page) => {
+          const links = new Set((page.elements || []).filter((el) => el.href).map((el) => el.href));
+          return `
+        <tr>
+          <td>${page.title || "(无标题)"}</td>
+          <td style="font-family: var(--mono); font-size: 0.82rem;">${page.url}</td>
+          <td><strong>${(page.elements || []).length}</strong></td>
+          <td>${links.size}</td>
+        </tr>
+      `;
+        })
+        .join("");
+    }
+
+    function renderElementsTable(pages) {
+      const tbody = document.getElementById("elementsTableBody");
+      const filter = document.getElementById("elementFilter").value.trim().toLowerCase();
+
+      let allElements = [];
+
+      pages.forEach((page) => {
+        (page.elements || []).forEach((el) => {
+          allElements.push({
+            ...el,
+            _pageTitle: page.title,
+            _pageUrl: page.url
+          });
+        });
+      });
+
+      if (filter) {
+        allElements = allElements.filter((el) => {
+          const hay = `${el.text || ""} ${el.href || ""} ${el.selector || ""}`.toLowerCase();
+          return hay.includes(filter);
+        });
+      }
+
+      if (allElements.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" class="empty-state">暂无数据</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = allElements.slice(0, 200).map((el) => `
+        <tr>
+          <td><span class="tag tag-${el.type}">${el.type}</span></td>
+          <td>${el.text || "-"}</td>
+          <td style="font-family: var(--mono); font-size: 0.78rem; word-break: break-all;">
+            ${el.href ? `<a href="${el.href}" target="_blank" rel="noopener" style="color: var(--accent-strong);">${el.href}</a>` : "-"}
+          </td>
+          <td style="font-family: var(--mono); font-size: 0.78rem;">${el.selector || "-"}</td>
+          <td style="color: var(--muted); font-size: 0.82rem;">${el.context || "-"}</td>
+        </tr>
+      `).join("");
+
+      if (allElements.length > 200) {
+        tbody.innerHTML += `<tr><td colspan="5" class="empty-state">显示前 200 条记录，共 ${allElements.length} 条</td></tr>`;
+      }
+    }
+
+    function switchTab(event, tabName) {
+      document.querySelectorAll(".tab-btn").forEach((btn) => btn.classList.remove("active"));
+      event.target.classList.add("active");
+
+      document.getElementById("overviewTab").style.display = tabName === "overview" ? "block" : "none";
+      document.getElementById("pagesTab").style.display = tabName === "pages" ? "block" : "none";
+      document.getElementById("elementsTab").style.display = tabName === "elements" ? "block" : "none";
+    }
+
+    function setupFilters() {
+      document.getElementById("pageFilter").addEventListener("input", () => {
+        if (crawlResults) {
+          renderPagesTable(crawlResults.pages);
+        }
+      });
+
+      document.getElementById("elementFilter").addEventListener("input", () => {
+        if (crawlResults) {
+          renderElementsTable(crawlResults.pages);
+        }
+      });
+    }
+
+    function downloadResults() {
+      if (!crawlResults) {
+        addLog("error", "暂无可下载的结果");
+        return;
+      }
+      window.open("/api/results/download", "_blank");
+    }
+
+    function openReportLatest() {
+      window.open("/crawl-report.html?source=latest", "_blank");
+    }
+
+    function openRagChat() {
+      window.open("/rag/", "_blank");
+    }
+
+    function openReportForFile(fileName) {
+      const target = `/crawl-report.html?file=${encodeURIComponent(fileName)}`;
+      window.open(target, "_blank");
+    }
+
+    function setRagDataset(name) {
+      const input = document.getElementById("ragDataset");
+      if (!input) return;
+      input.value = name || "latest";
+      setRagStatus("", `已选择数据集: ${input.value}`);
+    }
+
+    function setRagStatus(state, message) {
+      const node = document.getElementById("ragStatus");
+      if (!node) return;
+      node.className = "rag-status";
+      if (state) {
+        node.classList.add(state);
+      }
+      node.textContent = message || "";
+    }
+
+    function safeJson(value) {
+      try {
+        return JSON.parse(value);
+      } catch {
+        return null;
+      }
+    }
+
+    async function pushToRag() {
+      const ragBaseUrl = document.getElementById("ragBaseUrl").value.trim();
+      const kbName = document.getElementById("ragKbName").value.trim() || "default-kb";
+      const dataset = document.getElementById("ragDataset").value.trim() || "latest";
+      const siteId = document.getElementById("ragSiteId").value.trim();
+      const sessionId = document.getElementById("ragSessionId").value.trim();
+      const embeddingModel = document.getElementById("ragEmbeddingModel").value.trim();
+
+      if (!ragBaseUrl) {
+        setRagStatus("error", "请填写 RAG Base URL。");
+        return;
+      }
+
+      const payload = {
+        ragBaseUrl,
+        kbName,
+        dataset
+      };
+
+      if (siteId) payload.siteId = siteId;
+      if (sessionId) payload.sessionId = sessionId;
+      if (embeddingModel) payload.embeddingModel = embeddingModel;
+
+      setRagStatus("", "正在推送到 RAG...");
+      addLog("info", `推送到 RAG: ${kbName} / ${dataset}`);
+
+      try {
+        const response = await fetch("/api/rag/build-from-crawl", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+
+        const raw = await response.text();
+        const parsed = safeJson(raw) || raw;
+
+        if (!response.ok) {
+          setRagStatus("error", `构建失败: ${typeof parsed === "string" ? parsed : "RAG 返回错误"}`);
+          return;
+        }
+
+        const msg = typeof parsed === "string" ? parsed : JSON.stringify(parsed, null, 2);
+        setRagStatus("success", `构建完成。${msg.slice(0, 240)}`);
+
+        // Store crawled KB info so RAG frontend can discover it
+        const crawledKbs = safeJson(localStorage.getItem("crawledKbList")) || [];
+        const existingIdx = crawledKbs.findIndex(k => k.kbName === kbName);
+        const entry = { kbName, dataset, pushedAt: new Date().toISOString() };
+        if (existingIdx >= 0) {
+          crawledKbs[existingIdx] = entry;
+        } else {
+          crawledKbs.push(entry);
+        }
+        localStorage.setItem("crawledKbList", JSON.stringify(crawledKbs));
+
+        addLog("success", `知识库 ${kbName} 已注册到浏览器，RAG 对话页面可直接使用。`);
+      } catch (error) {
+        setRagStatus("error", error.message || "推送失败");
+      }
+    }
+
+    function formatBytes(bytes) {
+      if (!Number.isFinite(bytes)) return "-";
+      const units = ["B", "KB", "MB", "GB"];
+      let size = bytes;
+      let idx = 0;
+      while (size >= 1024 && idx < units.length - 1) {
+        size /= 1024;
+        idx += 1;
+      }
+      return `${size.toFixed(size < 10 && idx > 0 ? 1 : 0)} ${units[idx]}`;
+    }
+
+    function formatTimestamp(value) {
+      if (!value) return "-";
+      try {
+        return new Date(value).toLocaleString();
+      } catch {
+        return "-";
+      }
+    }
+
+    async function loadDatasetIndex() {
+      const tbody = document.getElementById("datasetTableBody");
+      tbody.innerHTML = `<tr><td colspan="5" class="empty-state">正在加载...</td></tr>`;
+
+      try {
+        const response = await fetch("/api/datasets", { cache: "no-store" });
+        if (!response.ok) {
+          throw new Error("无法读取数据库索引");
+        }
+        const data = await response.json();
+        const items = Array.isArray(data.files) ? data.files : [];
+
+        if (items.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="5" class="empty-state">database 目录暂无结果文件</td></tr>`;
+          return;
+        }
+
+        tbody.innerHTML = items
+          .map((item) => `
+            <tr>
+              <td>${item.name}</td>
+              <td>${formatTimestamp(item.updatedAt)}</td>
+              <td>${formatBytes(item.size)}</td>
+              <td>
+                <button class="btn btn-outline btn-small" onclick='openReportForFile(${JSON.stringify(item.name)})'>查看报告</button>
+              </td>
+              <td>
+                <button class="btn btn-outline btn-small" onclick='setRagDataset(${JSON.stringify(item.name)})'>使用</button>
+              </td>
+            </tr>
+          `)
+          .join("");
+      } catch (error) {
+        tbody.innerHTML = `<tr><td colspan="5" class="empty-state">${error.message}</td></tr>`;
+      }
+    }
+
+    function scrollToResults() {
+      const section = document.getElementById("resultsSection");
+      if (!section || section.style.display === "none") {
+        addLog("info", "暂无结果可查看，请先开始一次爬取。");
+        return;
+      }
+      section.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      connectSocket();
+      setupFilters();
+      loadDatasetIndex();
+    });
+  </script>
+</body>
+</html>

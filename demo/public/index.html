@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Demo Home</title>
+  <style>
+    body {
+      font-family: "Sora", sans-serif;
+      background: #f8fafc;
+      margin: 0;
+      padding: 32px;
+      color: #0f172a;
+    }
+
+    .card {
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 16px;
+      box-shadow: 0 10px 22px rgba(15, 23, 42, 0.08);
+    }
+
+    .btn {
+      display: inline-block;
+      padding: 10px 14px;
+      border-radius: 10px;
+      background: #1f8a70;
+      color: #fff;
+      text-decoration: none;
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>Demo Dashboard</h1>
+    <p>Use the widget to find where to export reports.</p>
+    <a class="btn" href="/reports.html">Go to Reports</a>
+  </div>
+
+  <div class="card">
+    <h2>Shortcuts</h2>
+    <p>Quick links for common tasks.</p>
+    <button id="open-reports">Open Reports</button>
+  </div>
+
+  <script>
+    window.__SITE_NAV_CONFIG__ = {
+      apiBase: "http://localhost:8080",
+      kbName: "demo-kb",
+      topK: 6,
+      title: "Feature Finder",
+      subtitle: "Ask and navigate"
+    };
+  </script>
+  <script src="/widget.js"></script>
+</body>
+</html>

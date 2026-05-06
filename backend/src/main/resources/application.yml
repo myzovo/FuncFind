@@ -1,0 +1,38 @@
+server:
+  port: 8080
+
+spring:
+  servlet:
+    multipart:
+      max-file-size: 20MB
+      max-request-size: 25MB
+
+app:
+  embedding-provider: workers-ai
+  embedding:
+    model-id: all-MiniLM-L6-v2
+    dimension: 384
+  vectorize:
+    index-name: docvec-default
+    namespace: default
+  storage:
+    raw-text-mode: r2
+    primary: r2
+    fallback: persistent
+    r2:
+      enabled: true
+      simulate-failure: false
+      bucket: docvec-raw
+    replay:
+      batch-size: 100
+  model-routing:
+    default-adapter: workers-ai
+    fallback-adapter: external
+    health-check-ttl-seconds: 10
+  workers-ai:
+    enabled: true
+    simulate-failure: false
+  external-model-service:
+    enabled: true
+    simulate-failure: false
+    base-url: http://localhost:9000
