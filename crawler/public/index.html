@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>FuncFind — FuncFind</title>
+  <title>FuncFind — 页问</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Manrope:wght@400;500;600;700;800&family=Noto+Sans+SC:wght@300;400;500;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
@@ -1141,8 +1141,22 @@
       transition: all 0.25s;
     }
     #view-chat .crawl-kb-item:hover { border-color: rgba(0,160,168,0.25); box-shadow: 0 2px 8px rgba(15,26,54,0.06); }
+    #view-chat .crawl-kb-item.active {
+      border-color: #00a0a8;
+      background: linear-gradient(135deg, #b2ebf2, rgba(178,235,242,0.6));
+      box-shadow: 0 0 0 3px rgba(0,160,168,0.15);
+    }
     #view-chat .crawl-kb-item strong { display: block; font-size: 14px; color: #0f1a36; }
     #view-chat .crawl-kb-item small { color: #3a4a72; font-size: 12px; }
+    #view-chat .kb-active-badge {
+      display: inline-block; font-size: 11px; font-weight: 700; color: #00a0a8;
+      background: rgba(0,160,168,0.12); padding: 1px 8px; border-radius: 10px;
+      margin-left: 6px; vertical-align: 1px;
+    }
+    #view-chat .btn-active {
+      background: linear-gradient(135deg, #00a0a8, #008a90) !important;
+      color: #fff !important; border-color: transparent !important;
+    }
     #view-chat .hint { color: #7b8bb2; font-size: 13px; }
 
     /* Chat Panel */
@@ -1257,6 +1271,44 @@
       #view-chat .hero, #view-chat .panel { padding: 14px; border-radius: 14px; }
       #view-chat .actions-row { flex-direction: column; }
       #view-chat .actions-row .btn { width: 100%; justify-content: center; }
+    }
+
+    /* ============================================
+       Crawl Tabs
+       ============================================ */
+    .crawl-tabs {
+      display: flex;
+      gap: 0;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 20px;
+    }
+
+    .crawl-tab {
+      padding: 10px 20px;
+      font-size: 13.5px;
+      font-weight: 600;
+      color: var(--muted);
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      transition: all 0.2s;
+      user-select: none;
+    }
+
+    .crawl-tab:hover {
+      color: var(--ink);
+    }
+
+    .crawl-tab.active {
+      color: var(--accent);
+      border-bottom-color: var(--accent);
+    }
+
+    .crawl-tab-content {
+      display: none;
+    }
+
+    .crawl-tab-content.active {
+      display: block;
     }
 
     /* ============================================
@@ -1431,27 +1483,12 @@
 
     <div class="nav-item" data-view="crawled-kb" onclick="switchView('crawled-kb')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
-      <span>已爬取知识库</span>
+      <span>知识库</span>
     </div>
 
     <div class="nav-item" data-view="crawl" onclick="switchView('crawl')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
       <span>爬取控制台</span>
-    </div>
-
-    <div class="nav-item" data-view="report" onclick="switchView('report')">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
-      <span>爬取报告</span>
-    </div>
-
-    <div class="nav-item" data-view="rag" onclick="switchView('rag')">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-      <span>知识库推送</span>
-    </div>
-
-    <div class="nav-item" data-view="download" onclick="switchView('download')">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-      <span>下载导出</span>
     </div>
 
     <div class="nav-spacer"></div>
@@ -1468,10 +1505,6 @@
     <div id="view-welcome" class="view-panel active">
       <div class="welcome-page">
         <div class="welcome-hero">
-          <div class="welcome-badge">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
-            RAG Workspace
-          </div>
           <h1>FuncFind</h1>
           <p>网页爬取、知识库构建、AI 对话，一页搞定。</p>
           <div class="welcome-cards">
@@ -1490,7 +1523,7 @@
               <h3>爬取控制台</h3>
               <p>配置并启动网页爬虫任务</p>
             </div>
-            <div class="welcome-card" onclick="switchView('report')">
+            <div class="welcome-card" onclick="switchView('crawl');switchCrawlTab('report')">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
               <h3>爬取报告</h3>
               <p>查看爬取结果与数据统计</p>
@@ -1710,25 +1743,27 @@
             <p class="status-text" v-if="systemMessage">{{ systemMessage }}</p>
           </section>
 
-          <!-- ====== 已爬取知识库 ====== -->
+          <!-- ====== 知识库 ====== -->
           <section class="panel reveal crawl-kb-panel" v-if="crawledKbs.length">
             <div class="panel-head">
               <h2>
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
-                已爬取知识库
+                知识库
               </h2>
               <span class="chip ok">{{ crawledKbs.length }} KB(s)</span>
             </div>
             <p class="hint" style="margin:0 0 14px 0;">
-              来自爬虫控制台的 RAG 构建结果，无需上传文档即可直接对话。
+              已构建的知识库列表，来自文档上传或爬虫推送，可直接用于对话。
             </p>
             <div class="crawl-kb-list">
-              <div v-for="(kb, idx) in crawledKbs" :key="idx" class="crawl-kb-item">
+              <div v-for="(kb, idx) in crawledKbs" :key="idx" class="crawl-kb-item" :class="{ active: kb._active }">
                 <div>
-                  <strong>{{ kb.kbName }}</strong>
+                  <strong>{{ kb.kbName }} <span v-if="kb._active" class="kb-active-badge">已激活</span></strong>
                   <small>{{ kb.dataset }} · {{ kb.pushedAt ? new Date(kb.pushedAt).toLocaleString() : '' }}</small>
                 </div>
-                <button class="btn small" @click="useCrawledKb(kb)">使用此知识库</button>
+                <button class="btn small" :class="{ 'btn-active': kb._active }" @click="useCrawledKb(kb)">
+                  {{ kb._active ? '已激活' : '使用此知识库' }}
+                </button>
               </div>
             </div>
             <button class="btn ghost small" style="margin-top:10px;" @click="clearCrawledKbs">清除列表</button>
@@ -1782,183 +1817,172 @@
     <!-- View 2: Crawl Console -->
     <div id="view-crawl" class="view-panel">
       <div class="view-shell">
-        <h2>爬取控制台</h2>
+        <div class="crawl-tabs">
+          <div class="crawl-tab active" data-tab="console" onclick="switchCrawlTab('console')">控制台</div>
+          <div class="crawl-tab" data-tab="rag" onclick="switchCrawlTab('rag')">知识库推送</div>
+          <div class="crawl-tab" data-tab="report" onclick="switchCrawlTab('report')">爬取报告</div>
+          <div class="crawl-tab" data-tab="download" onclick="switchCrawlTab('download')">下载导出</div>
+        </div>
 
-        <div class="grid-2">
-          <div class="panel">
-            <div class="panel-title">
-              <span>基础配置</span>
-              <div class="status-indicator status-idle" id="statusIndicator">
-                <span class="dot"></span>
-                <span id="statusText">就绪</span>
+        <!-- Tab: 控制台 -->
+        <div class="crawl-tab-content active" id="tab-console">
+          <div class="grid-2">
+            <div class="panel">
+              <div class="panel-title">
+                <span>基础配置</span>
+                <div class="status-indicator status-idle" id="statusIndicator">
+                  <span class="dot"></span>
+                  <span id="statusText">就绪</span>
+                </div>
+              </div>
+              <div class="field">
+                <label for="url">目标网址</label>
+                <input type="url" id="url" placeholder="https://example.com" value="https://crawlee.dev" />
+                <span class="hint">只需填写 URL，其他参数可在高级配置中调整。</span>
+              </div>
+              <div class="action-row">
+                <button class="btn btn-primary" id="startBtn" onclick="startCrawl()">开始爬取</button>
+                <button class="btn btn-danger" id="stopBtn" onclick="stopCrawl()" disabled>停止</button>
+              </div>
+              <details class="advanced">
+                <summary>高级配置</summary>
+                <div class="field"><label for="maxRequests">最大请求数</label><input type="number" id="maxRequests" value="100" min="1" max="10000" /></div>
+                <div class="field"><label for="maxConcurrency">并发数</label><input type="number" id="maxConcurrency" value="1" min="1" max="10" /></div>
+                <div class="field"><label for="navigationTimeout">导航超时 (秒)</label><input type="number" id="navigationTimeout" value="60" min="10" max="300" /></div>
+                <div class="field"><label for="requestHandlerTimeout">请求超时 (秒)</label><input type="number" id="requestHandlerTimeout" value="240" min="30" max="600" /></div>
+                <div class="field"><label for="maxRetries">最大重试次数</label><input type="number" id="maxRetries" value="1" min="0" max="5" /></div>
+                <div class="field"><label for="browserChannel">浏览器通道</label><select id="browserChannel"><option value="">默认 (Chromium)</option><option value="chrome">Chrome</option><option value="msedge">Microsoft Edge</option></select></div>
+                <div class="field"><label for="blockedResources">阻断资源类型</label><input type="text" id="blockedResources" value="image,font,media" /><span class="hint">用逗号分隔</span></div>
+                <div class="field"><label for="sensitiveWords">敏感词</label><textarea id="sensitiveWords">delete,remove,pay,submit,confirm,logout,reset,clear,删除,注销,支付,清空,重置</textarea></div>
+                <div class="field"><label for="outputName">输出文件名</label><input type="text" id="outputName" placeholder="sitemap-2026-05-05.json" /><span class="hint">留空则自动生成</span></div>
+              </details>
+            </div>
+            <div class="panel">
+              <div class="panel-title">实时日志</div>
+              <div class="log-container" id="logContainer">
+                <div class="log-entry log-info"><span class="log-time">--:--:--</span><span class="log-message">系统就绪，等待开始爬取...</span></div>
               </div>
             </div>
+          </div>
+          <div class="panel">
+            <div class="panel-title">
+              <span>数据库爬取索引</span>
+              <div>
+                <button class="btn btn-outline btn-small" onclick="openReportLatest()">打开最新报告</button>
+                <button class="btn btn-outline btn-small" onclick="loadDatasetIndex()">刷新列表</button>
+              </div>
+            </div>
+            <p class="hint" style="margin-bottom:12px;">扫描 database 目录下的 JSON 结果文件。</p>
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th>文件名</th><th>更新时间</th><th>大小</th><th>操作</th><th>RAG</th></tr></thead>
+                <tbody id="datasetTableBody"><tr><td colspan="5" class="empty">正在加载...</td></tr></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab: 知识库推送 -->
+        <div class="crawl-tab-content" id="tab-rag">
+          <div class="panel">
+            <div class="panel-title">RAG 构建</div>
+            <p class="hint" style="margin-bottom:14px;">将爬取结果发送到 DocVec_RAG 的 build-from-crawl 接口。</p>
+            <div class="rag-grid">
+              <div class="rag-field"><label>RAG Base URL</label><input id="ragBaseUrl" type="text" value="http://localhost:8080" /></div>
+              <div class="rag-field"><label>知识库名称</label><input id="ragKbName" type="text" value="default-kb" /></div>
+              <div class="rag-field"><label>数据集</label><input id="ragDataset" type="text" value="latest" /><span class="hint">填写 latest 或文件名</span></div>
+              <div class="rag-field"><label>Session ID (可选)</label><input id="ragSessionId" type="text" placeholder="X-Client-Session-Id" /></div>
+              <div class="rag-field"><label>Embedding 模型 (可选)</label><input id="ragEmbeddingModel" type="text" placeholder="all-MiniLM-L6-v2" /></div>
+            </div>
+            <div class="action-row" style="margin-top:14px;">
+              <button class="btn btn-primary" id="ragPushBtn" onclick="pushToRagView()">推送并构建</button>
+              <button class="btn btn-outline" onclick="setRagDatasetView('latest')">使用最新结果</button>
+            </div>
+            <div class="rag-status" id="ragStatus" style="margin-top:12px;">等待推送。</div>
+          </div>
+        </div>
+
+        <!-- Tab: 爬取报告 -->
+        <div class="crawl-tab-content" id="tab-report">
+          <div class="panel">
+            <div class="panel-header">
+              <h3>数据源</h3>
+              <div class="control">
+                <select id="datasetSelect"></select>
+                <button id="loadFileBtn" class="btn btn-outline btn-small">加载 JSON</button>
+                <input id="fileInput" type="file" accept="application/json" style="display:none" />
+              </div>
+            </div>
+            <div class="detail-meta" id="datasetMetaContent">暂无数据</div>
+            <div class="subtle" id="datasetHint">从控制台打开或上传 JSON 文件。</div>
+          </div>
+          <div class="panel" id="statsPanel">
+            <div class="panel-header">
+              <h3>快照统计</h3>
+              <span class="subtle" id="snapshotNote"></span>
+            </div>
+            <div class="stat-grid" id="statGrid"></div>
+          </div>
+          <div class="grid-2" id="chartsPanel">
+            <div class="panel">
+              <div class="panel-header"><h3>元素类型分布</h3><span class="subtle" id="elementMixNote"></span></div>
+              <div class="bar-chart" id="typeChart"></div>
+            </div>
+            <div class="panel">
+              <div class="panel-header"><h3>Top 页面</h3><span class="subtle" id="topPagesNote"></span></div>
+              <div class="bar-chart" id="topPagesChart"></div>
+            </div>
+          </div>
+          <div class="panel" id="pagesPanel">
+            <div class="panel-header">
+              <h3>页面列表</h3>
+              <div class="tools">
+                <input id="pageSearch" type="search" placeholder="筛选页面" style="min-width:180px" />
+              </div>
+            </div>
+            <div class="table-wrap" id="pagesTableWrap"></div>
+          </div>
+          <div class="panel" id="detailPanel">
+            <div class="panel-header">
+              <h3>页面详情</h3>
+              <div class="tools">
+                <input id="elementSearch" type="search" placeholder="筛选元素" style="min-width:160px" />
+                <select id="elementTypeFilter" style="min-width:120px"></select>
+              </div>
+            </div>
+            <div id="pageDetail"></div>
+            <div id="verifyPanel" style="margin-top:16px;">
+              <div class="detail-card">
+                <h3>验证定位</h3>
+                <div class="subtle" id="verifyStatus">未选择元素。</div>
+                <iframe class="verify-frame" id="verifyFrame" title="验证定位"></iframe>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab: 下载导出 -->
+        <div class="crawl-tab-content" id="tab-download">
+          <div class="panel">
+            <div class="panel-title">导出数据</div>
+            <p class="hint" style="margin-bottom:16px;">选择数据源后可下载 JSON 或 CSV 格式的爬取结果。</p>
             <div class="field">
-              <label for="url">目标网址</label>
-              <input type="url" id="url" placeholder="https://example.com" value="https://crawlee.dev" />
-              <span class="hint">只需填写 URL，其他参数可在高级配置中调整。</span>
+              <label>数据源</label>
+              <select id="downloadDatasetSelect"></select>
             </div>
-
-            <div class="action-row">
-              <button class="btn btn-primary" id="startBtn" onclick="startCrawl()">开始爬取</button>
-              <button class="btn btn-danger" id="stopBtn" onclick="stopCrawl()" disabled>停止</button>
-            </div>
-
-            <details class="advanced">
-              <summary>高级配置</summary>
-              <div class="field"><label for="maxRequests">最大请求数</label><input type="number" id="maxRequests" value="100" min="1" max="10000" /></div>
-              <div class="field"><label for="maxConcurrency">并发数</label><input type="number" id="maxConcurrency" value="1" min="1" max="10" /></div>
-              <div class="field"><label for="navigationTimeout">导航超时 (秒)</label><input type="number" id="navigationTimeout" value="60" min="10" max="300" /></div>
-              <div class="field"><label for="requestHandlerTimeout">请求超时 (秒)</label><input type="number" id="requestHandlerTimeout" value="240" min="30" max="600" /></div>
-              <div class="field"><label for="maxRetries">最大重试次数</label><input type="number" id="maxRetries" value="1" min="0" max="5" /></div>
-              <div class="field"><label for="browserChannel">浏览器通道</label><select id="browserChannel"><option value="">默认 (Chromium)</option><option value="chrome">Chrome</option><option value="msedge">Microsoft Edge</option></select></div>
-              <div class="field"><label for="blockedResources">阻断资源类型</label><input type="text" id="blockedResources" value="image,font,media" /><span class="hint">用逗号分隔</span></div>
-              <div class="field"><label for="sensitiveWords">敏感词</label><textarea id="sensitiveWords">delete,remove,pay,submit,confirm,logout,reset,clear,删除,注销,支付,清空,重置</textarea></div>
-              <div class="field"><label for="outputName">输出文件名</label><input type="text" id="outputName" placeholder="sitemap-2026-05-05.json" /><span class="hint">留空则自动生成</span></div>
-            </details>
-          </div>
-
-          <div class="panel">
-            <div class="panel-title">实时日志</div>
-            <div class="log-container" id="logContainer">
-              <div class="log-entry log-info"><span class="log-time">--:--:--</span><span class="log-message">系统就绪，等待开始爬取...</span></div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Dataset index -->
-        <div class="panel">
-          <div class="panel-title">
-            <span>数据库爬取索引</span>
-            <div>
-              <button class="btn btn-outline btn-small" onclick="openReportLatest()">打开最新报告</button>
-              <button class="btn btn-outline btn-small" onclick="loadDatasetIndex()">刷新列表</button>
-            </div>
-          </div>
-          <p class="hint" style="margin-bottom:12px;">扫描 database 目录下的 JSON 结果文件。</p>
-          <div class="table-wrap">
-            <table>
-              <thead><tr><th>文件名</th><th>更新时间</th><th>大小</th><th>操作</th><th>RAG</th></tr></thead>
-              <tbody id="datasetTableBody"><tr><td colspan="5" class="empty">正在加载...</td></tr></tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- View 3: Crawl Report -->
-    <div id="view-report" class="view-panel">
-      <div class="view-shell">
-        <h2>爬取报告</h2>
-
-        <div class="panel">
-          <div class="panel-header">
-            <h3>数据源</h3>
-            <div class="control">
-              <select id="datasetSelect"></select>
-              <button id="loadFileBtn" class="btn btn-outline btn-small">加载 JSON</button>
-              <input id="fileInput" type="file" accept="application/json" style="display:none" />
-            </div>
-          </div>
-          <div class="detail-meta" id="datasetMetaContent">暂无数据</div>
-          <div class="subtle" id="datasetHint">从控制台打开或上传 JSON 文件。</div>
-        </div>
-
-        <div class="panel" id="statsPanel">
-          <div class="panel-header">
-            <h3>快照统计</h3>
-            <span class="subtle" id="snapshotNote"></span>
-          </div>
-          <div class="stat-grid" id="statGrid"></div>
-        </div>
-
-        <div class="grid-2" id="chartsPanel">
-          <div class="panel">
-            <div class="panel-header"><h3>元素类型分布</h3><span class="subtle" id="elementMixNote"></span></div>
-            <div class="bar-chart" id="typeChart"></div>
-          </div>
-          <div class="panel">
-            <div class="panel-header"><h3>Top 页面</h3><span class="subtle" id="topPagesNote"></span></div>
-            <div class="bar-chart" id="topPagesChart"></div>
-          </div>
-        </div>
-
-        <div class="panel" id="pagesPanel">
-          <div class="panel-header">
-            <h3>页面列表</h3>
-            <div class="tools">
-              <input id="pageSearch" type="search" placeholder="筛选页面" style="min-width:180px" />
-            </div>
-          </div>
-          <div class="table-wrap" id="pagesTableWrap"></div>
-        </div>
-
-        <div class="panel" id="detailPanel">
-          <div class="panel-header">
-            <h3>页面详情</h3>
-            <div class="tools">
-              <input id="elementSearch" type="search" placeholder="筛选元素" style="min-width:160px" />
-              <select id="elementTypeFilter" style="min-width:120px"></select>
-            </div>
-          </div>
-          <div id="pageDetail"></div>
-          <div id="verifyPanel" style="margin-top:16px;">
-            <div class="detail-card">
-              <h3>验证定位</h3>
-              <div class="subtle" id="verifyStatus">未选择元素。</div>
-              <iframe class="verify-frame" id="verifyFrame" title="验证定位"></iframe>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- View 4: RAG Push -->
-    <div id="view-rag" class="view-panel">
-      <div class="view-shell">
-        <h2>知识库推送</h2>
-        <div class="panel">
-          <div class="panel-title">RAG 构建</div>
-          <p class="hint" style="margin-bottom:14px;">将爬取结果发送到 DocVec_RAG 的 build-from-crawl 接口。</p>
-          <div class="rag-grid">
-            <div class="rag-field"><label>RAG Base URL</label><input id="ragBaseUrl" type="text" value="http://localhost:8080" /></div>
-            <div class="rag-field"><label>知识库名称</label><input id="ragKbName" type="text" value="default-kb" /></div>
-            <div class="rag-field"><label>数据集</label><input id="ragDataset" type="text" value="latest" /><span class="hint">填写 latest 或文件名</span></div>
-            <div class="rag-field"><label>Session ID (可选)</label><input id="ragSessionId" type="text" placeholder="X-Client-Session-Id" /></div>
-            <div class="rag-field"><label>Embedding 模型 (可选)</label><input id="ragEmbeddingModel" type="text" placeholder="all-MiniLM-L6-v2" /></div>
-          </div>
-          <div class="action-row" style="margin-top:14px;">
-            <button class="btn btn-primary" id="ragPushBtn" onclick="pushToRagView()">推送并构建</button>
-            <button class="btn btn-outline" onclick="setRagDatasetView('latest')">使用最新结果</button>
-          </div>
-          <div class="rag-status" id="ragStatus" style="margin-top:12px;">等待推送。</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- View 5: Download -->
-    <div id="view-download" class="view-panel">
-      <div class="view-shell">
-        <h2>下载导出</h2>
-        <div class="panel">
-          <div class="panel-title">导出数据</div>
-          <p class="hint" style="margin-bottom:16px;">选择数据源后可下载 JSON 或 CSV 格式的爬取结果。</p>
-          <div class="field">
-            <label>数据源</label>
-            <select id="downloadDatasetSelect"></select>
-          </div>
-          <div class="download-grid" style="margin-top:14px;">
-            <div class="download-card">
-              <div class="icon">{ }</div>
-              <h4>JSON 格式</h4>
-              <p>完整的结构化数据，适合程序处理</p>
-              <button class="btn btn-primary btn-small" id="downloadJsonBtn" onclick="downloadJsonView()" disabled>下载 JSON</button>
-            </div>
-            <div class="download-card">
-              <div class="icon">.csv</div>
-              <h4>CSV 格式</h4>
-              <p>表格数据，适合 Excel 打开</p>
-              <button class="btn btn-outline btn-small" id="downloadCsvBtn" onclick="downloadCsvView()" disabled>下载 CSV</button>
+            <div class="download-grid" style="margin-top:14px;">
+              <div class="download-card">
+                <div class="icon">{ }</div>
+                <h4>JSON 格式</h4>
+                <p>完整的结构化数据，适合程序处理</p>
+                <button class="btn btn-primary btn-small" id="downloadJsonBtn" onclick="downloadJsonView()" disabled>下载 JSON</button>
+              </div>
+              <div class="download-card">
+                <div class="icon">.csv</div>
+                <h4>CSV 格式</h4>
+                <p>表格数据，适合 Excel 打开</p>
+                <button class="btn btn-outline btn-small" id="downloadCsvBtn" onclick="downloadCsvView()" disabled>下载 CSV</button>
+              </div>
             </div>
           </div>
         </div>
@@ -1986,7 +2010,6 @@
       }
 
       if (name === 'upload' || name === 'crawled-kb') {
-        // These use the same view-chat panel with different mode
         document.getElementById('view-chat').classList.add('active');
         if (app) {
           app.classList.add(name === 'upload' ? 'mode-upload' : 'mode-kb');
@@ -1994,6 +2017,21 @@
       } else {
         document.getElementById('view-' + name).classList.add('active');
       }
+
+      // Reset crawl tab to console when entering crawl view
+      if (name === 'crawl') {
+        switchCrawlTab('console');
+      }
+    }
+
+    function switchCrawlTab(tabName) {
+      document.querySelectorAll('.crawl-tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.crawl-tab-content').forEach(c => c.classList.remove('active'));
+      document.querySelector('.crawl-tab[data-tab="' + tabName + '"]').classList.add('active');
+      document.getElementById('tab-' + tabName).classList.add('active');
+      // Auto-refresh data when entering certain tabs
+      if (tabName === 'console') loadDatasetIndex();
+      if (tabName === 'report') reportLoadAllFromDatabase();
     }
 
     // ============================================
@@ -2198,16 +2236,19 @@
 
     function setRagDatasetFromIndex(name) {
       document.getElementById("ragDataset").value = name;
-      switchView("rag");
+      switchView("crawl");
+      switchCrawlTab("rag");
     }
 
     function openReportLatest() {
-      switchView("report");
+      switchView("crawl");
+      switchCrawlTab("report");
       reportLoadLatest();
     }
 
     function openReportForFile(fileName) {
-      switchView("report");
+      switchView("crawl");
+      switchCrawlTab("report");
       reportLoadDataset(fileName);
     }
 
@@ -2228,8 +2269,21 @@
 
     function refreshReportData() {
       if (!crawlResults) return;
-      if (reportState.datasets.find(d => d.source === "latest")) return;
-      addReportDataset({ file: "latest", label: "Latest (server)" }, crawlResults, "server");
+      // Update or add the "latest" entry
+      const existing = reportState.datasets.findIndex(d => d.source === "latest");
+      const entry = {
+        id: "latest-" + Math.random().toString(36).slice(2, 8),
+        name: "Latest (server)",
+        source: "latest",
+        origin: "server",
+        data: crawlResults,
+      };
+      if (existing >= 0) {
+        reportState.datasets[existing] = entry;
+      } else {
+        reportState.datasets.push(entry);
+      }
+      reportState.selectedId = entry.id;
       refreshReportSelect();
       reportRender();
     }
@@ -2767,9 +2821,34 @@
 
       document.getElementById("downloadDatasetSelect").addEventListener("change", () => {});
 
-      // Try loading latest results
-      reportLoadLatest().catch(() => {});
+      // Load report data: try in-memory latest first, then fall back to database directory
+      reportLoadLatest().catch(() => {}).finally(() => {
+        reportLoadAllFromDatabase();
+      });
     });
+
+    async function reportLoadAllFromDatabase() {
+      try {
+        const r = await fetch("/api/datasets", { cache: "no-store" });
+        if (!r.ok) return;
+        const data = await r.json();
+        const items = Array.isArray(data.files) ? data.files : [];
+        if (!items.length) return;
+        // Load each dataset file into the report
+        for (const item of items) {
+          const exists = reportState.datasets.some(d => d.source === item.name);
+          if (exists) continue;
+          try {
+            const dr = await fetch("/api/datasets/" + encodeURIComponent(item.name), { cache: "no-store" });
+            if (!dr.ok) continue;
+            const dataset = await dr.json();
+            addReportDataset({ file: item.name, label: item.name }, dataset, "database");
+          } catch { /* skip broken file */ }
+        }
+        refreshReportSelect();
+        reportRender();
+      } catch { /* server unavailable */ }
+    }
   </script>
 </body>
 </html>

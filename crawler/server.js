@@ -199,39 +199,6 @@ app.get("/api/datasets/:name", (req, res) => {
   }
 });
 
-app.get("/api/datasets", (_req, res) => {
-  try {
-    const items = listDatabaseFiles();
-    res.json({ items });
-  } catch (error) {
-    res.status(500).json({ error: "Failed to list datasets" });
-  }
-});
-
-app.get("/api/datasets/:name", (req, res) => {
-  const raw = req.params.name || "";
-  const fileName = basename(raw);
-
-  if (fileName !== raw) {
-    return res.status(400).json({ error: "Invalid file name" });
-  }
-
-  if (extname(fileName).toLowerCase() !== ".json") {
-    return res.status(400).json({ error: "Only .json files are supported" });
-  }
-
-  const filePath = join(databaseDir, fileName);
-  if (!fs.existsSync(filePath)) {
-    return res.status(404).json({ error: "Dataset not found" });
-  }
-
-  try {
-    const payload = fs.readFileSync(filePath, "utf-8");
-    res.type("application/json").send(payload);
-  } catch (error) {
-    res.status(500).json({ error: "Failed to read dataset" });
-  }
-});
 
 app.get("/api/results/download", (_req, res) => {
   if (lastOutputPath && fs.existsSync(lastOutputPath)) {

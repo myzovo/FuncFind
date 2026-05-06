@@ -160,6 +160,9 @@ createApp({
         }
       } catch { /* ignore */ }
 
+      // Restore active state based on current kbName
+      this.restoreActiveKbState();
+
       // 2. Also fetch from console server to get KBs built this session
       fetch("/api/rag/kbs")
         .then(r => r.json())
@@ -178,23 +181,34 @@ createApp({
             this.crawledKbs = merged;
             // Sync back to localStorage
             localStorage.setItem("crawledKbList", JSON.stringify(merged));
+            // Restore active state after merge
+            this.restoreActiveKbState();
           }
         })
         .catch(() => { /* server not available, use localStorage only */ });
+    },
+    restoreActiveKbState() {
+      const currentKb = normalizeKbName(this.settings.kbName);
+      this.crawledKbs.forEach(k => {
+        k._active = normalizeKbName(k.kbName) === currentKb;
+      });
     },
     useCrawledKb(entry) {
       const kbName = entry.kbName || entry;
       this.settings.kbName = kbName;
       this.kbReady = true;
       this.crawledKbActive = true;
-      this.systemMessage = `已激活爬取知识库: ${kbName}`;
+      this.systemMessage = `已激活知识库: ${kbName}`;
+      // Mark this KB as active
+      this.crawledKbs.forEach(k => { k._active = false; });
+      entry._active = true;
     },
     clearCrawledKbs() {
       localStorage.removeItem("crawledKbList");
       this.crawledKbs = [];
       this.crawledKbActive = false;
       if (!this.selectedFiles.length) this.kbReady = false;
-      this.systemMessage = "已清除爬取知识库列表。";
+      this.systemMessage = "已清除知识库列表。";
     },
     // --- end Crawled KB methods ---
     openFilePicker() {
@@ -500,6 +514,21 @@ createApp({
         this.pipelineState.index = "done";
         this.kbReady = true;
         this.systemMessage = `知识库 ${kbName} 构建完成。`;
+
+        // Track this KB in the knowledge base list
+        const entry = {
+          kbName,
+          dataset: "文档上传",
+          pushedAt: new Date().toISOString(),
+          source: "upload",
+        };
+        const existing = this.crawledKbs.findIndex(k => k.kbName === kbName);
+        if (existing >= 0) {
+          this.crawledKbs[existing] = entry;
+        } else {
+          this.crawledKbs.push(entry);
+        }
+        localStorage.setItem("crawledKbList", JSON.stringify(this.crawledKbs));
       } finally {
         this.buildingKb = false;
       }
