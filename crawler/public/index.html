@@ -48,34 +48,44 @@
       position: fixed;
       left: 0; top: 0; bottom: 0;
       width: var(--sidebar-w);
-      background: rgba(255, 255, 255, 0.75);
-      backdrop-filter: blur(20px) saturate(1.2);
-      -webkit-backdrop-filter: blur(20px) saturate(1.2);
-      border-right: 1px solid var(--border);
+      background: rgba(255, 255, 255, 0.6);
+      backdrop-filter: blur(24px) saturate(1.3);
+      -webkit-backdrop-filter: blur(24px) saturate(1.3);
+      border-right: 1px solid rgba(255,255,255,0.5);
       display: flex;
       flex-direction: column;
       z-index: 100;
-      padding: 20px 0;
+      padding: 16px 0;
+      box-shadow: 1px 0 24px rgba(15,26,54,0.04);
     }
 
     .sidebar-logo {
       display: flex;
       align-items: center;
-      gap: 10px;
-      padding: 20px 18px;
-      border-bottom: 1px solid var(--border);
-      margin-bottom: 8px;
+      gap: 12px;
+      padding: 16px 20px 20px;
+      margin: 0 12px 4px;
+      border-bottom: 1px solid rgba(38,63,130,0.08);
     }
 
     .logo-mark {
-      width: 34px;
-      height: 34px;
+      width: 38px;
+      height: 38px;
       flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 12px;
+      background: linear-gradient(135deg, rgba(36,91,255,0.12) 0%, rgba(99,102,241,0.08) 100%);
+      transition: transform 0.25s ease;
+    }
+    .logo-mark:hover {
+      transform: scale(1.05);
     }
 
     .logo-mark svg {
-      width: 34px;
-      height: 34px;
+      width: 28px;
+      height: 28px;
       display: block;
     }
 
@@ -88,10 +98,10 @@
     .logo-text h1 {
       margin: 0;
       font-family: var(--heading);
-      font-size: 16px;
+      font-size: 17px;
       font-weight: 800;
-      letter-spacing: -0.02em;
-      background: linear-gradient(135deg, #245bff, #00a0a8);
+      letter-spacing: -0.025em;
+      background: linear-gradient(135deg, #0f1a36 0%, #245bff 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
@@ -100,49 +110,79 @@
     .logo-sub {
       font-size: 11px;
       font-weight: 600;
-      color: var(--accent-warm);
-      margin-top: 1px;
-      letter-spacing: 0.02em;
+      color: #5a6a8a;
+      margin-top: 2px;
+      letter-spacing: 0.04em;
+    }
+
+    .nav-section {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      padding: 8px 12px;
+      overflow-y: auto;
     }
 
     .nav-item {
+      position: relative;
       display: flex;
       align-items: center;
-      gap: 10px;
-      padding: 10px 20px;
+      gap: 12px;
+      padding: 10px 14px;
       cursor: pointer;
-      color: var(--muted);
+      color: #5a6a8a;
       font-size: 13.5px;
       font-weight: 600;
-      border-left: 3px solid transparent;
+      border-radius: 10px;
+      border: 1px solid transparent;
       transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
       user-select: none;
     }
 
     .nav-item:hover {
       color: var(--ink);
-      background: rgba(36, 91, 255, 0.04);
+      background: rgba(36, 91, 255, 0.05);
+      border-color: rgba(36, 91, 255, 0.06);
     }
 
     .nav-item.active {
       color: var(--accent);
-      border-left-color: var(--accent);
-      background: rgba(36, 91, 255, 0.06);
+      background: rgba(36, 91, 255, 0.08);
+      border-color: rgba(36, 91, 255, 0.12);
+      box-shadow: 0 2px 8px rgba(36, 91, 255, 0.08);
+    }
+
+    .nav-item.active::before {
+      content: '';
+      position: absolute;
+      left: -12px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 3px;
+      height: 20px;
+      border-radius: 0 3px 3px 0;
+      background: linear-gradient(180deg, #245bff, #6366f1);
     }
 
     .nav-item svg {
       width: 18px;
       height: 18px;
       flex-shrink: 0;
+      transition: transform 0.2s ease;
+    }
+    .nav-item:hover svg {
+      transform: scale(1.08);
     }
 
     .nav-spacer { flex: 1; }
 
     .nav-status {
       padding: 12px 20px;
-      border-top: 1px solid var(--border);
+      margin: 0 12px;
+      border-top: 1px solid rgba(38,63,130,0.08);
       font-size: 11px;
-      color: var(--muted);
+      color: #5a6a8a;
     }
 
     .nav-status .dot {
@@ -150,6 +190,7 @@
       width: 7px; height: 7px;
       border-radius: 50%;
       margin-right: 6px;
+      vertical-align: middle;
     }
 
     .dot-idle { background: var(--muted); }
@@ -158,8 +199,8 @@
     .dot-error { background: var(--danger); }
 
     @keyframes pulse {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.4; }
+      0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(36,91,255,0.4); }
+      50% { opacity: 0.6; box-shadow: 0 0 0 4px rgba(36,91,255,0); }
     }
 
     /* ---- Content ---- */
@@ -1750,6 +1791,136 @@
       .welcome-cards { grid-template-columns: 1fr; }
       .welcome-page { padding: 16px; }
     }
+
+    /* ============================================
+       Help Page
+       ============================================ */
+    .help-page {
+      max-width: 780px;
+      margin: 0 auto;
+      padding: 40px 32px 60px;
+    }
+
+    .help-header {
+      margin-bottom: 36px;
+    }
+
+    .help-header h2 {
+      font-family: var(--heading);
+      font-size: 28px;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      color: var(--ink);
+      margin: 0 0 8px;
+    }
+
+    .help-header p {
+      font-size: 15px;
+      color: #5a6a8a;
+      margin: 0;
+    }
+
+    .help-sections {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .help-section {
+      background: rgba(255,255,255,0.7);
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(255,255,255,0.6);
+      border-radius: 14px;
+      padding: 24px;
+      box-shadow: 0 2px 12px rgba(15,26,54,0.04);
+    }
+
+    .help-section-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .help-section-title svg {
+      width: 20px;
+      height: 20px;
+      color: var(--accent);
+      flex-shrink: 0;
+    }
+
+    .help-section-title h3 {
+      font-family: var(--heading);
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--ink);
+      margin: 0;
+    }
+
+    .help-section > p {
+      font-size: 14px;
+      color: #3a4a72;
+      line-height: 1.7;
+      margin: 0 0 8px;
+    }
+    .help-section > p:last-child {
+      margin-bottom: 0;
+    }
+
+    .help-section ul {
+      margin: 8px 0 0;
+      padding-left: 20px;
+      list-style: none;
+    }
+
+    .help-section ul li {
+      position: relative;
+      font-size: 13.5px;
+      color: #3a4a72;
+      line-height: 1.7;
+      padding-left: 0;
+    }
+
+    .help-section ul li::marker {
+      color: var(--accent);
+    }
+
+    .help-section ul li strong {
+      color: var(--ink);
+      font-weight: 600;
+    }
+
+    .help-q {
+      margin-bottom: 14px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid rgba(38,63,130,0.06);
+    }
+    .help-q:last-child {
+      margin-bottom: 0;
+      padding-bottom: 0;
+      border-bottom: none;
+    }
+
+    .help-q strong {
+      display: block;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--ink);
+      margin-bottom: 4px;
+    }
+
+    .help-q p {
+      font-size: 13.5px;
+      color: #5a6a8a;
+      line-height: 1.65;
+      margin: 0;
+    }
+
+    @media (max-width: 600px) {
+      .help-page { padding: 24px 16px 40px; }
+      .help-header h2 { font-size: 22px; }
+      .help-section { padding: 18px; }
+    }
   </style>
 </head>
 <body>
@@ -1770,37 +1941,46 @@
       </div>
     </div>
 
-    <div class="nav-item active" data-view="welcome" onclick="switchView('welcome')">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-      <span>欢迎页面</span>
+    <div class="nav-section">
+      <div class="nav-item active" data-view="welcome" onclick="switchView('welcome')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        <span>欢迎</span>
+      </div>
+
+      <div class="nav-item" data-view="chat" onclick="switchView('chat')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        <span>对话</span>
+      </div>
+
+      <div class="nav-item" data-view="upload" onclick="switchView('upload')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><polyline points="9 15 12 12 15 15"/></svg>
+        <span>文档</span>
+      </div>
+
+      <div class="nav-item" data-view="crawled-kb" onclick="switchView('crawled-kb')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+        <span>知识库</span>
+      </div>
+
+      <div class="nav-item" data-view="crawl" onclick="switchView('crawl')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        <span>工具</span>
+      </div>
+
     </div>
 
-    <div class="nav-item" data-view="chat" onclick="switchView('chat')">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-      <span>RAG 对话</span>
-    </div>
+    <div class="nav-spacer"></div>
 
-    <div class="nav-item" data-view="upload" onclick="switchView('upload')">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><polyline points="9 15 12 12 15 15"/></svg>
-      <span>文档上传</span>
+    <div style="padding: 0 12px;">
+    <div class="nav-item" data-view="help" onclick="switchView('help')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      <span>帮助</span>
     </div>
-
-    <div class="nav-item" data-view="crawled-kb" onclick="switchView('crawled-kb')">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
-      <span>知识库</span>
-    </div>
-
-    <div class="nav-item" data-view="crawl" onclick="switchView('crawl')">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-      <span>爬取控制台</span>
-    </div>
-
     <div class="nav-item" data-view="settings" onclick="switchView('settings')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
       <span>设置</span>
     </div>
-
-    <div class="nav-spacer"></div>
+    </div>
 
     <div class="nav-status">
       <span><span class="dot dot-idle" id="navStatusDot"></span> <span id="navStatusText">就绪</span></span>
@@ -1849,6 +2029,107 @@
               </div>
               <h3>爬取报告</h3>
               <p>查看爬取结果与数据统计</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- View: Help -->
+    <div id="view-help" class="view-panel">
+      <div class="help-page">
+        <div class="help-header">
+          <h2>使用帮助</h2>
+          <p>FuncFind 功能指南与常见问题</p>
+        </div>
+
+        <div class="help-sections">
+          <div class="help-section">
+            <div class="help-section-title">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+              <h3>欢迎页面</h3>
+            </div>
+            <p>欢迎页面是 FuncFind 的入口首页，展示平台核心功能的快捷导航卡片。点击任意卡片即可快速进入对应功能模块。</p>
+          </div>
+
+          <div class="help-section">
+            <div class="help-section-title">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+              <h3>对话</h3>
+            </div>
+            <p>基于 RAG（检索增强生成）技术的 AI 智能问答模块。系统会自动从知识库中检索相关内容，结合大语言模型生成准确的回答。</p>
+            <ul>
+              <li><strong>发起对话：</strong>在输入框中输入问题，按回车或点击发送按钮</li>
+              <li><strong>知识库切换：</strong>顶部下拉菜单可切换不同知识库，获取不同领域的回答</li>
+              <li><strong>会话管理：</strong>支持新建会话、查看历史记录，对话内容保存在本地浏览器中</li>
+            </ul>
+          </div>
+
+          <div class="help-section">
+            <div class="help-section-title">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><polyline points="9 15 12 12 15 15"/></svg>
+              <h3>文档</h3>
+            </div>
+            <p>上传本地文档构建向量知识库。支持的文件格式：</p>
+            <ul>
+              <li><strong>PDF：</strong>自动提取文本内容</li>
+              <li><strong>DOCX：</strong>解析 Word 文档</li>
+              <li><strong>TXT：</strong>纯文本文件</li>
+            </ul>
+            <p>上传后系统会自动完成文本提取、分块、向量化和索引构建。</p>
+          </div>
+
+          <div class="help-section">
+            <div class="help-section-title">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+              <h3>知识库</h3>
+            </div>
+            <p>查看和管理已构建的知识库。可以浏览知识库中的文档列表、查看分块详情，以及删除不需要的知识库。</p>
+          </div>
+
+          <div class="help-section">
+            <div class="help-section-title">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+              <h3>工具</h3>
+            </div>
+            <p>网页爬取控制台，用于自动化采集网页数据并构建知识库。</p>
+            <ul>
+              <li><strong>控制台：</strong>配置爬取目标 URL、并发数、超时时间等参数，启动爬虫任务</li>
+              <li><strong>实时日志：</strong>爬取过程中实时显示进度和日志信息</li>
+              <li><strong>数据索引：</strong>查看已爬取的数据集列表，支持推送到 RAG 知识库</li>
+              <li><strong>爬取报告：</strong>查看爬取结果的统计图表和详细数据</li>
+            </ul>
+          </div>
+
+          <div class="help-section">
+            <div class="help-section-title">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+              <h3>设置</h3>
+            </div>
+            <p>配置平台的运行参数，包括：</p>
+            <ul>
+              <li><strong>AI 模型：</strong>选择用于生成回答的大语言模型</li>
+              <li><strong>Cloudflare：</strong>配置 Cloudflare 相关服务参数</li>
+              <li><strong>运行时配置：</strong>调整系统运行时的各项参数</li>
+            </ul>
+          </div>
+
+          <div class="help-section help-faq">
+            <div class="help-section-title">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+              <h3>常见问题</h3>
+            </div>
+            <div class="help-q">
+              <strong>Q：对话时提示"未找到知识库"怎么办？</strong>
+              <p>A：请先在"文档"页面上传文档并完成知识库构建，或在"工具"页面完成网页爬取并推送到 RAG。</p>
+            </div>
+            <div class="help-q">
+              <strong>Q：爬取任务卡住不动了？</strong>
+              <p>A：检查目标网站是否可正常访问，适当增大导航超时时间，或降低并发数后重试。</p>
+            </div>
+            <div class="help-q">
+              <strong>Q：上传文档后知识库没有反应？</strong>
+              <p>A：知识库构建需要一定时间，大文件可能需要数分钟。请在"知识库"页面查看构建进度。</p>
             </div>
           </div>
         </div>
