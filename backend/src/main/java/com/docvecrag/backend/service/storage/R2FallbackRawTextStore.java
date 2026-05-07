@@ -1,6 +1,7 @@
 package com.docvecrag.backend.service.storage;
 
 import com.docvecrag.backend.config.AppProperties;
+import com.docvecrag.backend.config.Defaults;
 import com.docvecrag.backend.model.StoredDocument;
 import com.docvecrag.backend.service.session.SessionRuntimeConfig;
 import com.docvecrag.backend.service.session.SessionRuntimeConfigContextHolder;
@@ -104,7 +105,7 @@ public class R2FallbackRawTextStore implements RawTextStore {
             doc.setDocumentId(UUID.randomUUID().toString());
         }
         if (doc.getKbName() == null || doc.getKbName().isBlank()) {
-            doc.setKbName("default-kb");
+            doc.setKbName(Defaults.KB_NAME);
         }
         if (doc.getCreatedAt() == null) {
             doc.setCreatedAt(Instant.now());
@@ -113,7 +114,7 @@ public class R2FallbackRawTextStore implements RawTextStore {
     }
 
     private String normalizeKbName(String kbName) {
-        return (kbName == null || kbName.isBlank()) ? "default-kb" : kbName.trim();
+        return (kbName == null || kbName.isBlank()) ? Defaults.KB_NAME : kbName.trim();
     }
 
     private String resolveTargetR2Bucket() {

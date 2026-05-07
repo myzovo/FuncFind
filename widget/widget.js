@@ -1,4 +1,6 @@
 (() => {
+  if (document.getElementById("site-nav-widget-host")) return;
+
   const DEFAULT_CONFIG = {
     apiBase: "http://localhost:8080",
     kbName: "default-kb",

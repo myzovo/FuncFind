@@ -1,6 +1,7 @@
 package com.docvecrag.backend.service.vector;
 
 import com.docvecrag.backend.config.AppProperties;
+import com.docvecrag.backend.config.Defaults;
 import com.docvecrag.backend.model.IndexedChunk;
 import com.docvecrag.backend.model.RetrievedChunk;
 import com.docvecrag.backend.service.session.SessionRuntimeConfig;
@@ -105,7 +106,7 @@ public class CloudflareVectorizeClientStub implements VectorStoreClient {
     }
 
     private String buildStoreKey(String kbName) {
-        String normalizedKbName = (kbName == null || kbName.isBlank()) ? "default-kb" : kbName.trim();
+        String normalizedKbName = (kbName == null || kbName.isBlank()) ? Defaults.KB_NAME : kbName.trim();
         String indexName = appProperties.getVectorize().getIndexName();
         String namespace = appProperties.getVectorize().getNamespace();
 

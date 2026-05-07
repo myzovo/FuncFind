@@ -1,6 +1,7 @@
 package com.docvecrag.backend.service.storage;
 
 import com.docvecrag.backend.config.AppProperties;
+import com.docvecrag.backend.config.Defaults;
 import com.docvecrag.backend.model.StoredDocument;
 import com.docvecrag.backend.service.session.SessionRuntimeConfig;
 import com.docvecrag.backend.service.session.SessionRuntimeConfigContextHolder;
@@ -49,7 +50,7 @@ public class InMemoryR2RawTextClient implements R2RawTextClient {
     }
 
     private String buildStoreKey(String kbName) {
-        String resolvedKbName = (kbName == null || kbName.isBlank()) ? "default-kb" : kbName.trim();
+        String resolvedKbName = (kbName == null || kbName.isBlank()) ? Defaults.KB_NAME : kbName.trim();
         return resolveBucketName() + "::" + resolvedKbName;
     }
 

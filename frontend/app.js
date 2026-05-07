@@ -6,6 +6,7 @@ const RUNTIME_SNAPSHOT_STORAGE_KEY = "docvec_runtime_config_snapshots";
 const CHAT_MESSAGES_STORAGE_KEY = "docvec_chat_messages";
 const PERSIST_KEYS_STORAGE_KEY = "docvec_persist_keys_locally";
 const DEFAULT_KB_NAME = "default-kb";
+const PREDEFINED_MODELS = ["gpt-4o-mini", "deepseek-chat", "qwen2.5-7b-instruct", "claude-3-haiku", "llama-3-8b-instruct-q4"];
 
 let idSeed = 1;
 
@@ -169,13 +170,15 @@ createApp({
     await this.loadRuntimeConfigFromServer(true);
 
     // 当页面获得焦点时，自动刷新知识库列表
-    window.addEventListener("focus", () => {
-      this.loadCrawledKbs();
-    });
+    this._onFocus = () => this.loadCrawledKbs();
+    window.addEventListener("focus", this._onFocus);
     // 爬虫推送成功后自动刷新知识库列表
-    window.addEventListener("rag-kb-updated", () => {
-      this.loadCrawledKbs();
-    });
+    this._onKbUpdated = () => this.loadCrawledKbs();
+    window.addEventListener("rag-kb-updated", this._onKbUpdated);
+  },
+  beforeUnmount() {
+    if (this._onFocus) window.removeEventListener("focus", this._onFocus);
+    if (this._onKbUpdated) window.removeEventListener("rag-kb-updated", this._onKbUpdated);
   },
   methods: {
     // --- Chat message persistence ---
@@ -502,8 +505,7 @@ createApp({
       // 恢复模型选择状态
       const savedModelId = snapshot.generation?.generationModelId;
       if (savedModelId) {
-        const predefinedModels = ["gpt-4o-mini", "deepseek-chat", "qwen2.5-7b-instruct", "claude-3-haiku", "llama-3-8b-instruct-q4"];
-        if (predefinedModels.includes(savedModelId)) {
+        if (PREDEFINED_MODELS.includes(savedModelId)) {
           this.settings.generationModel = savedModelId;
           this.settings.customModelId = "";
         } else {
@@ -546,8 +548,7 @@ createApp({
 
         // 同步模型选择状态
         const serverModelId = responseData.generation.generationModelId || "gpt-4o-mini";
-        const predefinedModels = ["gpt-4o-mini", "deepseek-chat", "qwen2.5-7b-instruct", "claude-3-haiku", "llama-3-8b-instruct-q4"];
-        if (predefinedModels.includes(serverModelId)) {
+        if (PREDEFINED_MODELS.includes(serverModelId)) {
           this.settings.generationModel = serverModelId;
           this.settings.customModelId = "";
         } else {
