@@ -1497,92 +1497,208 @@
     #view-chat #app.mode-kb .workspace { grid-template-columns: 1fr; }
 
     /* ============================================
-       Welcome Page
+       Welcome Page — Animated Gradient + Glass
        ============================================ */
     .welcome-page {
+      position: relative;
       display: flex;
       align-items: center;
       justify-content: center;
       min-height: calc(100vh - 48px);
       padding: 24px;
+      overflow: hidden;
+      background: linear-gradient(135deg, #f0f4ff 0%, #e8eeff 25%, #f5f0ff 50%, #eef5ff 75%, #f0f4ff 100%);
+      background-size: 400% 400%;
+      animation: welcomeGradientShift 12s ease infinite;
+    }
+
+    @keyframes welcomeGradientShift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    /* Floating particles canvas */
+    .welcome-particles {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* Decorative blurred orbs */
+    .welcome-page::before,
+    .welcome-page::after {
+      content: '';
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(80px);
+      opacity: 0.35;
+      pointer-events: none;
+      z-index: 0;
+    }
+    .welcome-page::before {
+      width: 400px;
+      height: 400px;
+      background: radial-gradient(circle, #245bff 0%, transparent 70%);
+      top: -10%;
+      right: -5%;
+      animation: welcomeOrb1 8s ease-in-out infinite;
+    }
+    .welcome-page::after {
+      width: 350px;
+      height: 350px;
+      background: radial-gradient(circle, #6366f1 0%, transparent 70%);
+      bottom: -10%;
+      left: -5%;
+      animation: welcomeOrb2 10s ease-in-out infinite;
+    }
+
+    @keyframes welcomeOrb1 {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      50% { transform: translate(-30px, 30px) scale(1.1); }
+    }
+    @keyframes welcomeOrb2 {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      50% { transform: translate(30px, -20px) scale(1.05); }
     }
 
     .welcome-hero {
+      position: relative;
+      z-index: 1;
       text-align: center;
-      max-width: 800px;
+      max-width: 840px;
     }
 
     .welcome-badge {
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      background: linear-gradient(135deg, #e4ecff, rgba(200,220,255,0.6));
+      background: rgba(255,255,255,0.7);
+      backdrop-filter: blur(12px);
       color: #245bff;
-      border: 1px solid rgba(36,91,255,0.15);
+      border: 1px solid rgba(36,91,255,0.18);
       border-radius: 999px;
-      padding: 6px 14px;
+      padding: 6px 16px;
       font-size: 11px;
       font-weight: 800;
       text-transform: uppercase;
       letter-spacing: 0.1em;
-      margin-bottom: 20px;
+      margin-bottom: 24px;
+      animation: welcomeFadeIn 0.6s ease-out both;
     }
 
     .welcome-badge svg { width: 14px; height: 14px; }
 
     .welcome-hero > h1 {
       font-family: "Space Grotesk", "Manrope", sans-serif;
-      font-size: clamp(36px, 6vw, 64px);
+      font-size: clamp(40px, 7vw, 72px);
       font-weight: 800;
-      line-height: 1.08;
-      letter-spacing: -0.035em;
-      background: linear-gradient(135deg, #0f1a36 0%, #245bff 100%);
+      line-height: 1.05;
+      letter-spacing: -0.04em;
+      background: linear-gradient(135deg, #0f1a36 0%, #245bff 40%, #6366f1 70%, #245bff 100%);
+      background-size: 200% 200%;
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
-      margin: 0 0 12px;
+      animation: welcomeFadeIn 0.7s ease-out 0.1s both, welcomeTitleGradient 6s ease infinite;
+      margin: 0 0 16px;
+    }
+
+    @keyframes welcomeTitleGradient {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
     }
 
     .welcome-hero > p {
       color: #3a4a72;
-      font-size: 16px;
-      line-height: 1.65;
-      margin: 0 0 40px;
+      font-size: 17px;
+      line-height: 1.7;
+      margin: 0 0 48px;
+      animation: welcomeFadeIn 0.7s ease-out 0.2s both;
     }
 
     .welcome-cards {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
-      gap: 16px;
-      max-width: 760px;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 18px;
+      max-width: 800px;
       margin: 0 auto;
     }
 
     .welcome-card {
       position: relative;
-      border-radius: 16px;
-      border: 1px solid rgba(38,63,130,0.12);
-      background: rgba(255,255,255,0.88);
-      backdrop-filter: blur(16px) saturate(1.1);
-      box-shadow: 0 4px 16px rgba(15,26,54,0.06), inset 0 1px 0 rgba(255,255,255,0.5);
-      padding: 28px 20px;
+      border-radius: 18px;
+      border: 1px solid rgba(255,255,255,0.6);
+      background: rgba(255,255,255,0.55);
+      backdrop-filter: blur(20px) saturate(1.2);
+      box-shadow:
+        0 4px 24px rgba(15,26,54,0.06),
+        0 1px 2px rgba(15,26,54,0.04),
+        inset 0 1px 0 rgba(255,255,255,0.7);
+      padding: 32px 20px 28px;
       cursor: pointer;
-      transition: all 0.3s cubic-bezier(0.16,1,0.3,1);
+      transition: all 0.25s cubic-bezier(0.16,1,0.3,1);
       text-align: center;
+      animation: welcomeCardIn 0.6s ease-out both;
+      overflow: hidden;
+    }
+    .welcome-card:nth-child(1) { animation-delay: 0.3s; }
+    .welcome-card:nth-child(2) { animation-delay: 0.4s; }
+    .welcome-card:nth-child(3) { animation-delay: 0.5s; }
+    .welcome-card:nth-child(4) { animation-delay: 0.6s; }
+
+    /* Subtle gradient shine on hover */
+    .welcome-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      background: linear-gradient(135deg, rgba(36,91,255,0.06) 0%, rgba(99,102,241,0.04) 100%);
+      opacity: 0;
+      transition: opacity 0.25s ease;
+      pointer-events: none;
     }
 
     .welcome-card:hover {
-      border-color: rgba(36,91,255,0.25);
-      box-shadow: 0 12px 36px rgba(36,91,255,0.12), inset 0 1px 0 rgba(255,255,255,0.5);
-      transform: translateY(-4px);
+      border-color: rgba(36,91,255,0.3);
+      box-shadow:
+        0 16px 48px rgba(36,91,255,0.14),
+        0 2px 4px rgba(36,91,255,0.06),
+        inset 0 1px 0 rgba(255,255,255,0.8);
+      transform: translateY(-6px);
+    }
+    .welcome-card:hover::before {
+      opacity: 1;
     }
 
-    .welcome-card svg {
-      width: 32px;
-      height: 32px;
+    .welcome-card:active {
+      transform: translateY(-2px);
+      transition-duration: 0.1s;
+    }
+
+    .welcome-card-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 48px;
+      height: 48px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, rgba(36,91,255,0.1) 0%, rgba(99,102,241,0.08) 100%);
+      margin-bottom: 16px;
+      transition: all 0.25s ease;
+    }
+
+    .welcome-card:hover .welcome-card-icon {
+      background: linear-gradient(135deg, rgba(36,91,255,0.16) 0%, rgba(99,102,241,0.12) 100%);
+      transform: scale(1.05);
+    }
+
+    .welcome-card-icon svg {
+      width: 22px;
+      height: 22px;
       color: #245bff;
-      margin-bottom: 12px;
-      opacity: 0.8;
     }
 
     .welcome-card h3 {
@@ -1596,15 +1712,43 @@
     .welcome-card p {
       margin: 0;
       font-size: 12.5px;
-      color: #7b8bb2;
+      color: #5a6a8a;
       line-height: 1.5;
     }
 
-    @media (max-width: 600px) {
+    @keyframes welcomeFadeIn {
+      from { opacity: 0; transform: translateY(16px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes welcomeCardIn {
+      from { opacity: 0; transform: translateY(24px) scale(0.96); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    /* Reduced motion */
+    @media (prefers-reduced-motion: reduce) {
+      .welcome-page,
+      .welcome-page::before,
+      .welcome-page::after,
+      .welcome-hero > h1 {
+        animation: none;
+      }
+      .welcome-badge,
+      .welcome-hero > p,
+      .welcome-card {
+        animation: none;
+        opacity: 1;
+        transform: none;
+      }
+    }
+
+    @media (max-width: 700px) {
       .welcome-cards { grid-template-columns: 1fr 1fr; }
     }
-    @media (max-width: 400px) {
+    @media (max-width: 420px) {
       .welcome-cards { grid-template-columns: 1fr; }
+      .welcome-page { padding: 16px; }
     }
   </style>
 </head>
@@ -1669,27 +1813,40 @@
     <!-- View 0: Welcome -->
     <div id="view-welcome" class="view-panel active">
       <div class="welcome-page">
+        <canvas class="welcome-particles" id="welcomeParticles"></canvas>
         <div class="welcome-hero">
+          <div class="welcome-badge">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            AI 驱动的知识平台
+          </div>
           <h1>FuncFind</h1>
           <p>网页爬取、知识库构建、AI 对话，一页搞定。</p>
           <div class="welcome-cards">
             <div class="welcome-card" onclick="switchView('chat')">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+              <div class="welcome-card-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+              </div>
               <h3>RAG 对话</h3>
               <p>基于知识库的 AI 智能问答</p>
             </div>
             <div class="welcome-card" onclick="switchView('upload')">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><polyline points="9 15 12 12 15 15"/></svg>
+              <div class="welcome-card-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><polyline points="9 15 12 12 15 15"/></svg>
+              </div>
               <h3>文档上传</h3>
               <p>上传文档构建向量知识库</p>
             </div>
             <div class="welcome-card" onclick="switchView('crawl')">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+              <div class="welcome-card-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+              </div>
               <h3>爬取控制台</h3>
               <p>配置并启动网页爬虫任务</p>
             </div>
             <div class="welcome-card" onclick="switchView('crawl');switchCrawlTab('report')">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+              <div class="welcome-card-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+              </div>
               <h3>爬取报告</h3>
               <p>查看爬取结果与数据统计</p>
             </div>
@@ -2178,6 +2335,99 @@
   <script type="module" src="/rag/app.js"></script>
 
   <script>
+    // ============================================
+    // Welcome Page Particles
+    // ============================================
+    (function initWelcomeParticles() {
+      const canvas = document.getElementById('welcomeParticles');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      let particles = [];
+      let animId = null;
+      const PARTICLE_COUNT = 40;
+      const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      function resize() {
+        const parent = canvas.parentElement;
+        canvas.width = parent.clientWidth;
+        canvas.height = parent.clientHeight;
+      }
+
+      function createParticles() {
+        particles = [];
+        for (let i = 0; i < PARTICLE_COUNT; i++) {
+          particles.push({
+            x: Math.random() * canvas.width,
+            y: Math.random() * canvas.height,
+            r: Math.random() * 2.5 + 1,
+            dx: (Math.random() - 0.5) * 0.4,
+            dy: (Math.random() - 0.5) * 0.4,
+            opacity: Math.random() * 0.3 + 0.1,
+          });
+        }
+      }
+
+      function draw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        for (const p of particles) {
+          p.x += p.dx;
+          p.y += p.dy;
+          if (p.x < 0 || p.x > canvas.width) p.dx *= -1;
+          if (p.y < 0 || p.y > canvas.height) p.dy *= -1;
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+          ctx.fillStyle = 'rgba(36, 91, 255, ' + p.opacity + ')';
+          ctx.fill();
+        }
+        // Draw connections
+        for (let i = 0; i < particles.length; i++) {
+          for (let j = i + 1; j < particles.length; j++) {
+            const dx = particles[i].x - particles[j].x;
+            const dy = particles[i].y - particles[j].y;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+            if (dist < 120) {
+              ctx.beginPath();
+              ctx.moveTo(particles[i].x, particles[i].y);
+              ctx.lineTo(particles[j].x, particles[j].y);
+              ctx.strokeStyle = 'rgba(36, 91, 255, ' + (0.08 * (1 - dist / 120)) + ')';
+              ctx.lineWidth = 0.5;
+              ctx.stroke();
+            }
+          }
+        }
+        animId = requestAnimationFrame(draw);
+      }
+
+      function start() {
+        if (prefersReduced) return;
+        resize();
+        createParticles();
+        if (animId) cancelAnimationFrame(animId);
+        draw();
+      }
+
+      function stop() {
+        if (animId) {
+          cancelAnimationFrame(animId);
+          animId = null;
+        }
+      }
+
+      // Only animate when welcome page is visible
+      const observer = new IntersectionObserver(entries => {
+        entries.forEach(e => {
+          if (e.isIntersecting) start(); else stop();
+        });
+      }, { threshold: 0.1 });
+
+      const welcomeView = document.getElementById('view-welcome');
+      if (welcomeView) observer.observe(welcomeView);
+
+      window.addEventListener('resize', () => {
+        if (animId) { resize(); createParticles(); }
+      });
+    })();
+
     // ============================================
     // View Switching
     // ============================================
