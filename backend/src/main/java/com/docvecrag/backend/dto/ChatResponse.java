@@ -8,6 +8,8 @@ public class ChatResponse {
     private String kbName;
     private String generationModel;
     private int retrievedCount;
+    private boolean aiGenerated = true;  // 标识是否由 AI 生成
+    private String fallbackReason;       // AI 未参与时的原因
     private List<ContextChunkResponse> contextChunks = new ArrayList<>();
     private List<LocationHintResponse> locations = new ArrayList<>();
 
@@ -41,6 +43,22 @@ public class ChatResponse {
 
     public void setRetrievedCount(int retrievedCount) {
         this.retrievedCount = retrievedCount;
+    }
+
+    public boolean isAiGenerated() {
+        return aiGenerated;
+    }
+
+    public void setAiGenerated(boolean aiGenerated) {
+        this.aiGenerated = aiGenerated;
+    }
+
+    public String getFallbackReason() {
+        return fallbackReason;
+    }
+
+    public void setFallbackReason(String fallbackReason) {
+        this.fallbackReason = fallbackReason;
     }
 
     public List<ContextChunkResponse> getContextChunks() {

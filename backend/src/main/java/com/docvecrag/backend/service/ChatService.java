@@ -32,12 +32,29 @@ public class ChatService {
     }
 
     public ChatResponse chat(ChatRequest request) {
-        List<Float> queryEmbedding = embeddingService.embedForQuery(request.getQuestion());
-        List<RetrievedChunk> chunks = retrievalService.retrieve(
-                request.getKbName(),
-                queryEmbedding,
-                request.getTopK(),
-                Map.of());
+        List<Float> queryEmbedding;
+        List<RetrievedChunk> chunks;
+
+        try {
+            queryEmbedding = embeddingService.embedForQuery(request.getQuestion());
+            chunks = retrievalService.retrieve(
+                    request.getKbName(),
+                    queryEmbedding,
+                    request.getTopK(),
+                    Map.of());
+        } catch (IllegalStateException e) {
+            // 知识库未构建时，返回友好提示而不是抛出异常
+            ChatResponse response = new ChatResponse();
+            response.setKbName(request.getKbName());
+            response.setGenerationModel(request.getGenerationModel());
+            response.setRetrievedCount(0);
+            response.setAnswer("⚠️ **知识库未就绪**\n\n" + e.getMessage() + "\n\n请先上传文档并构建知识库后再进行问答。");
+            response.setAiGenerated(false);
+            response.setFallbackReason(e.getMessage());
+            response.setContextChunks(new ArrayList<>());
+            response.setLocations(new ArrayList<>());
+            return response;
+        }
 
         String generationModel = resolveGenerationModel(request.getGenerationModel());
 
@@ -51,6 +68,25 @@ public class ChatService {
         response.setGenerationModel(generationModel);
         response.setRetrievedCount(chunks.size());
         response.setAnswer(answer);
+
+        // 检测是否是 AI 生成的回答
+        if (answer != null) {
+            // 检测新的 fallback 标记
+            if (answer.contains("⚠️ **AI 未参与回答生成**")) {
+                response.setAiGenerated(false);
+                if (answer.contains("Workers AI")) {
+                    response.setFallbackReason("Workers AI API 调用失败或未配置");
+                } else {
+                    response.setFallbackReason("External LLM API 调用失败或未配置");
+                }
+            }
+            // 检测旧的占位桩格式（未真正调用 LLM）
+            else if (answer.contains("[adapter:") && answer.contains("[model:")
+                    && answer.contains("基于检索上下文生成回答")) {
+                response.setAiGenerated(false);
+                response.setFallbackReason("使用了旧的占位桩代码，LLM 未真正调用");
+            }
+        }
 
         List<ContextChunkResponse> contextBlocks = new ArrayList<>();
         List<LocationHintResponse> locations = new ArrayList<>();

@@ -189,7 +189,8 @@ public class WorkersAiModelAdapter implements ModelAdapter {
 
     private String buildFallbackAnswer(String question, List<RetrievedChunk> contexts) {
         StringBuilder builder = new StringBuilder();
-        builder.append("检索到以下相关信息（Workers AI 服务不可用，仅展示原始检索结果）：\n\n");
+        builder.append("⚠️ **AI 未参与回答生成**\n\n");
+        builder.append("原因：Workers AI API 调用失败或未配置，以下仅为知识库检索结果：\n\n");
 
         if (contexts == null || contexts.isEmpty()) {
             builder.append("未检索到相关上下文，请先上传文档并构建知识库。");
@@ -210,6 +211,13 @@ public class WorkersAiModelAdapter implements ModelAdapter {
                     .append(preview)
                     .append("\n\n");
         }
+
+        builder.append("---\n");
+        builder.append("**调试提示**：请检查以下配置：\n");
+        builder.append("- 确保 Cloudflare `accountId` 和 `apiToken` 已在设置中配置\n");
+        builder.append("- 确保 Workers AI 已启用且模型可用\n");
+        builder.append("- 检查后端日志获取详细错误信息");
+
         return builder.toString().trim();
     }
 }

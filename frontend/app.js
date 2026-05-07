@@ -570,11 +570,16 @@ createApp({
         if (!response.ok) throw new Error("chat api error");
 
         const data = await response.json();
-        this.messages.push({
+        const msg = {
           id: idSeed++,
           role: "assistant",
           content: data.answer || "后端未返回 answer 字段。",
-        });
+          aiGenerated: data.aiGenerated !== false,
+          fallbackReason: data.fallbackReason || null,
+          retrievedCount: data.retrievedCount || 0,
+          generationModel: data.generationModel || null,
+        };
+        this.messages.push(msg);
       } catch {
         const fallback = this.mockAnswer(question);
         this.messages.push({ id: idSeed++, role: "assistant", content: fallback });

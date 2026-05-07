@@ -108,6 +108,7 @@ FuncFind/
 
 ```bash
 cd backend
+cd backend
 ./mvnw spring-boot:run
 # API 运行在 http://localhost:8080
 ```

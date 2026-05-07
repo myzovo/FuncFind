@@ -156,7 +156,7 @@ public class SessionRuntimeConfigService {
 
     private String normalizeSessionId(String sessionId) {
         if (sessionId == null || sessionId.isBlank()) {
-            throw new IllegalArgumentException("X-Client-Session-Id header is required for runtime config APIs.");
+            return "anonymous";
         }
         return sessionId.trim();
     }

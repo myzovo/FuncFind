@@ -1211,6 +1211,40 @@
       color: #6b5020; font-size: 12.5px; text-align: center;
     }
 
+    /* AI Status Badges */
+    .ai-status-warning, .ai-status-success {
+      margin-top: 8px;
+      padding-top: 8px;
+      border-top: 1px solid rgba(0,0,0,0.06);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .ai-status-badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.03em;
+    }
+    .ai-status-warning .ai-status-badge {
+      background: rgba(239, 68, 68, 0.1);
+      color: #dc2626;
+      border: 1px solid rgba(239, 68, 68, 0.2);
+    }
+    .ai-status-success .ai-status-badge {
+      background: rgba(34, 197, 94, 0.1);
+      color: #16a34a;
+      border: 1px solid rgba(34, 197, 94, 0.2);
+    }
+    .ai-status-reason, .ai-status-model {
+      font-size: 11px;
+      color: #6b7280;
+    }
+
     /* Typing Indicator */
     #view-chat .typing-indicator { display: inline-flex; align-items: center; gap: 4px; padding: 8px 4px; }
     #view-chat .typing-indicator span {
@@ -1768,6 +1802,15 @@
               <article v-for="msg in messages" :key="msg.id" class="bubble" :class="msg.role">
                 <h4>{{ msg.role === 'user' ? '你' : msg.role === 'assistant' ? 'AI' : '系统' }}</h4>
                 <p>{{ msg.content }}</p>
+                <!-- AI 状态标识 -->
+                <div v-if="msg.role === 'assistant' && msg.aiGenerated === false" class="ai-status-warning">
+                  <span class="ai-status-badge">AI 未参与</span>
+                  <span v-if="msg.fallbackReason" class="ai-status-reason">{{ msg.fallbackReason }}</span>
+                </div>
+                <div v-if="msg.role === 'assistant' && msg.aiGenerated === true" class="ai-status-success">
+                  <span class="ai-status-badge">AI 生成</span>
+                  <span v-if="msg.generationModel" class="ai-status-model">模型: {{ msg.generationModel }}</span>
+                </div>
               </article>
               <!-- Typing indicator -->
               <article v-if="chatting" class="bubble assistant">

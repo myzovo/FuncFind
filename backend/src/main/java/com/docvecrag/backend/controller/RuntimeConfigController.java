@@ -27,7 +27,7 @@ public class RuntimeConfigController {
 
     @PostMapping("/apply")
     public RuntimeConfigResponse apply(
-            @RequestHeader(name = SESSION_HEADER) String sessionId,
+            @RequestHeader(name = SESSION_HEADER, required = false) String sessionId,
             @Valid @RequestBody RuntimeConfigApplyRequest request) {
         SessionRuntimeConfig config = sessionRuntimeConfigService.apply(sessionId, request);
         return toResponse(config);
@@ -35,7 +35,7 @@ public class RuntimeConfigController {
 
     @GetMapping("/current")
     public RuntimeConfigResponse current(
-            @RequestHeader(name = SESSION_HEADER) String sessionId,
+            @RequestHeader(name = SESSION_HEADER, required = false) String sessionId,
             @RequestParam(name = "kbName", required = false) String kbName) {
         SessionRuntimeConfig config = sessionRuntimeConfigService.resolveCurrentOrDefault(sessionId, kbName);
         return toResponse(config);
