@@ -6,6 +6,8 @@ import com.docvecrag.backend.model.IndexedChunk;
 import com.docvecrag.backend.service.embedding.EmbeddingBinding;
 import com.docvecrag.backend.service.embedding.EmbeddingService;
 import com.docvecrag.backend.service.vector.VectorStoreClient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -17,6 +19,8 @@ import java.util.UUID;
 
 @Service
 public class CrawlKnowledgeBaseBuildService {
+
+    private static final Logger log = LoggerFactory.getLogger(CrawlKnowledgeBaseBuildService.class);
 
     private final EmbeddingService embeddingService;
     private final VectorStoreClient vectorStoreClient;
@@ -31,6 +35,7 @@ public class CrawlKnowledgeBaseBuildService {
         if (pages == null || pages.isEmpty()) {
             throw new IllegalArgumentException("No pages found in crawl payload.");
         }
+        log.info("Building from crawl: kb={}, pages={}, model={}", request.getKbName(), pages.size(), request.getEmbeddingModel());
 
         EmbeddingBinding binding = embeddingService.bindForIndexing(request.getEmbeddingModel());
 
@@ -82,6 +87,7 @@ public class CrawlKnowledgeBaseBuildService {
         }
 
         vectorStoreClient.upsert(request.getKbName(), indexed);
+        log.info("Indexed {} crawl chunks for kb={}", indexed.size(), request.getKbName());
 
         KnowledgeBaseBuildResponse response = new KnowledgeBaseBuildResponse();
         response.setKbName(request.getKbName());

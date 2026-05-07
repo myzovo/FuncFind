@@ -1,6 +1,7 @@
 package com.docvecrag.backend.service.model;
 
 import com.docvecrag.backend.config.AppProperties;
+import com.docvecrag.backend.config.Defaults;
 import com.docvecrag.backend.model.RetrievedChunk;
 import com.docvecrag.backend.service.embedding.EmbeddingVectorUtil;
 import com.docvecrag.backend.service.preprocess.PreprocessResult;
@@ -74,7 +75,7 @@ public class ExternalModelServiceAdapter implements ModelAdapter {
 
     @Override
     public String generate(String question, List<RetrievedChunk> contexts, String generationModel) {
-        String model = (generationModel == null || generationModel.isBlank()) ? "gpt-4o-mini" : generationModel;
+        String model = (generationModel == null || generationModel.isBlank()) ? Defaults.GENERATION_MODEL : generationModel;
 
         // Resolve config: session runtime config takes priority over app properties
         String baseUrl = null;

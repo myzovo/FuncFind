@@ -1,5 +1,6 @@
 package com.docvecrag.backend.dto;
 
+import com.docvecrag.backend.config.Defaults;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 
@@ -12,7 +13,7 @@ public class CrawlBuildRequest {
 
     private String siteId;
 
-    private String embeddingModel = "all-MiniLM-L6-v2";
+    private String embeddingModel = Defaults.EMBEDDING_MODEL;
 
     @NotEmpty
     private List<CrawlPageRequest> pages = new ArrayList<>();

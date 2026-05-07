@@ -1,5 +1,6 @@
 package com.docvecrag.backend.service.storage;
 
+import com.docvecrag.backend.config.Defaults;
 import com.docvecrag.backend.model.StoredDocument;
 import org.springframework.stereotype.Component;
 
@@ -34,7 +35,7 @@ public class InMemoryRawTextStore implements RawTextStore {
             doc.setCreatedAt(Instant.now());
         }
         if (doc.getKbName() == null || doc.getKbName().isBlank()) {
-            doc.setKbName("default-kb");
+            doc.setKbName(Defaults.KB_NAME);
         }
         documentStore.computeIfAbsent(doc.getKbName(), ignored -> new ArrayList<>()).add(doc);
         return doc;

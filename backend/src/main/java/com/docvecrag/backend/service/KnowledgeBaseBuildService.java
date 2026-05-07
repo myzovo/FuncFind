@@ -10,6 +10,8 @@ import com.docvecrag.backend.service.embedding.EmbeddingBinding;
 import com.docvecrag.backend.service.embedding.EmbeddingService;
 import com.docvecrag.backend.service.storage.RawTextStore;
 import com.docvecrag.backend.service.vector.VectorStoreClient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -18,6 +20,8 @@ import java.util.Map;
 
 @Service
 public class KnowledgeBaseBuildService {
+
+    private static final Logger log = LoggerFactory.getLogger(KnowledgeBaseBuildService.class);
 
     private final RawTextStore rawTextStore;
     private final TwoStageChunkingService chunkingService;
@@ -35,10 +39,12 @@ public class KnowledgeBaseBuildService {
     }
 
     public KnowledgeBaseBuildResponse build(KnowledgeBaseBuildRequest request) {
+        log.info("Building knowledge base: kb={}, model={}, chunkSize={}", request.getKbName(), request.getEmbeddingModel(), request.getChunkSize());
         List<StoredDocument> docs = rawTextStore.findByKbName(request.getKbName());
         if (docs.isEmpty()) {
             throw new IllegalStateException("No documents found in kbName=" + request.getKbName());
         }
+        log.info("Found {} documents for kb={}", docs.size(), request.getKbName());
 
         EmbeddingBinding binding = embeddingService.bindForIndexing(request.getEmbeddingModel());
 
@@ -60,6 +66,7 @@ public class KnowledgeBaseBuildService {
         }
 
         vectorStoreClient.upsert(request.getKbName(), indexed);
+        log.info("Indexed {} chunks for kb={}", indexed.size(), request.getKbName());
 
         KnowledgeBaseBuildResponse response = new KnowledgeBaseBuildResponse();
         response.setKbName(request.getKbName());

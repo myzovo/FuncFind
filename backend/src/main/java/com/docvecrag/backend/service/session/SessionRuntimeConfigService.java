@@ -1,6 +1,7 @@
 package com.docvecrag.backend.service.session;
 
 import com.docvecrag.backend.config.AppProperties;
+import com.docvecrag.backend.config.Defaults;
 import com.docvecrag.backend.dto.RuntimeConfigApplyRequest;
 import org.springframework.stereotype.Service;
 
@@ -11,8 +12,8 @@ import java.util.concurrent.ConcurrentHashMap;
 @Service
 public class SessionRuntimeConfigService {
 
-    public static final String DEFAULT_KB_NAME = "default-kb";
-    private static final String DEFAULT_GENERATION_MODEL = "gpt-4o-mini";
+    public static final String DEFAULT_KB_NAME = Defaults.KB_NAME;
+    private static final String DEFAULT_GENERATION_MODEL = Defaults.GENERATION_MODEL;
 
     private final AppProperties appProperties;
     private final Map<String, SessionRuntimeConfig> configs = new ConcurrentHashMap<>();

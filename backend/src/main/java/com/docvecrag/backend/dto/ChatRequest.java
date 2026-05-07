@@ -1,5 +1,6 @@
 package com.docvecrag.backend.dto;
 
+import com.docvecrag.backend.config.Defaults;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
@@ -13,9 +14,9 @@ public class ChatRequest {
 
     @Min(1)
     @Max(20)
-    private int topK = 6;
+    private int topK = Defaults.TOP_K;
 
-    private String generationModel = "gpt-4o-mini";
+    private String generationModel = Defaults.GENERATION_MODEL;
 
     public String getQuestion() {
         return question;

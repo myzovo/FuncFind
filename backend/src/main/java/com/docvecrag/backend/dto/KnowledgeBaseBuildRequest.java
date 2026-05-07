@@ -1,5 +1,6 @@
 package com.docvecrag.backend.dto;
 
+import com.docvecrag.backend.config.Defaults;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
@@ -13,17 +14,17 @@ public class KnowledgeBaseBuildRequest {
 
     @Min(100)
     @Max(3000)
-    private int chunkSize = 500;
+    private int chunkSize = Defaults.CHUNK_SIZE;
 
     @Min(0)
     @Max(1)
-    private double semanticThreshold = 0.78;
+    private double semanticThreshold = Defaults.SEMANTIC_THRESHOLD;
 
     @Min(1)
     @Max(20)
-    private int topK = 6;
+    private int topK = Defaults.TOP_K;
 
-    private String embeddingModel = "all-MiniLM-L6-v2";
+    private String embeddingModel = Defaults.EMBEDDING_MODEL;
 
     private List<SourceDocRequest> sourceDocs = new ArrayList<>();
 

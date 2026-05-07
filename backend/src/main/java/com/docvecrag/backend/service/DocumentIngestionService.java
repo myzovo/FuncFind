@@ -1,5 +1,6 @@
 package com.docvecrag.backend.service;
 
+import com.docvecrag.backend.config.Defaults;
 import com.docvecrag.backend.model.StoredDocument;
 import com.docvecrag.backend.service.preprocess.PreprocessResult;
 import com.docvecrag.backend.service.preprocess.TextPreprocessor;
@@ -36,7 +37,7 @@ public class DocumentIngestionService {
 
         String extracted = extractText(file, filename);
         PreprocessResult preprocessResult = textPreprocessor.preprocess(extracted);
-        String normalizedKb = (kbName == null || kbName.isBlank()) ? "default-kb" : kbName.trim();
+        String normalizedKb = (kbName == null || kbName.isBlank()) ? Defaults.KB_NAME : kbName.trim();
 
         StoredDocument doc = rawTextStore.save(normalizedKb, filename, preprocessResult.getCleanedText());
         log.info("Document ingested: id={}, kb={}", doc.getDocumentId(), doc.getKbName());

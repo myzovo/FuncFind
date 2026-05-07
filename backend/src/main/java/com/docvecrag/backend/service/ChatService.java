@@ -1,5 +1,6 @@
 package com.docvecrag.backend.service;
 
+import com.docvecrag.backend.config.Defaults;
 import com.docvecrag.backend.dto.ChatRequest;
 import com.docvecrag.backend.dto.ChatResponse;
 import com.docvecrag.backend.dto.ContextChunkResponse;
@@ -8,6 +9,8 @@ import com.docvecrag.backend.model.RetrievedChunk;
 import com.docvecrag.backend.service.embedding.EmbeddingService;
 import com.docvecrag.backend.service.session.SessionRuntimeConfig;
 import com.docvecrag.backend.service.session.SessionRuntimeConfigContextHolder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -18,6 +21,8 @@ import java.util.Set;
 
 @Service
 public class ChatService {
+
+    private static final Logger log = LoggerFactory.getLogger(ChatService.class);
 
     private final EmbeddingService embeddingService;
     private final RetrievalService retrievalService;
@@ -32,6 +37,7 @@ public class ChatService {
     }
 
     public ChatResponse chat(ChatRequest request) {
+        log.info("Chat request: kb={}, topK={}, model={}", request.getKbName(), request.getTopK(), request.getGenerationModel());
         List<Float> queryEmbedding;
         List<RetrievedChunk> chunks;
 
@@ -42,7 +48,9 @@ public class ChatService {
                     queryEmbedding,
                     request.getTopK(),
                     Map.of());
+            log.info("Retrieved {} chunks for kb={}", chunks.size(), request.getKbName());
         } catch (IllegalStateException e) {
+            log.warn("KB not ready for chat: {}", e.getMessage());
             // 知识库未构建时，返回友好提示而不是抛出异常
             ChatResponse response = new ChatResponse();
             response.setKbName(request.getKbName());
@@ -149,12 +157,12 @@ public class ChatService {
 
         SessionRuntimeConfig config = SessionRuntimeConfigContextHolder.getCurrent();
         if (config == null || config.getGeneration() == null) {
-            return "gpt-4o-mini";
+            return Defaults.GENERATION_MODEL;
         }
 
         String runtimeModel = config.getGeneration().getGenerationModelId();
         if (runtimeModel == null || runtimeModel.isBlank()) {
-            return "gpt-4o-mini";
+            return Defaults.GENERATION_MODEL;
         }
         return runtimeModel;
     }
