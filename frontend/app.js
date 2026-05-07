@@ -286,10 +286,10 @@ createApp({
           this.kbReady = false;
           this.systemMessage = `知识库 ${kbName} 未就绪，请先构建知识库。`;
         }
-      } catch {
-        // 如果后端不可用，仍然设置为 ready（前端演示模式）
-        this.kbReady = true;
-        this.systemMessage = `已激活知识库: ${kbName}（后端未连接）`;
+      } catch (error) {
+        console.warn("KB activation check failed:", error);
+        this.kbReady = false;
+        this.systemMessage = `无法连接后端，请确认服务已启动。`;
       }
     },
     clearCrawledKbs() {
@@ -299,7 +299,7 @@ createApp({
       if (!this.selectedFiles.length) this.kbReady = false;
       this.systemMessage = "已清除知识库列表。";
       // 同时清除服务器端的 builtKbs 列表，防止刷新后重新拉取
-      fetch("/api/rag/kbs/clear", { method: "POST" }).catch(() => {});
+      fetch("/api/rag/kbs/clear", { method: "POST" }).catch(err => console.warn("Failed to clear server KBs:", err));
     },
     // --- end Crawled KB methods ---
 
@@ -661,11 +661,15 @@ createApp({
           formData.append("file", file.raw);
           formData.append("kbName", kbName);
 
-          await fetch(`${this.settings.apiBase}/documents/upload`, {
+          const resp = await fetch(`${this.settings.apiBase}/documents/upload`, {
             method: "POST",
             headers: this.buildHeaders(),
             body: formData,
           });
+          if (!resp.ok) {
+            const err = await resp.json().catch(() => ({}));
+            throw new Error(err.message || `Upload failed (${resp.status})`);
+          }
         }
         this.systemMessage = "文档上传完成。";
       } catch (error) {
@@ -713,14 +717,14 @@ createApp({
           })),
         };
 
-        try {
-          await fetch(`${this.settings.apiBase}/knowledge-base/build`, {
-            method: "POST",
-            headers: this.buildHeaders({ "Content-Type": "application/json" }),
-            body: JSON.stringify(payload),
-          });
-        } catch {
-          // Keep the frontend usable without backend during early bootstrapping.
+        const resp = await fetch(`${this.settings.apiBase}/knowledge-base/build`, {
+          method: "POST",
+          headers: this.buildHeaders({ "Content-Type": "application/json" }),
+          body: JSON.stringify(payload),
+        });
+        if (!resp.ok) {
+          const err = await resp.json().catch(() => ({}));
+          throw new Error(err.message || `Build failed (${resp.status})`);
         }
 
         await this.wait(450);
@@ -742,6 +746,10 @@ createApp({
           this.crawledKbs.push(entry);
         }
         localStorage.setItem("crawledKbList", JSON.stringify(this.crawledKbs));
+      } catch (error) {
+        console.warn("Knowledge base build failed:", error);
+        this.kbReady = false;
+        this.systemMessage = `知识库构建失败: ${error.message || "未知错误"}`;
       } finally {
         this.buildingKb = false;
       }

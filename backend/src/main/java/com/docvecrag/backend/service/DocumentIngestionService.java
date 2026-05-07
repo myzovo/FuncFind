@@ -4,14 +4,19 @@ import com.docvecrag.backend.model.StoredDocument;
 import com.docvecrag.backend.service.preprocess.PreprocessResult;
 import com.docvecrag.backend.service.preprocess.TextPreprocessor;
 import com.docvecrag.backend.service.storage.RawTextStore;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Paths;
 
 @Service
 public class DocumentIngestionService {
+
+    private static final Logger log = LoggerFactory.getLogger(DocumentIngestionService.class);
 
     private final RawTextStore rawTextStore;
     private final TextPreprocessor textPreprocessor;
@@ -26,25 +31,34 @@ public class DocumentIngestionService {
             throw new IllegalArgumentException("Uploaded file is empty.");
         }
 
-        String extracted = extractText(file);
+        String filename = safeFilename(file);
+        log.info("Ingesting document: kb={}, file={}, size={}", kbName, filename, file.getSize());
+
+        String extracted = extractText(file, filename);
         PreprocessResult preprocessResult = textPreprocessor.preprocess(extracted);
         String normalizedKb = (kbName == null || kbName.isBlank()) ? "default-kb" : kbName.trim();
 
-        return rawTextStore.save(normalizedKb, safeFilename(file), preprocessResult.getCleanedText());
+        StoredDocument doc = rawTextStore.save(normalizedKb, filename, preprocessResult.getCleanedText());
+        log.info("Document ingested: id={}, kb={}", doc.getDocumentId(), doc.getKbName());
+        return doc;
     }
 
-    private String extractText(MultipartFile file) throws IOException {
-        String filename = safeFilename(file).toLowerCase();
-        if (filename.endsWith(".txt")) {
+    private String extractText(MultipartFile file, String filename) throws IOException {
+        String lower = filename.toLowerCase();
+        if (lower.endsWith(".txt") || lower.endsWith(".md") || lower.endsWith(".csv")
+                || lower.endsWith(".json") || lower.endsWith(".log")) {
             return new String(file.getBytes(), StandardCharsets.UTF_8);
         }
 
-        // Placeholder for unstructured or dedicated extraction pipeline.
-        return "[extracted-placeholder] file=" + safeFilename(file)
-                + "\nThis is a bootstrap extraction result. Replace with unstructured-based extraction in next step.";
+        throw new IllegalArgumentException(
+                "Cannot extract text from file type: " + filename + ". Supported: .txt, .md, .csv, .json, .log");
     }
 
     private String safeFilename(MultipartFile file) {
-        return file.getOriginalFilename() == null ? "unknown" : file.getOriginalFilename();
+        String original = file.getOriginalFilename();
+        if (original == null || original.isBlank()) {
+            return "unknown";
+        }
+        return Paths.get(original).getFileName().toString();
     }
 }

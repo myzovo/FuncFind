@@ -2379,6 +2379,18 @@
       }
     }
 
+    function escapeHtml(str) {
+      if (str == null) return "";
+      return String(str).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+    }
+
+    function sanitizeHref(href) {
+      if (!href) return "";
+      const trimmed = String(href).trim();
+      if (/^https?:\/\//i.test(trimmed)) return escapeHtml(trimmed);
+      return escapeHtml("https://example.com/invalid#" + encodeURIComponent(trimmed));
+    }
+
     // Dataset index on crawl page
     async function loadDatasetIndex() {
       const tbody = document.getElementById("datasetTableBody");
@@ -2392,15 +2404,31 @@
           tbody.innerHTML = '<tr><td colspan="5" class="empty">database 目录暂无结果文件</td></tr>';
           return;
         }
-        tbody.innerHTML = items.map(item => '<tr>' +
-          '<td>' + item.name + '</td>' +
-          '<td>' + formatTimestamp(item.updatedAt) + '</td>' +
-          '<td>' + formatBytes(item.size) + '</td>' +
-          '<td><button class="btn btn-outline btn-small" onclick="openReportForFile(\'' + item.name + '\')">查看</button></td>' +
-          '<td><button class="btn btn-outline btn-small" onclick="setRagDatasetFromIndex(\'' + item.name + '\')">使用</button></td>' +
-          '</tr>').join("");
+        tbody.replaceChildren();
+        items.forEach(item => {
+          const row = document.createElement("tr");
+          const nameTd = document.createElement("td"); nameTd.textContent = item.name;
+          const timeTd = document.createElement("td"); timeTd.textContent = formatTimestamp(item.updatedAt);
+          const sizeTd = document.createElement("td"); sizeTd.textContent = formatBytes(item.size);
+          const viewTd = document.createElement("td");
+          const viewBtn = document.createElement("button");
+          viewBtn.className = "btn btn-outline btn-small"; viewBtn.textContent = "查看";
+          viewBtn.addEventListener("click", () => openReportForFile(item.name));
+          viewTd.appendChild(viewBtn);
+          const useTd = document.createElement("td");
+          const useBtn = document.createElement("button");
+          useBtn.className = "btn btn-outline btn-small"; useBtn.textContent = "使用";
+          useBtn.addEventListener("click", () => setRagDatasetFromIndex(item.name));
+          useTd.appendChild(useBtn);
+          row.append(nameTd, timeTd, sizeTd, viewTd, useTd);
+          tbody.appendChild(row);
+        });
       } catch (error) {
-        tbody.innerHTML = '<tr><td colspan="5" class="empty">' + error.message + '</td></tr>';
+        const row = document.createElement("tr");
+        const td = document.createElement("td");
+        td.colSpan = 5; td.className = "empty"; td.textContent = error.message;
+        row.appendChild(td);
+        tbody.replaceChildren(row);
       }
     }
 
@@ -2606,7 +2634,9 @@
       ].forEach(c => {
         const node = document.createElement("div");
         node.className = "stat";
-        node.innerHTML = '<div class="value">' + c.value + '</div><div class="label">' + c.label + '</div>';
+        const valDiv = document.createElement("div"); valDiv.className = "value"; valDiv.textContent = c.value;
+        const labDiv = document.createElement("div"); labDiv.className = "label"; labDiv.textContent = c.label;
+        node.append(valDiv, labDiv);
         statGrid.appendChild(node);
       });
 
@@ -2647,7 +2677,12 @@
       items.forEach(item => {
         const row = document.createElement("div");
         row.className = "bar-row";
-        row.innerHTML = '<div class="bar-label">' + item.label + '</div><div class="bar-wrap"><div class="bar" style="width:0%"></div><div class="bar-value">' + formatNum(item.value) + '</div></div>';
+        const barLabel = document.createElement("div"); barLabel.className = "bar-label"; barLabel.textContent = item.label;
+        const barWrap = document.createElement("div"); barWrap.className = "bar-wrap";
+        const bar = document.createElement("div"); bar.className = "bar"; bar.style.width = "0%";
+        const barVal = document.createElement("div"); barVal.className = "bar-value"; barVal.textContent = formatNum(item.value);
+        barWrap.append(bar, barVal);
+        row.append(barLabel, barWrap);
         container.appendChild(row);
         const target = max ? (item.value / max) * 100 : 0;
         requestAnimationFrame(() => { row.querySelector(".bar").style.width = target + "%"; });
@@ -2664,7 +2699,11 @@
       pageEntries.forEach(page => {
         const row = document.createElement("tr");
         if (page.index === reportState.selectedPageIndex) row.classList.add("active");
-        row.innerHTML = '<td>' + (page.title || "(无标题)") + '</td><td class="mono">' + page.url + '</td><td>' + formatNum(page.elementCount) + '</td><td>' + formatNum(page.hrefCount) + '</td>';
+        const titleTd = document.createElement("td"); titleTd.textContent = page.title || "(无标题)";
+        const urlTd = document.createElement("td"); urlTd.className = "mono"; urlTd.textContent = page.url;
+        const elTd = document.createElement("td"); elTd.textContent = formatNum(page.elementCount);
+        const hrefTd = document.createElement("td"); hrefTd.textContent = formatNum(page.hrefCount);
+        row.append(titleTd, urlTd, elTd, hrefTd);
         row.addEventListener("click", () => {
           reportState.selectedPageIndex = page.index;
           reportState.showAllElements = false;
@@ -2687,7 +2726,10 @@
 
       const card = document.createElement("div");
       card.className = "detail-card";
-      card.innerHTML = '<h3>' + (selected.title || "(无标题)") + '</h3><div class="detail-meta">' + selected.url + ' · ' + formatNum(selected.elementCount) + ' elements</div>';
+      const h3 = document.createElement("h3"); h3.textContent = selected.title || "(无标题)";
+      const meta = document.createElement("div"); meta.className = "detail-meta";
+      meta.textContent = selected.url + " · " + formatNum(selected.elementCount) + " elements";
+      card.append(h3, meta);
 
       const elList = document.createElement("div");
       elList.className = "element-list";
@@ -2703,14 +2745,33 @@
       filtered.slice(0, maxVis).forEach(item => {
         const entry = document.createElement("div");
         entry.className = "element-card";
-        entry.innerHTML =
-          '<div class="element-title"><span class="tag">' + (item.type || "unknown") + '</span><span>' + (item.text || "(no text)") + '</span></div>' +
-          '<div class="element-body">' +
-          (item.href ? '<div><a href="' + item.href + '" target="_blank" rel="noreferrer">' + item.href + '</a></div>' : '<div>(no href)</div>') +
-          '<div><code>' + (item.selector || "(no selector)") + '</code></div>' +
-          (item.xpath ? '<div><code>' + item.xpath + '</code></div>' : '') +
-          (item.context ? '<div>' + item.context + '</div>' : '') +
-          '</div>';
+        const elTitle = document.createElement("div"); elTitle.className = "element-title";
+        const tag = document.createElement("span"); tag.className = "tag"; tag.textContent = item.type || "unknown";
+        const text = document.createElement("span"); text.textContent = item.text || "(no text)";
+        elTitle.append(tag, text);
+
+        const elBody = document.createElement("div"); elBody.className = "element-body";
+        if (item.href) {
+          const hrefDiv = document.createElement("div");
+          const a = document.createElement("a");
+          a.href = sanitizeHref(item.href); a.target = "_blank"; a.rel = "noreferrer"; a.textContent = item.href;
+          hrefDiv.appendChild(a); elBody.appendChild(hrefDiv);
+        } else {
+          const noHref = document.createElement("div"); noHref.textContent = "(no href)"; elBody.appendChild(noHref);
+        }
+        const selDiv = document.createElement("div");
+        const selCode = document.createElement("code"); selCode.textContent = item.selector || "(no selector)";
+        selDiv.appendChild(selCode); elBody.appendChild(selDiv);
+        if (item.xpath) {
+          const xpathDiv = document.createElement("div");
+          const xpathCode = document.createElement("code"); xpathCode.textContent = item.xpath;
+          xpathDiv.appendChild(xpathCode); elBody.appendChild(xpathDiv);
+        }
+        if (item.context) {
+          const ctxDiv = document.createElement("div"); ctxDiv.textContent = item.context;
+          elBody.appendChild(ctxDiv);
+        }
+        entry.append(elTitle, elBody);
 
         const actions = document.createElement("div");
         actions.className = "element-actions";

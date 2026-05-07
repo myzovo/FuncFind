@@ -14,12 +14,14 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/api/documents")
 public class DocumentController {
 
     private static final String SESSION_HEADER = "X-Client-Session-Id";
+    private static final Set<String> ALLOWED_EXTENSIONS = Set.of(".txt", ".md", ".csv", ".json", ".log");
 
     private final DocumentIngestionService documentIngestionService;
     private final SessionRuntimeConfigService sessionRuntimeConfigService;
@@ -34,6 +36,8 @@ public class DocumentController {
     public DocumentUploadResponse upload(@RequestParam("file") MultipartFile file,
             @RequestParam(value = "kbName", required = false) String kbName,
             @RequestHeader(name = SESSION_HEADER, required = false) String sessionId) throws IOException {
+        validateFile(file);
+
         String normalizedKbName = sessionRuntimeConfigService.normalizeKbName(kbName);
         SessionRuntimeConfigContextHolder.setCurrent(
                 sessionRuntimeConfigService.resolveEffective(sessionId, normalizedKbName));
@@ -53,5 +57,21 @@ public class DocumentController {
         response.setSize(file.getSize());
         response.setStatus("UPLOADED");
         return response;
+    }
+
+    private void validateFile(MultipartFile file) {
+        if (file.isEmpty()) {
+            throw new IllegalArgumentException("Uploaded file is empty.");
+        }
+        String filename = file.getOriginalFilename();
+        if (filename == null || filename.isBlank()) {
+            throw new IllegalArgumentException("Filename is missing.");
+        }
+        String lower = filename.toLowerCase();
+        boolean allowed = ALLOWED_EXTENSIONS.stream().anyMatch(lower::endsWith);
+        if (!allowed) {
+            throw new IllegalArgumentException(
+                    "Unsupported file type. Allowed: " + String.join(", ", ALLOWED_EXTENSIONS));
+        }
     }
 }
