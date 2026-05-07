@@ -64,6 +64,11 @@ app.get("/api/rag/kbs", (_req, res) => {
   res.json({ kbs: builtKbs });
 });
 
+app.post("/api/rag/kbs/clear", (_req, res) => {
+  builtKbs.length = 0;
+  res.json({ success: true });
+});
+
 app.post("/api/rag/build-from-crawl", async (req, res) => {
   const config = req.body || {};
   const ragBaseUrl = normalizeBaseUrl(config.ragBaseUrl || process.env.RAG_BASE_URL);

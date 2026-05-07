@@ -228,6 +228,39 @@
       gap: 8px;
     }
 
+    .toggle-switch {
+      position: relative;
+      display: inline-block;
+      width: 48px;
+      height: 26px;
+      flex-shrink: 0;
+    }
+    .toggle-switch input { opacity: 0; width: 0; height: 0; }
+    .toggle-slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: var(--border);
+      border-radius: 26px;
+      transition: background 0.25s;
+    }
+    .toggle-slider::before {
+      content: "";
+      position: absolute;
+      height: 20px; width: 20px;
+      left: 3px; bottom: 3px;
+      background: #fff;
+      border-radius: 50%;
+      transition: transform 0.25s;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+    }
+    .toggle-switch input:checked + .toggle-slider {
+      background: var(--accent);
+    }
+    .toggle-switch input:checked + .toggle-slider::before {
+      transform: translateX(22px);
+    }
+
     .field {
       margin-bottom: 14px;
       display: flex;
@@ -1618,6 +1651,11 @@
       <span>爬取控制台</span>
     </div>
 
+    <div class="nav-item" data-view="settings" onclick="switchView('settings')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+      <span>设置</span>
+    </div>
+
     <div class="nav-spacer"></div>
 
     <div class="nav-status">
@@ -1762,29 +1800,32 @@
           </section>
 
           <!-- ====== 知识库 ====== -->
-          <section class="panel reveal crawl-kb-panel" v-if="crawledKbs.length">
+          <section class="panel reveal crawl-kb-panel">
             <div class="panel-head">
               <h2>
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
                 知识库
               </h2>
-              <span class="chip ok">{{ crawledKbs.length }} KB(s)</span>
+              <span class="chip" :class="crawledKbs.length ? 'ok' : 'warn'">{{ crawledKbs.length }} KB(s)</span>
             </div>
-            <p class="hint" style="margin:0 0 14px 0;">
+            <p class="hint" style="margin:0 0 14px 0;" v-if="crawledKbs.length">
               已构建的知识库列表，来自文档上传或爬虫推送，可直接用于对话。
             </p>
-            <div class="crawl-kb-list">
+            <p class="hint" style="margin:0 0 14px 0;" v-else>
+              暂无知识库。请先上传文档构建知识库，或从爬虫控制台推送数据。
+            </p>
+            <div class="crawl-kb-list" v-if="crawledKbs.length">
               <div v-for="(kb, idx) in crawledKbs" :key="idx" class="crawl-kb-item" :class="{ active: kb._active }">
                 <div>
                   <strong>{{ kb.kbName }} <span v-if="kb._active" class="kb-active-badge">已激活</span></strong>
                   <small>{{ kb.dataset }} · {{ kb.pushedAt ? new Date(kb.pushedAt).toLocaleString() : '' }}</small>
                 </div>
                 <button class="btn small" :class="{ 'btn-active': kb._active }" @click="useCrawledKb(kb)">
-                  {{ kb._active ? '已激活' : '使用此知识库' }}
+                  {{ kb._active ? '已激活 · 点击停用' : '使用此知识库' }}
                 </button>
               </div>
             </div>
-            <button class="btn ghost small" style="margin-top:10px;" @click="clearCrawledKbs">清除列表</button>
+            <button class="btn ghost small" style="margin-top:10px;" @click="clearCrawledKbs" v-if="crawledKbs.length">清除列表</button>
           </section>
 
           <section class="panel reveal chat-panel">
@@ -1793,9 +1834,14 @@
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
                 网页 AI 聊天
               </h2>
-              <span class="chip" :class="kbReady ? 'ok' : 'warn'">
-                {{ kbReady ? 'Knowledge Base Ready' : 'Knowledge Base Not Ready' }}
-              </span>
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <span class="chip" :class="kbReady ? 'ok' : 'warn'">
+                  {{ kbReady ? 'Knowledge Base Ready' : 'Knowledge Base Not Ready' }}
+                </span>
+                <button class="icon-btn" @click="clearChatMessages" title="清除聊天记录">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 16px; height: 16px;"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                </button>
+              </div>
             </div>
 
             <div class="chat-feed" ref="chatFeed">
@@ -2101,6 +2147,26 @@
                 <button class="btn btn-outline btn-small" id="downloadCsvBtn" onclick="downloadCsvView()" disabled>下载 CSV</button>
               </div>
             </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- View: Settings -->
+    <div id="view-settings" class="view-panel">
+      <div style="max-width:560px;margin:40px auto;padding:0 20px;">
+        <h2 style="margin-bottom:24px;font-size:22px;font-weight:700;">设置</h2>
+
+        <div class="panel" style="padding:24px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;">
+            <div>
+              <div style="font-weight:600;font-size:15px;">本地长期保存 API Key</div>
+              <div style="color:var(--muted);font-size:13px;margin-top:4px;">开启后 API Key 保存在浏览器 localStorage 中，关闭浏览器后仍保留</div>
+            </div>
+            <label class="toggle-switch">
+              <input type="checkbox" :checked="persistKeysLocally" @change="togglePersistKeys">
+              <span class="toggle-slider"></span>
+            </label>
           </div>
         </div>
       </div>
@@ -2703,6 +2769,8 @@
         const parsed = safeJsonParse(raw) || raw;
         if (!r.ok) { setRagStatusView("error", "构建失败: " + (typeof parsed === "string" ? parsed : "")); return; }
         setRagStatusView("success", "构建完成。" + (typeof parsed === "string" ? parsed : JSON.stringify(parsed)).slice(0, 200));
+        // 通知 Vue app 刷新知识库列表
+        window.dispatchEvent(new CustomEvent("rag-kb-updated"));
       } catch (e) {
         setRagStatusView("error", e.message || "推送失败");
       }
@@ -2734,6 +2802,8 @@
         const parsed = safeJsonParse(raw) || raw;
         if (!r.ok) { setRagStatusView("error", "推送失败: " + (typeof parsed === "string" ? parsed : "")); return; }
         setRagStatusView("success", "元素已推送。");
+        // 通知 Vue app 刷新知识库列表
+        window.dispatchEvent(new CustomEvent("rag-kb-updated"));
       } catch (e) {
         setRagStatusView("error", e.message || "推送失败");
       }

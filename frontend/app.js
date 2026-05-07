@@ -3,6 +3,8 @@ import { createApp, nextTick } from "https://unpkg.com/vue@3/dist/vue.esm-browse
 const SESSION_HEADER = "X-Client-Session-Id";
 const SESSION_ID_STORAGE_KEY = "docvec_client_session_id";
 const RUNTIME_SNAPSHOT_STORAGE_KEY = "docvec_runtime_config_snapshots";
+const CHAT_MESSAGES_STORAGE_KEY = "docvec_chat_messages";
+const PERSIST_KEYS_STORAGE_KEY = "docvec_persist_keys_locally";
 const DEFAULT_KB_NAME = "default-kb";
 
 let idSeed = 1;
@@ -115,6 +117,8 @@ createApp({
       // --- Crawled KB support ---
       crawledKbs: [],
       crawledKbActive: false,
+      // --- Settings ---
+      persistKeysLocally: false,
       // --- Chat settings ---
       showChatSettings: false,
     };
@@ -157,16 +161,55 @@ createApp({
   async created() {
     this.ensureSessionId();
     this.loadCrawledKbs();
+    // 读取 API Key 持久化开关状态
+    this.persistKeysLocally = localStorage.getItem(PERSIST_KEYS_STORAGE_KEY) === "true";
     this.restoreRuntimeSnapshots();
     this.restoreRuntimeSnapshotForKb(normalizeKbName(this.settings.kbName));
+    this.restoreChatMessages();
     await this.loadRuntimeConfigFromServer(true);
 
     // 当页面获得焦点时，自动刷新知识库列表
     window.addEventListener("focus", () => {
       this.loadCrawledKbs();
     });
+    // 爬虫推送成功后自动刷新知识库列表
+    window.addEventListener("rag-kb-updated", () => {
+      this.loadCrawledKbs();
+    });
   },
   methods: {
+    // --- Chat message persistence ---
+    restoreChatMessages() {
+      try {
+        const raw = localStorage.getItem(CHAT_MESSAGES_STORAGE_KEY);
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            this.messages = parsed;
+            // 更新 idSeed 避免 ID 冲突
+            const maxId = Math.max(...parsed.map(m => m.id || 0));
+            if (maxId >= idSeed) {
+              idSeed = maxId + 1;
+            }
+          }
+        }
+      } catch { /* ignore */ }
+    },
+    saveChatMessages() {
+      try {
+        localStorage.setItem(CHAT_MESSAGES_STORAGE_KEY, JSON.stringify(this.messages));
+      } catch { /* ignore */ }
+    },
+    clearChatMessages() {
+      this.messages = [
+        {
+          id: idSeed++,
+          role: "system",
+          content: "欢迎使用 DocVec Studio。上传文档并构建知识库后即可开始问答。",
+        },
+      ];
+      this.saveChatMessages();
+    },
     // --- Crawled KB methods ---
     loadCrawledKbs() {
       // 1. Load from localStorage (persisted across browser sessions)
@@ -213,6 +256,16 @@ createApp({
     },
     async useCrawledKb(entry) {
       const kbName = entry.kbName || entry;
+
+      // Toggle: 如果点击的是已激活的 KB，则取消激活
+      if (entry._active) {
+        this.settings.kbName = DEFAULT_KB_NAME;
+        this.crawledKbActive = false;
+        this.crawledKbs.forEach(k => { k._active = false; });
+        this.systemMessage = `已停用知识库: ${kbName}`;
+        return;
+      }
+
       this.settings.kbName = kbName;
       this.crawledKbActive = true;
       this.systemMessage = `已选择知识库: ${kbName}`;
@@ -245,8 +298,22 @@ createApp({
       this.crawledKbActive = false;
       if (!this.selectedFiles.length) this.kbReady = false;
       this.systemMessage = "已清除知识库列表。";
+      // 同时清除服务器端的 builtKbs 列表，防止刷新后重新拉取
+      fetch("/api/rag/kbs/clear", { method: "POST" }).catch(() => {});
     },
     // --- end Crawled KB methods ---
+
+    // --- Settings ---
+    togglePersistKeys() {
+      this.persistKeysLocally = !this.persistKeysLocally;
+      localStorage.setItem(PERSIST_KEYS_STORAGE_KEY, String(this.persistKeysLocally));
+      // 迁移现有 snapshots 到目标 storage
+      this.persistRuntimeSnapshots();
+      if (!this.persistKeysLocally) {
+        // 关闭时清除 localStorage 中的旧数据
+        localStorage.removeItem(RUNTIME_SNAPSHOT_STORAGE_KEY);
+      }
+    },
 
     // 模型和 Base URL 的映射
     getModelConfig(modelId) {
@@ -371,7 +438,14 @@ createApp({
       };
     },
     restoreRuntimeSnapshots() {
-      const raw = sessionStorage.getItem(RUNTIME_SNAPSHOT_STORAGE_KEY);
+      // 优先从 localStorage 读取（长期存储），否则从 sessionStorage
+      let raw = null;
+      if (this.persistKeysLocally) {
+        raw = localStorage.getItem(RUNTIME_SNAPSHOT_STORAGE_KEY);
+      }
+      if (!raw) {
+        raw = sessionStorage.getItem(RUNTIME_SNAPSHOT_STORAGE_KEY);
+      }
       if (!raw) {
         this.runtimeConfigByKb = {};
         return;
@@ -385,7 +459,13 @@ createApp({
       }
     },
     persistRuntimeSnapshots() {
-      sessionStorage.setItem(RUNTIME_SNAPSHOT_STORAGE_KEY, JSON.stringify(this.runtimeConfigByKb));
+      const data = JSON.stringify(this.runtimeConfigByKb);
+      if (this.persistKeysLocally) {
+        localStorage.setItem(RUNTIME_SNAPSHOT_STORAGE_KEY, data);
+        sessionStorage.removeItem(RUNTIME_SNAPSHOT_STORAGE_KEY);
+      } else {
+        sessionStorage.setItem(RUNTIME_SNAPSHOT_STORAGE_KEY, data);
+      }
     },
     persistRuntimeSnapshot(kbName) {
       const key = normalizeKbName(kbName);
@@ -715,6 +795,7 @@ createApp({
         this.messages.push({ id: idSeed++, role: "assistant", content: fallback });
       } finally {
         this.chatting = false;
+        this.saveChatMessages();
         await this.scrollChatToBottom();
       }
     },
