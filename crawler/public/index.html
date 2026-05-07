@@ -1859,13 +1859,15 @@
                     <div class="runtime-grid">
                       <label>
                         生成模型
-                        <select v-model="settings.generationModel">
-                          <option>gpt-4o-mini</option>
-                          <option>llama-3-8b-instruct-q4</option>
-                          <option>qwen2.5-7b-instruct</option>
-                          <option>deepseek-chat</option>
-                          <option>claude-3-haiku</option>
+                        <select v-model="settings.generationModel" @change="onModelChange">
+                          <option value="gpt-4o-mini">GPT-4o Mini (OpenAI)</option>
+                          <option value="deepseek-chat">DeepSeek Chat</option>
+                          <option value="qwen2.5-7b-instruct">Qwen 2.5 7B (通义千问)</option>
+                          <option value="claude-3-haiku">Claude 3 Haiku (Anthropic)</option>
+                          <option value="llama-3-8b-instruct-q4">Llama 3 8B (Workers AI)</option>
+                          <option value="custom">自定义模型...</option>
                         </select>
+                        <input v-if="settings.generationModel === 'custom'" v-model="settings.customModelId" type="text" placeholder="输入自定义模型 ID" style="margin-top: 6px;" />
                       </label>
                       <label>
                         生成服务商 Provider
@@ -2899,6 +2901,22 @@
         reportState.selectedPageIndex = null;
         reportState.showAllElements = false;
         reportRender();
+
+        // 自动更新知识库名称为选中的数据集名称
+        const selectedDataset = reportState.datasets.find(d => d.id === e.target.value);
+        if (selectedDataset) {
+          const kbNameInput = document.getElementById("ragKbName");
+          const datasetInput = document.getElementById("ragDataset");
+          if (kbNameInput) {
+            // 从文件名生成知识库名称（去掉扩展名）
+            const fileName = selectedDataset.file || selectedDataset.label || "default-kb";
+            const kbName = fileName.replace(/\.json$/i, "") || "default-kb";
+            kbNameInput.value = kbName;
+          }
+          if (datasetInput) {
+            datasetInput.value = selectedDataset.file || "latest";
+          }
+        }
       });
 
       document.getElementById("loadFileBtn").addEventListener("click", () => {
@@ -2913,6 +2931,17 @@
           addReportDataset({ file: file.name, label: file.name }, data, "upload");
           refreshReportSelect();
           reportRender();
+
+          // 自动更新知识库名称为上传的文件名
+          const kbNameInput = document.getElementById("ragKbName");
+          const datasetInput = document.getElementById("ragDataset");
+          if (kbNameInput) {
+            const kbName = file.name.replace(/\.json$/i, "") || "default-kb";
+            kbNameInput.value = kbName;
+          }
+          if (datasetInput) {
+            datasetInput.value = file.name;
+          }
         } catch {
           document.getElementById("datasetHint").textContent = "JSON 解析失败。";
         }

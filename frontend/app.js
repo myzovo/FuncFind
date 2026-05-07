@@ -100,6 +100,7 @@ createApp({
         apiBase: "http://localhost:8080/api",
         embeddingModel: "all-MiniLM-L6-v2",
         generationModel: "gpt-4o-mini",
+        customModelId: "",  // 自定义模型 ID
         chunkSize: 500,
         semanticThreshold: 0.78,
         topK: 6,
@@ -142,6 +143,16 @@ createApp({
       this.runtimeConfigMessage = `已切换到知识库 ${newKb} 的会话配置快照。`;
       this.loadRuntimeConfigFromServer(true);
     },
+    // 当用户输入 API key 时，自动切换到 external 模式
+    "runtimeConfig.generation.apiKey"(newValue) {
+      if (newValue && newValue.trim()) {
+        // 如果用户输入了 API key 且当前是 workers-ai 模式，自动切换到 external
+        if (this.runtimeConfig.generation.providerType === "workers-ai") {
+          this.runtimeConfig.generation.providerType = "external";
+          this.runtimeConfigMessage = "检测到 API Key 已输入，已自动切换到 external 模式。";
+        }
+      }
+    },
   },
   async created() {
     this.ensureSessionId();
@@ -149,6 +160,11 @@ createApp({
     this.restoreRuntimeSnapshots();
     this.restoreRuntimeSnapshotForKb(normalizeKbName(this.settings.kbName));
     await this.loadRuntimeConfigFromServer(true);
+
+    // 当页面获得焦点时，自动刷新知识库列表
+    window.addEventListener("focus", () => {
+      this.loadCrawledKbs();
+    });
   },
   methods: {
     // --- Crawled KB methods ---
@@ -195,15 +211,33 @@ createApp({
         k._active = normalizeKbName(k.kbName) === currentKb;
       });
     },
-    useCrawledKb(entry) {
+    async useCrawledKb(entry) {
       const kbName = entry.kbName || entry;
       this.settings.kbName = kbName;
-      this.kbReady = true;
       this.crawledKbActive = true;
-      this.systemMessage = `已激活知识库: ${kbName}`;
+      this.systemMessage = `已选择知识库: ${kbName}`;
       // Mark this KB as active
       this.crawledKbs.forEach(k => { k._active = false; });
       entry._active = true;
+
+      // 检查后端状态，确认知识库是否真正准备好
+      try {
+        const response = await fetch(`${this.settings.apiBase}/runtime-config/current?kbName=${encodeURIComponent(kbName)}`, {
+          method: "GET",
+          headers: this.buildHeaders(),
+        });
+        if (response.ok) {
+          this.kbReady = true;
+          this.systemMessage = `已激活知识库: ${kbName}`;
+        } else {
+          this.kbReady = false;
+          this.systemMessage = `知识库 ${kbName} 未就绪，请先构建知识库。`;
+        }
+      } catch {
+        // 如果后端不可用，仍然设置为 ready（前端演示模式）
+        this.kbReady = true;
+        this.systemMessage = `已激活知识库: ${kbName}（后端未连接）`;
+      }
     },
     clearCrawledKbs() {
       localStorage.removeItem("crawledKbList");
@@ -213,6 +247,66 @@ createApp({
       this.systemMessage = "已清除知识库列表。";
     },
     // --- end Crawled KB methods ---
+
+    // 模型和 Base URL 的映射
+    getModelConfig(modelId) {
+      const modelConfigs = {
+        "gpt-4o-mini": {
+          baseUrl: "https://api.openai.com",
+          providerType: "external",
+          label: "GPT-4o Mini (OpenAI)"
+        },
+        "deepseek-chat": {
+          baseUrl: "https://api.deepseek.com",
+          providerType: "external",
+          label: "DeepSeek Chat"
+        },
+        "qwen2.5-7b-instruct": {
+          baseUrl: "https://dashscope.aliyuncs.com/compatible-mode",
+          providerType: "external",
+          label: "Qwen 2.5 7B (通义千问)"
+        },
+        "claude-3-haiku": {
+          baseUrl: "https://api.anthropic.com",
+          providerType: "external",
+          label: "Claude 3 Haiku (Anthropic)"
+        },
+        "llama-3-8b-instruct-q4": {
+          baseUrl: "",
+          providerType: "workers-ai",
+          label: "Llama 3 8B (Workers AI)"
+        }
+      };
+      return modelConfigs[modelId] || null;
+    },
+
+    // 当用户选择模型时自动更新配置
+    onModelChange() {
+      const modelId = this.settings.generationModel;
+
+      if (modelId === "custom") {
+        // 自定义模型：切换到 external 模式，清空 Base URL 让用户填写
+        this.runtimeConfig.generation.providerType = "external";
+        this.runtimeConfigMessage = "已切换到自定义模型模式，请填写模型 ID 和 Base URL。";
+        return;
+      }
+
+      const config = this.getModelConfig(modelId);
+      if (config) {
+        // 自动更新 providerType
+        this.runtimeConfig.generation.providerType = config.providerType;
+
+        // 如果是 external 模式，自动更新 Base URL
+        if (config.providerType === "external" && config.baseUrl) {
+          this.runtimeConfig.generation.baseUrl = config.baseUrl;
+        }
+
+        // 更新 runtimeConfig 中的模型 ID
+        this.runtimeConfig.generation.generationModelId = modelId;
+
+        this.runtimeConfigMessage = `已选择 ${config.label}，已自动配置 Base URL 和 Provider。`;
+      }
+    },
     openFilePicker() {
       this.$refs.fileInput.click();
     },
@@ -324,6 +418,20 @@ createApp({
 
       this.runtimeConfig = merged;
       this.runtimeServerState = defaultRuntimeServerState();
+
+      // 恢复模型选择状态
+      const savedModelId = snapshot.generation?.generationModelId;
+      if (savedModelId) {
+        const predefinedModels = ["gpt-4o-mini", "deepseek-chat", "qwen2.5-7b-instruct", "claude-3-haiku", "llama-3-8b-instruct-q4"];
+        if (predefinedModels.includes(savedModelId)) {
+          this.settings.generationModel = savedModelId;
+          this.settings.customModelId = "";
+        } else {
+          // 自定义模型
+          this.settings.generationModel = "custom";
+          this.settings.customModelId = savedModelId;
+        }
+      }
     },
     mergeRuntimeFromServer(responseData) {
       if (!responseData || typeof responseData !== "object") {
@@ -354,6 +462,17 @@ createApp({
 
         if (!responseData.generation.hasApiKey) {
           this.runtimeConfig.generation.apiKey = "";
+        }
+
+        // 同步模型选择状态
+        const serverModelId = responseData.generation.generationModelId || "gpt-4o-mini";
+        const predefinedModels = ["gpt-4o-mini", "deepseek-chat", "qwen2.5-7b-instruct", "claude-3-haiku", "llama-3-8b-instruct-q4"];
+        if (predefinedModels.includes(serverModelId)) {
+          this.settings.generationModel = serverModelId;
+          this.settings.customModelId = "";
+        } else {
+          this.settings.generationModel = "custom";
+          this.settings.customModelId = serverModelId;
         }
       }
 
@@ -401,7 +520,12 @@ createApp({
       this.persistRuntimeSnapshot(kbName);
 
       // Sync user-selected model into runtime config before applying
-      if (this.settings.generationModel) {
+      if (this.settings.generationModel === "custom") {
+        // 自定义模型：使用 customModelId
+        if (this.settings.customModelId) {
+          this.runtimeConfig.generation.generationModelId = this.settings.customModelId;
+        }
+      } else if (this.settings.generationModel) {
         this.runtimeConfig.generation.generationModelId = this.settings.generationModel;
       }
 
@@ -552,7 +676,13 @@ createApp({
       await this.scrollChatToBottom();
 
       const kbName = this.currentKbName();
-      const generationModel = this.settings.generationModel || this.runtimeConfig.generation.generationModelId;
+      // 确定使用的模型：如果是自定义模型，使用 customModelId
+      let generationModel;
+      if (this.settings.generationModel === "custom") {
+        generationModel = this.settings.customModelId || this.runtimeConfig.generation.generationModelId;
+      } else {
+        generationModel = this.settings.generationModel || this.runtimeConfig.generation.generationModelId;
+      }
       const payload = {
         question,
         kbName,
