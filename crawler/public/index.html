@@ -178,11 +178,14 @@
     .nav-spacer { flex: 1; }
 
     .nav-status {
-      padding: 12px 20px;
+      padding: 12px 16px;
       margin: 0 12px;
       border-top: 1px solid rgba(38,63,130,0.08);
       font-size: 11px;
       color: #5a6a8a;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
     }
 
     .nav-status .dot {
@@ -801,12 +804,130 @@
     @keyframes rise { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
 
     /* ---- Responsive ---- */
+    /* ---- Sidebar Collapse Toggle ---- */
+    .sidebar-collapse {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 24px;
+      height: 24px;
+      border-radius: 6px;
+      border: none;
+      background: transparent;
+      color: #a0a8c0;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      padding: 0;
+      flex-shrink: 0;
+    }
+
+    .sidebar-collapse:hover {
+      background: rgba(36,91,255,0.08);
+      color: var(--accent);
+    }
+
+    .sidebar-collapse svg {
+      width: 14px;
+      height: 14px;
+      transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    /* ---- Collapsed Sidebar State ---- */
+    .sidebar {
+      transition: width 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .sidebar.collapsed {
+      width: 64px;
+    }
+
+    .sidebar.collapsed .sidebar-logo {
+      padding: 16px 0;
+      justify-content: center;
+      margin: 0 8px 4px;
+      gap: 0;
+    }
+
+    .sidebar.collapsed .logo-text {
+      opacity: 0;
+      width: 0;
+      overflow: hidden;
+      transition: opacity 0.2s ease, width 0.35s ease;
+    }
+
+    .sidebar.collapsed .logo-mark {
+      width: 36px;
+      height: 36px;
+    }
+
+    .sidebar.collapsed .nav-section {
+      padding: 8px;
+      align-items: center;
+    }
+
+    .sidebar.collapsed .nav-item {
+      justify-content: center;
+      padding: 10px 0;
+      width: 44px;
+      height: 44px;
+    }
+
+    .sidebar.collapsed .nav-item span {
+      opacity: 0;
+      width: 0;
+      overflow: hidden;
+      transition: opacity 0.2s ease, width 0.35s ease;
+    }
+
+    .sidebar.collapsed .nav-item svg {
+      width: 20px;
+      height: 20px;
+    }
+
+    .sidebar.collapsed .nav-item.active::before {
+      left: -8px;
+    }
+
+    .sidebar.collapsed > div[style*="padding: 0 12px"] {
+      padding: 0 8px !important;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .sidebar.collapsed .nav-status {
+      padding: 12px 8px;
+      margin: 0 8px;
+      text-align: center;
+      justify-content: center;
+    }
+
+    .sidebar.collapsed .nav-status-text {
+      opacity: 0;
+      width: 0;
+      overflow: hidden;
+      transition: opacity 0.2s ease, width 0.35s ease;
+    }
+
+    .sidebar.collapsed .sidebar-collapse svg {
+      transform: rotate(180deg);
+    }
+
+    .sidebar.collapsed + .content {
+      margin-left: 64px;
+    }
+
+    .content {
+      transition: margin-left 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
     @media (max-width: 900px) {
       :root { --sidebar-w: 56px; }
-      .logo-text, .nav-item span, .nav-status span { display: none; }
+      .logo-text, .nav-item span, .nav-status-text { display: none; }
       .nav-item { justify-content: center; padding: 12px 0; }
       .nav-item svg { width: 22px; height: 22px; }
       .sidebar-logo { padding: 16px 0; justify-content: center; }
+      .sidebar-collapse { display: none; }
     }
 
     @media (max-width: 600px) {
@@ -2105,7 +2226,10 @@
     </div>
 
     <div class="nav-status">
-      <span><span class="dot dot-idle" id="navStatusDot"></span> <span id="navStatusText">就绪</span></span>
+      <span class="nav-status-text"><span class="dot dot-idle" id="navStatusDot"></span> <span id="navStatusText">就绪</span></span>
+      <button class="sidebar-collapse" onclick="toggleSidebar()" title="收起导航栏">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="11 17 6 12 11 7"/><polyline points="18 17 13 12 18 7"/></svg>
+      </button>
     </div>
   </nav>
 
@@ -2832,6 +2956,25 @@
       window.addEventListener('resize', () => {
         if (animId) { resize(); createParticles(); }
       });
+    })();
+
+    // ============================================
+    // Sidebar Collapse
+    // ============================================
+    function toggleSidebar() {
+      const sidebar = document.querySelector('.sidebar');
+      const content = document.querySelector('.content');
+      sidebar.classList.toggle('collapsed');
+      // Persist state
+      const collapsed = sidebar.classList.contains('collapsed');
+      localStorage.setItem('sidebar-collapsed', collapsed ? '1' : '0');
+    }
+
+    // Restore sidebar state on load
+    (function() {
+      if (localStorage.getItem('sidebar-collapsed') === '1') {
+        document.querySelector('.sidebar').classList.add('collapsed');
+      }
     })();
 
     // ============================================
