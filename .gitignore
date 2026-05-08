@@ -31,3 +31,4 @@ playwright-report/
 # Environment
 .env
 .env.local
+myprogram.md
