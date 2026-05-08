@@ -8,6 +8,8 @@
 
 基于 **RAG（检索增强生成）** 的网页功能定位与导航平台。自动爬取网站、提取可交互元素、构建知识库，通过自然语言驱动页面功能查找与跨页导航。
 
+![FuncFind 项目演示](assets/image.png)
+
 ---
 
 ### 项目概述
@@ -454,9 +456,9 @@ On location failure, events are automatically reported to `/api/locate` (JSONL f
 
 ## Demo Video / 演示视频
 
-<video src="view.mp4" controls width="100%"></video>
+<video src="assets/view.mp4" controls width="100%"></video>
 
-> If the video does not render above, click [here to download view.mp4](view.mp4).
+> If the video does not render above, click [here to download view.mp4](assets/view.mp4).
 
 ---
 
