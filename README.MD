@@ -118,7 +118,7 @@ cd backend
 # API 运行在 http://localhost:8080
 ```
 
-#### 2. 启动爬虫控制台（入口）
+#### 2. 启动控制台（入口）
 
 ```bash
 cd crawler
@@ -236,16 +236,16 @@ A **RAG (Retrieval-Augmented Generation)** based web feature location and naviga
 
 ### Project Overview
 
-| Dimension     | Description                                                                      |
-| ------------- | -------------------------------------------------------------------------------- |
-| Project Type  | Intelligent Web Feature Navigation + RAG Knowledge Retrieval                     |
+| Dimension       | Description                                                                                  |
+| --------------- | -------------------------------------------------------------------------------------------- |
+| Project Type    | Intelligent Web Feature Navigation + RAG Knowledge Retrieval                                 |
 | Core Capability | Website Crawling → Element Extraction → Knowledge Base → NL Location → Cross-page Navigation |
-| Backend       | Java Spring Boot (Maven)                                                         |
-| Crawler       | Node.js + Crawlee + Playwright                                                   |
-| Frontend      | Vue 3 (Vanilla JS, zero build-tool dependency)                                   |
-| Widget        | Vanilla JS (Shadow DOM, zero-dependency embedding)                               |
-| Vector Store  | Cloudflare Vectorize (swappable)                                                 |
-| License       | MIT                                                                              |
+| Backend         | Java Spring Boot (Maven)                                                                     |
+| Crawler         | Node.js + Crawlee + Playwright                                                               |
+| Frontend        | Vue 3 (Vanilla JS, zero build-tool dependency)                                               |
+| Widget          | Vanilla JS (Shadow DOM, zero-dependency embedding)                                           |
+| Vector Store    | Cloudflare Vectorize (swappable)                                                             |
+| License         | MIT                                                                                          |
 
 ---
 
@@ -328,10 +328,10 @@ FuncFind/
 
 #### Requirements
 
-| Component | Requirement                           |
-| --------- | ------------------------------------- |
-| Backend   | Java 17+, Maven 3.6+                  |
-| Crawler   | Node.js 18+                           |
+| Component | Requirement                             |
+| --------- | --------------------------------------- |
+| Backend   | Java 17+, Maven 3.6+                    |
+| Crawler   | Node.js 18+                             |
 | Browser   | Chromium (auto-installed by Playwright) |
 
 #### 1. Start RAG Backend
@@ -394,15 +394,15 @@ Widget uses Shadow DOM for style isolation and will not affect the host page sty
 
 #### RAG Backend (`localhost:8080`)
 
-| Endpoint                                | Method | Description                        |
-| --------------------------------------- | ------ | ---------------------------------- |
-| `/api/documents/upload`                 | POST   | Upload document                    |
-| `/api/knowledge-base/build`             | POST   | Build knowledge base from documents|
-| `/api/knowledge-base/build-from-crawl`  | POST   | Build knowledge base from crawl results|
-| `/api/chat`                             | POST   | Q&A (returns location hints)       |
-| `/api/locate`                           | POST   | Report location failure events     |
-| `/api/runtime-config/apply`             | POST   | Apply runtime configuration        |
-| `/api/runtime-config/current`           | GET    | View current configuration         |
+| Endpoint                               | Method | Description                             |
+| -------------------------------------- | ------ | --------------------------------------- |
+| `/api/documents/upload`                | POST   | Upload document                         |
+| `/api/knowledge-base/build`            | POST   | Build knowledge base from documents     |
+| `/api/knowledge-base/build-from-crawl` | POST   | Build knowledge base from crawl results |
+| `/api/chat`                            | POST   | Q&A (returns location hints)            |
+| `/api/locate`                          | POST   | Report location failure events          |
+| `/api/runtime-config/apply`            | POST   | Apply runtime configuration             |
+| `/api/runtime-config/current`          | GET    | View current configuration              |
 
 #### Crawler Console (`localhost:3456`)
 
