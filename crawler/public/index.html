@@ -444,38 +444,142 @@
 
     details.advanced[open] { border-color: rgba(36, 91, 255, 0.2); }
 
-    /* ---- Log container ---- */
-    .log-container {
-      background: #0c1222;
-      color: #f0f4ff;
-      border-radius: 16px;
-      padding: 16px;
-      height: 400px;
-      overflow-y: auto;
-      font-family: var(--mono);
-      font-size: 0.82rem;
-      border: 1px solid rgba(36, 91, 255, 0.12);
-      box-shadow: inset 0 2px 8px rgba(0,0,0,0.2);
+    /* ---- Log container (Dark OLED + Glassmorphism) ---- */
+    .log-wrapper {
+      border-radius: 14px;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.06);
     }
 
-    .log-container::-webkit-scrollbar { width: 6px; }
+    .log-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 16px;
+      background: rgba(18, 18, 22, 0.7);
+      backdrop-filter: blur(24px) saturate(140%);
+      -webkit-backdrop-filter: blur(24px) saturate(140%);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .log-header-dot {
+      width: 11px;
+      height: 11px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .log-header-dot.red {
+      background: #e5534b;
+      box-shadow: 0 0 6px rgba(229, 83, 75, 0.2), inset 0 1px 0 rgba(255,255,255,0.15);
+    }
+    .log-header-dot.yellow {
+      background: #e2a53a;
+      box-shadow: 0 0 6px rgba(226, 165, 58, 0.2), inset 0 1px 0 rgba(255,255,255,0.15);
+    }
+    .log-header-dot.green {
+      background: #52b565;
+      box-shadow: 0 0 6px rgba(82, 181, 101, 0.2), inset 0 1px 0 rgba(255,255,255,0.15);
+    }
+
+    .log-header-title {
+      flex: 1;
+      text-align: center;
+      font-family: var(--mono);
+      font-size: 0.7rem;
+      color: rgba(255, 255, 255, 0.18);
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+    }
+
+    .log-header-actions {
+      display: flex;
+      gap: 4px;
+    }
+
+    .log-header-btn {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      color: rgba(255, 255, 255, 0.22);
+      cursor: pointer;
+      font-size: 0.66rem;
+      font-family: var(--mono);
+      padding: 3px 10px;
+      border-radius: 6px;
+      transition: all 0.2s ease;
+    }
+    .log-header-btn:hover {
+      color: rgba(255, 255, 255, 0.5);
+      background: rgba(255, 255, 255, 0.06);
+      border-color: rgba(255, 255, 255, 0.08);
+    }
+
+    .log-container {
+      background: rgba(8, 8, 12, 0.6);
+      backdrop-filter: blur(20px) saturate(130%);
+      -webkit-backdrop-filter: blur(20px) saturate(130%);
+      color: rgba(255, 255, 255, 0.6);
+      padding: 12px 16px;
+      height: 370px;
+      overflow-y: auto;
+      font-family: var(--mono);
+      font-size: 0.8rem;
+      line-height: 1.7;
+      position: relative;
+    }
+
+    /* subtle noise texture */
+    .log-container::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.015'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .log-container > * { position: relative; z-index: 2; }
+
+    .log-container::-webkit-scrollbar { width: 5px; }
     .log-container::-webkit-scrollbar-track { background: transparent; }
-    .log-container::-webkit-scrollbar-thumb { background: rgba(36, 91, 255, 0.25); border-radius: 3px; }
+    .log-container::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.06);
+      border-radius: 3px;
+    }
+    .log-container::-webkit-scrollbar-thumb:hover {
+      background: rgba(255, 255, 255, 0.12);
+    }
 
     .log-entry {
       display: grid;
-      grid-template-columns: 72px 1fr;
-      gap: 10px;
-      padding: 6px 0;
-      border-bottom: 1px solid rgba(36, 91, 255, 0.06);
-      animation: slideIn 0.2s ease;
+      grid-template-columns: 76px 1fr;
+      gap: 14px;
+      padding: 4px 6px;
+      border-radius: 4px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.02);
+      animation: slideIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      transition: background 0.15s ease;
     }
+    .log-entry:last-child { border-bottom: none; }
+    .log-entry:hover { background: rgba(255, 255, 255, 0.015); }
 
-    .log-time { color: #5a6a8a; font-size: 0.72rem; }
-    .log-message { word-break: break-word; color: #c8d0e8; }
-    .log-info { color: #7da8ff; }
-    .log-error { color: #ff9b9b; }
-    .log-success { color: #6ee7b7; }
+    .log-time {
+      color: rgba(255, 255, 255, 0.35);
+      font-size: 0.68rem;
+      user-select: none;
+      text-align: right;
+      padding-right: 14px;
+      border-right: 1px solid rgba(255, 255, 255, 0.04);
+      padding-top: 1px;
+    }
+    .log-message { word-break: break-word; color: rgba(255, 255, 255, 0.72); }
+    .log-info .log-message { color: rgba(160, 190, 240, 0.92); }
+    .log-error .log-message { color: rgba(240, 140, 140, 0.92); }
+    .log-success .log-message { color: rgba(130, 210, 160, 0.9); }
+
+    .log-entry.log-error { background: rgba(220, 120, 120, 0.03); }
+    .log-entry.log-error:hover { background: rgba(220, 120, 120, 0.05); }
+    .log-entry.log-success { background: rgba(110, 195, 140, 0.02); }
+    .log-entry.log-success:hover { background: rgba(110, 195, 140, 0.04); }
 
     /* ---- Status indicator ---- */
     .status-indicator {
@@ -2706,8 +2810,20 @@
             </div>
             <div class="panel">
               <div class="panel-title">实时日志</div>
-              <div class="log-container" id="logContainer">
-                <div class="log-entry log-info"><span class="log-time">--:--:--</span><span class="log-message">系统就绪，等待开始爬取...</span></div>
+              <div class="log-wrapper">
+                <div class="log-header">
+                  <span class="log-header-dot red"></span>
+                  <span class="log-header-dot yellow"></span>
+                  <span class="log-header-dot green"></span>
+                  <span class="log-header-title">crawl-console</span>
+                  <div class="log-header-actions">
+                    <button class="log-header-btn" onclick="clearLogs()" title="清空日志">clear</button>
+                    <button class="log-header-btn" onclick="toggleAutoScroll()" id="autoScrollBtn" title="自动滚动">autoscroll</button>
+                  </div>
+                </div>
+                <div class="log-container" id="logContainer">
+                  <div class="log-entry log-info"><span class="log-time">--:--:--</span><span class="log-message">系统就绪，等待开始爬取...</span></div>
+                </div>
               </div>
             </div>
           </div>
@@ -3069,8 +3185,20 @@
       entry.appendChild(time);
       entry.appendChild(msg);
       container.appendChild(entry);
-      container.scrollTop = container.scrollHeight;
+      if (autoScroll) container.scrollTop = container.scrollHeight;
       if (container.children.length > 500) container.removeChild(container.firstChild);
+    }
+
+    let autoScroll = true;
+    function toggleAutoScroll() {
+      autoScroll = !autoScroll;
+      const btn = document.getElementById('autoScrollBtn');
+      btn.style.color = autoScroll ? '' : '#ff9b9b';
+      btn.textContent = autoScroll ? 'autoscroll' : 'paused';
+    }
+    function clearLogs() {
+      const container = document.getElementById('logContainer');
+      container.innerHTML = '<div class="log-entry log-info"><span class="log-time">--:--:--</span><span class="log-message">日志已清空</span></div>';
     }
 
     function updateStatus(status) {
